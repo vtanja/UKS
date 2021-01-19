@@ -1,0 +1,18 @@
+{% extends "welcome.html" %}
+
+{% block stuff %}
+<div class="d-flex p-2 justify-content-center">
+    {% load crispy_forms_tags %}
+
+    <form method="post" action="{% url 'register' %}" class="col-sm-4">
+        {% csrf_token %}
+
+        {{ form | crispy }}
+
+        <input class="btn btn-primary m-3" type="submit" value="register">
+        <input type="hidden" name="next" value="{{ next }}">
+    </form>
+
+</div>
+
+{% endblock %}
