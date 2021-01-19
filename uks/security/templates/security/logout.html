@@ -1,0 +1,9 @@
+{% extends "welcome.html" %}
+
+{% block stuff %}
+    <h1>You've been logged out</h1>
+
+    <a class="btn btn-primary" href="{% url 'login' %}">Log in again</a>
+
+    <a class="btn btn-primary" href="{% url 'welcome' %}">Home</a>
+{% endblock %}
