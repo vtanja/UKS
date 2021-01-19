@@ -4,35 +4,34 @@
 <div class="d-flex p-2 justify-content-center">
     {% load crispy_forms_tags %}
 
-    {% if form.errors %}
-    <p>Your username and password didn't match. Please try again.</p>
-    {% endif %}
-
-    {% if next %}
-        {% if user.is_authenticated %}
-        <p>Your account doesn't have access to this page. To proceed,
-        please login with an account that has access.</p>
-        {% else %}
-        <p>Please login to see this page.</p>
+        {% if next %}
+            {% if user.is_authenticated %}
+            <p>Your account doesn't have access to this page. To proceed,
+            please login with an account that has access.</p>
+            {% else %}
+            <p>Please login to see this page.</p>
+            {% endif %}
         {% endif %}
-    {% endif %}
 
-    <form method="post" action="{% url 'login' %}" class="col-sm-4">
-        {% csrf_token %}
-        <div class="row">
-            <div class="col">
-                {{ form.username|as_crispy_field }}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{ form.password|as_crispy_field }}
-            </div>
-        </div>
+        <form method="post" action="{% url 'login' %}" class="col-sm-4">
+            {% csrf_token %}
 
-        <input class="btn btn-primary m-3" type="submit" value="login">
-        <input type="hidden" name="next" value="{{ next }}">
-    </form>
+            <div class="row">
+                <div class="col">
+                    {{ form.username|as_crispy_field }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{ form.password|as_crispy_field }}
+                </div>
+            </div>
+            {% if form.errors %}
+                <p class="row-form-errors">Your username and password didn't match. Please try again.</p>
+            {% endif %}
+            <input class="btn btn-primary m-3" type="submit" value="login">
+            <input type="hidden" name="next" value="{{ next }}">
+        </form>
 
 </div>
 
