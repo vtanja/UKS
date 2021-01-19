@@ -1,35 +1,39 @@
-{% extends "base.html" %}
+{% extends "welcome.html" %}
 
-{% block content %}
+{% block stuff %}
+<div class="d-flex p-2 justify-content-center">
+    {% load crispy_forms_tags %}
 
-{% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %}
-
-{% if next %}
-    {% if user.is_authenticated %}
-    <p>Your account doesn't have access to this page. To proceed,
-    please login with an account that has access.</p>
-    {% else %}
-    <p>Please login to see this page.</p>
+    {% if form.errors %}
+    <p>Your username and password didn't match. Please try again.</p>
     {% endif %}
-{% endif %}
 
-<form method="post" action="{% url 'login' %}">
-{% csrf_token %}
-<table>
-<tr>
-    <td>{{ form.username.label_tag }}</td>
-    <td>{{ form.username }}</td>
-</tr>
-<tr>
-    <td>{{ form.password.label_tag }}</td>
-    <td>{{ form.password }}</td>
-</tr>
-</table>
+    {% if next %}
+        {% if user.is_authenticated %}
+        <p>Your account doesn't have access to this page. To proceed,
+        please login with an account that has access.</p>
+        {% else %}
+        <p>Please login to see this page.</p>
+        {% endif %}
+    {% endif %}
 
-<input type="submit" value="login">
-<input type="hidden" name="next" value="{{ next }}">
-</form>
+    <form method="post" action="{% url 'login' %}" class="col-sm-4">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col">
+                {{ form.username|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{ form.password|as_crispy_field }}
+            </div>
+        </div>
+
+        <input class="btn btn-primary m-3" type="submit" value="login">
+        <input type="hidden" name="next" value="{{ next }}">
+    </form>
+
+</div>
 
 {% endblock %}
