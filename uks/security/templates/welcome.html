@@ -13,7 +13,14 @@
 	</nav>
 
     {% block stuff %}
-        Welcome to our little site. Please log in, if you dont have account you can register here.
+        <div class="container">
+            <div class="row justify-content-md-center">
+                <p>
+                    Welcome! Please <a href="{% url 'login' %}"> log in</a>,
+                    or if you dont have account you can register <a href="{% url 'register' %}">here</a>.
+                </p>
+            </div>
+        </div>
     {% endblock %}
 
 {% endblock %}
