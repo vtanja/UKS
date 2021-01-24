@@ -1,5 +1,32 @@
 {% extends "home.html" %}
 
-{% block stuff %}
-<p>This is dashboard page!</p>
+{% block repos %}
+    <div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3" style="text-align: center" >
+            <br><br>
+            <h5>Repositories</h5>
+            <br>
+
+            <ul class="list-group list-group-flush" style="align-self: center">
+                {% for repository in repositories %}
+                        <li class="list-group-item">{{ repository.name }}</li>
+{#                        Bottom line should be uncommented when repo detail is implemente#}
+{#                        <li class="list-group-item"><a href="{% url 'profile' %}">{{ repository.name }}</a></li#}
+                {% endfor %}
+            </ul>
+
+        </div>
+        <div class="col-md-9"  >
+            {% block repoDetail %}
+            {#        This is place where should be placed repo detail.#}
+            {#        To implement that, repo detail page should extend dashboard.html#}
+            {#        like this template extends home.#}
+
+            {% endblock %}
+        </div>
+    </div>
+</div>
+
 {% endblock %}
+

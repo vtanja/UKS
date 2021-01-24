@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
 		<ul class="navbar-nav mr-auto">
           <li class="nav-item">
             <a class="nav-link" href="{% url 'dashboard' %}">Home</a>
@@ -12,7 +12,9 @@
         </ul>
 	</nav>
 
-    {% block stuff %}
+    {% block repos %}
     {% endblock %}
 
+    {% block stuff %}
+    {% endblock %}
 {% endblock %}
