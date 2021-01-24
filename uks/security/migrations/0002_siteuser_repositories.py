@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0001_repository_model_added'),
+        # ('dashboard', '0001_repository_model_added'),
         ('security', '0001_initial'),
     ]
 
