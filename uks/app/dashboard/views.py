@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 
 
 def dashboard(request):
-    return render(request, 'dashboard.html')
+    return render(request, 'dashboard/dashboard.html')
 
 def profile(request):
     return render(request, 'dashboard/profile.html')
