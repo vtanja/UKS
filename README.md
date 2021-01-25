@@ -9,17 +9,23 @@ Projekat iz predmeta Upravljanje konfiguracijom softvera. Projekat radili:
 
 ## Pokretanje
 
-Za pokretanje aplikacije je potrebno da podesite virtuelno okruženje. To možete učiniti na sledeći način:
+Za pokretanje aplikacije je potrebno da podesite virtuelno okruženje. Ako nemate virtuelno okruzenje, instalirajte ga sa
 
-```shell
+```commandline
 pip install virtualenv
+```
+
+Onda mozete kreirati novo okruzenje, aktivirati ga i instalirati potrebne dependency-je:
+
+```commandline
 python -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
 ```
 
 Nakon što ste podesili virtuelno okruženje pozicionirajte se u folder /uks u kome se nalazi fajl manage.py. 
 Odatle aplikaciju možete pokrenuti sa:
 
-```shell
+```commandline
 python manage.py runserver
 ```
