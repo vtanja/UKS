@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from app.dashboard.models import Repository
+from app.user.models import Repository
 
 
 # Create your models here.

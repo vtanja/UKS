@@ -8,8 +8,8 @@ from security.models import SiteUser
 def dashboard(request):
     repositories = request.user.siteuser.repositories.all()
     context = {'repositories': repositories}
-    return render(request, 'dashboard/dashboard.html', context)
+    return render(request, 'user/dashboard.html', context)
 
 
 def profile(request):
-    return render(request, 'dashboard/profile.html')
+    return render(request, 'user/profile.html')
