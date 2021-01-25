@@ -40,9 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
+    'app.user',
     'security',
     'crispy_forms',
-    'app.user',
 ]
 
 MIDDLEWARE = [
@@ -139,4 +139,4 @@ MESSAGE_TAGS = {
         messages.ERROR: 'alert-danger',
  }
 
-LOGIN_REDIRECT_URL = '/dashboard/'
+LOGIN_REDIRECT_URL = '/api/user/dashboard'
