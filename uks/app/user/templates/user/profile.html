@@ -1,14 +1,16 @@
 {% extends "home.html" %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block stuff %}
 
     <style>
         .profile-pic{
-            max-width: 200px;
-            max-height:200px;
-            margin: 0 auto;
-            border-radius: 50%;
+              height: 125px;
+              width: 125px;
+              margin-right: 20px;
+              margin-bottom: 16px;
+              border-radius: 50%;
         }
     </style>
 
@@ -20,7 +22,17 @@
         <div class="media-body">
           <h2 class="account-heading">{{ request.user.username }}</h2>
           <p class="text-secondary">{{ request.user.email }}</p>
+            <br>
+            <div class="media-body">
+            <form method="POST" action="" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{p_form | crispy}}
+<br>
+                <button class="btn btn-outline-success" type="submit" >Update profile</button>
+        </form>
+                </div>
         </div>
+
       </div>
 {#    <div class="row">#}
 {#        <div class="col-md-3">#}
