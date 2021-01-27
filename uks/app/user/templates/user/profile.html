@@ -21,19 +21,19 @@
         <img class="rounded-circle profile-pic" src="{{ request.user.siteuser.profile_img.url }}">
         <div class="media-body">
           <h2 class="account-heading">{{ request.user.username }}</h2>
-          <p class="text-secondary">{{ request.user.email }}</p>
-            <br>
+          <p class="text-secondary">{{ request.user.email }}</p><br>
             <div class="media-body">
-            <form method="POST" action="" enctype="multipart/form-data">
+                <form method="POST" action="" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{p_form | crispy}}
-<br>
-                <button class="btn btn-outline-success" type="submit" >Update profile</button>
-        </form>
-                </div>
+                <br>
+                    <button class="btn btn-outline-success" type="submit" >Update profile</button>
+                </form>
+            </div>
         </div>
 
       </div>
+    </div>
 {#    <div class="row">#}
 {#        <div class="col-md-3">#}
 {#            <div class="card card-body">#}
