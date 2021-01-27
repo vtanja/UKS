@@ -19,7 +19,7 @@ def profile(request):
                                         instance=request.user.siteuser)
         if p_form.is_valid():
             p_form.save()
-            messages.success(request, f'Tou have successfully updated your profile!')
+            messages.success(request, f'You have successfully updated your profile!')
             return redirect('profile')
     else:
         p_form = ProfileImageUpdateForm(instance=request.user.siteuser)
