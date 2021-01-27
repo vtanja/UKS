@@ -21,8 +21,11 @@
         <img class="rounded-circle profile-pic" src="{{ request.user.siteuser.profile_img.url }}">
         <div class="media-body">
           <h2 class="account-heading">{{ request.user.username }}</h2>
-          <p class="text-secondary">{{ request.user.email }}</p><br>
+          <p class="text-secondary">{{ request.user.email }}</p>
+            <button  onclick="location.href='{% url 'password-reset' %}'" class=" btn btn-outline-success"> Reset password</button>
+
             <div class="media-body">
+                <br>
                 <form method="POST" action="" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{p_form | crispy}}
