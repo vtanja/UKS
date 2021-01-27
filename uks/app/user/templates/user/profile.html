@@ -16,50 +16,38 @@
 
     <br>
 
-    <div class="content-section">
-      <div class="media">
-        <img class="rounded-circle profile-pic" src="{{ request.user.siteuser.profile_img.url }}">
-        <div class="media-body">
-          <h2 class="account-heading">{{ request.user.username }}</h2>
-          <p class="text-secondary">{{ request.user.email }}</p>
-            <button  onclick="location.href='{% url 'password-reset' %}'" class=" btn btn-outline-success"> Reset password</button>
+    <div class="content-section container-fluid">
+        <div class="row">
 
+          <div class="media col-md-3">
+            <img class="rounded-circle profile-pic" src="{{ request.user.siteuser.profile_img.url }}">
             <div class="media-body">
-                <br>
-                <form method="POST" action="" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{p_form | crispy}}
-                <br>
-                    <button class="btn btn-outline-success" type="submit" >Update profile</button>
-                </form>
+              <h2 class="account-heading">{{ request.user.username }}</h2>
+              <p class="text-secondary">{{ request.user.email }}</p>
+                <button  onclick="location.href='{% url 'password-reset' %}'" class=" btn btn-outline-success"> Reset password</button>
+
+                <div class="media-body">
+                    <br>
+                    <form method="POST" action="" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{p_form | crispy}}
+                    <br>
+                        <button class="btn btn-outline-success" type="submit" >Update profile</button>
+                    </form>
+                </div>
             </div>
+
+          </div>
+            <div class="col-md-9" >
+               {% block profile-half %}
+               {% endblock profile-half %}
+            </div>
+
         </div>
 
-      </div>
     </div>
-{#    <div class="row">#}
-{#        <div class="col-md-3">#}
-{#            <div class="card card-body">#}
-{#                    <img class="profile-pic" src="{{ request.user.siteuser.profile_img.url }}" >#}
-{##}
-{#                    <div>Username: {{ request.user.username }}</div>#}
-{#                    <div>Name: {{ request.user.first_name }} {{ request.user.last_name }} </div>#}
-{#                    <div>Email: {{ request.user.email }} </div>#}
-{##}
-{#            </div>#}
-{#        </div>#}
-{#        <div class="col-md-9">#}
-{#            <div class="card card-body">#}
-{##}
-{#                <form method="POST" action="" enctype="multipart/form-data">#}
-{#                    {% csrf_token %}#}
-{#                    {{form.as_p}}#}
-{##}
-{#                <input class="btn btn-primary" type="submit" name="Update Information">#}
-{#                </form>#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
+
+
 
 
 {% endblock %}
