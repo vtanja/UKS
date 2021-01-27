@@ -39,8 +39,30 @@
 
           </div>
             <div class="col-md-9" >
+            {% if 'profile'  in  request.path %}
+
+                <div class="card text-center">
+                      <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs">
+                          <li class="nav-item" style="color: green">
+                            <a  class="nav-link text-success {% if 'repos' in request.path %}active{% endif %}"  href='{% url 'repos' %}' >Repositories</a>
+                          </li>
+                          <li class="nav-item" >
+                            <a  class="nav-link text-success {% if 'issues' in request.path %}active{% endif %}" href='{% url 'issues' %}' >Issues</a>
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="card-body">
+                          {% block profile-card %}
+                          {% endblock profile-card %}
+                      </div>
+                    </div>
+
+
+            {% else %}
                {% block profile-half %}
                {% endblock profile-half %}
+            {% endif %}
             </div>
 
         </div>
