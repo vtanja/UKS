@@ -1,0 +1,29 @@
+{% extends "user/profile.html" %}
+
+{% block profile-card %}
+    {% if 'repos' in request.path %}
+         {% if repos|length == 0 %}
+             <h5>There are no repositories!</h5>
+        {% endif %}
+        {% for repo in repos %}
+            <div class="card" >
+              <div class="card-body">
+                <h5 class="card-title">{{ repo.name }}</h5>
+                <p class="card-text">{{ repo.description }}</p>
+              </div>
+            </div> <br>
+        {% endfor %}
+    {% else %}
+        {% if issues|length == 0 %}
+             <h5>There are no issues added by this user!</h5>
+        {% endif %}
+        {% for issues in issues %}
+            <div class="card" >
+              <div class="card-body">
+                <h5 class="card-title">{{ issue.title }}</h5>
+                <p class="card-text">{{ issue.description }}</p>
+              </div>
+            </div> <br>
+        {% endfor %}
+    {% endif %}
+{% endblock profile-card %}

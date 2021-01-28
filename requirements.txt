@@ -32,3 +32,5 @@ sqlparse==0.4.1
 urllib3==1.25.8
 virtualenv==20.4.0
 webencodings==0.5.1
+Pillow==8.1.0
+
