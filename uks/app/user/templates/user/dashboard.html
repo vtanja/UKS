@@ -6,7 +6,7 @@
         <div class="col-md-3" style="text-align: center" >
             <br><br>
             <h5>Repositories &nbsp; &nbsp;
-                <button type="button" class="btn btn-success">Add new repository</button>
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#repoDialog">Add new repository</button>
             </h5>
             <br>
 
@@ -29,6 +29,37 @@
         </div>
     </div>
 </div>
+{# Modal dialog for adding a new repository #}
+<div class="modal fade" id="repoDialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">New repository</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+       <form method="post" action="{% url 'repository' %}">
+            <div class="modal-body">
+                 {% csrf_token %}
+                    <div>
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div>
+                        <label for="description">Description</label>
+                        <textarea class="form-control" id="description" rows="5" name="description" required></textarea>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Add</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+       </form>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
+
 
