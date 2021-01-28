@@ -10,7 +10,7 @@ class Milestone(models.Model):
     description = models.TextField()
     dateCreated = models.DateField()
     dueDate = models.DateField()
-    repository = models.ForeignKey(Repository, on_delete=models.CASCADE, null=True)
+    repository = models.ForeignKey(Repository, on_delete=models.CASCADE, null=False)
 
     def __str__(self):
         return self.title
