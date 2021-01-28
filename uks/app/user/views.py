@@ -1,8 +1,7 @@
-from django.contrib import messages
 from django.shortcuts import render, redirect
-from .forms import RepositoryForm
-from .models import Repository
-from security.models import SiteUser
+from app.repository.forms import RepositoryForm
+from django.contrib import messages
+from app.repository.models import Repository
 
 
 # Create your views here.
@@ -42,5 +41,4 @@ def detail(request, id):
     repository = Repository.objects.get(id=id)
     print(repository.name)
     context = {'repositories': repositories, 'repository': repository}
-    return render(request, 'user/repoDetail.html', context)
-
+    return render(request, 'repoDetail.html', context)
