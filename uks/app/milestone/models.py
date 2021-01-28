@@ -7,3 +7,6 @@ class Milestone(models.Model):
     description = models.TextField()
     dateCreated = models.DateField()
     dueDate = models.DateField()
+
+    def __str__(self):
+        return self.title
