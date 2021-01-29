@@ -7,3 +7,4 @@ from app.repository.models import Repository
 class SiteUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     repositories = models.ManyToManyField(Repository)
+    profile_img = models.ImageField(default='profile_default.png')
