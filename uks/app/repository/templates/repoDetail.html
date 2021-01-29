@@ -1,29 +1,36 @@
 {% extends "user/dashboard.html" %}
 
 {% block repoDetail %}
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#">Repository {{repository.name}}</a>
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav">
-      <li class="nav-item active">
-        <a class="nav-link" href="#">Code <span class="sr-only">(current)</span></a>
+<div class="card text-center">
+  <div class="card-header">
+    <ul class="nav nav-tabs card-header-tabs">
+      <li class="nav-item" style="color: green">
+        <a class="nav-link disabled" href="#">Repository {{repository.name}}</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Issues</a>
+      <li class="nav-item" style="color: green">
+        <a  class="nav-link text-success" id="one-tab" data-toggle="tab" href="#one" role="tab" aria-controls="One" aria-selected="true">Overview</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Pull requests</a>
+      <li class="nav-item" >
+        <a  class="nav-link text-success" id="two-tab" data-toggle="tab" href="#two" role="tab" aria-controls="Two" aria-selected="false">Issues</a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Projects</a>
+      <li class="nav-item" >
+        <a  class="nav-link text-success">Projects</a>
       </li>
-        <li class="nav-item">
-        <a class="nav-link" href="#">Wiki</a>
+      <li class="nav-item" >
+        <a  class="nav-link text-success">Wiki</a>
       </li>
     </ul>
   </div>
-</nav>
-<div>
-  <p>Test</p>
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active p-3" id="one" role="tabpanel" aria-labelledby="one-tab">
+            <h5 class="card-title">Repository {{repository.name}}</h5>
+            <textarea rows="10" cols="180" readonly>{{repository.description}}</textarea>
+    </div>
+    <div class="tab-pane fade p-3" id="two" role="tabpanel" aria-labelledby="two-tab">
+            <h5 class="card-title">Issues</h5>
+    </div>
+    {% block repository-body %}
+    {% endblock repository-body %}
+  </div>
 </div>
 {% endblock %}
