@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user', '0001_initial'),
+        ('repository', '0001_initial'),
         ('security', '0001_initial'),
     ]
 
@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='siteuser',
             name='repositories',
-            field=models.ManyToManyField(to='user.Repository'),
+            field=models.ManyToManyField(to='repository.Repository'),
         ),
     ]

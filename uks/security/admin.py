@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from app.user.models import Repository
+from app.repository.models import Repository
 from security.models import SiteUser
 
 # Register your models here.

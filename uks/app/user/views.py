@@ -1,7 +1,8 @@
-from django.contrib import messages
 from django.shortcuts import render, redirect
+from app.repository.forms import RepositoryForm
+from django.contrib import messages
+from app.repository.models import Repository
 from app.user.forms import ProfileImageUpdateForm
-from .forms import RepositoryForm
 from security.models import SiteUser
 
 
@@ -82,3 +83,11 @@ def addRepository(request):
         form = RepositoryForm()
 
     return render(request, 'user/dashboard.html', {'form': form})
+
+
+def detail(request, id):
+    repositories = request.user.siteuser.repositories.all()
+    repository = Repository.objects.get(id=id)
+    print(repository.name)
+    context = {'repositories': repositories, 'repository': repository}
+    return render(request, 'repoDetail.html', context)
