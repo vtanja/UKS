@@ -1,9 +1,8 @@
 from django.shortcuts import render, redirect
-from app.repository.forms import RepositoryForm
+from apps.repository.forms import RepositoryForm
 from django.contrib import messages
-from app.repository.models import Repository
-from app.user.forms import ProfileImageUpdateForm
-from security.models import SiteUser
+from apps.repository.models import Repository
+from apps.user.forms import ProfileImageUpdateForm
 
 
 # Create your views here.

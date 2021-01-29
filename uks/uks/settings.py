@@ -39,9 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app',
-    'app.user',
-    'app.repository',
+    'apps.user',
+    'apps.repository',
     'security',
     'crispy_forms',
 ]
@@ -144,7 +143,7 @@ MESSAGE_TAGS = {
         messages.ERROR: 'alert-danger',
  }
 
-LOGIN_REDIRECT_URL = '/api/user/dashboard'
+LOGIN_REDIRECT_URL = '/user/dashboard'
 
 
 MEDIA_URL = '/images/'
