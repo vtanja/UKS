@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from uks.apps.repository.models import Repository
-from uks.security.models import SiteUser
+from apps.repository.models import Repository
+from security.models import SiteUser
 
 # Create your models here.
 class Issue(models.Model):
