@@ -18,30 +18,11 @@ def profile(request):
     if(context == "redirect"):
         return redirect('profile')
 
-    return render(request, 'user/profile.html', context)
-
-def repos(request):
-    context = get_profile_form(request)
-
-    if (context == "redirect"):
-        return redirect('repos')
-
     repositories = request.user.siteuser.repositories.all()
     context['repos'] = repositories
-
-    return render(request, 'user/profile_info.html', context)
-
-def issues(request):
-    context = get_profile_form(request)
-
-    if (context == "redirect"):
-        return redirect('issues')
-
-    # issues = request.user.siteuser.issues.all()
-    # context['issues'] = issues
     context['issues'] = []
 
-    return render(request, 'user/profile_info.html', context)
+    return render(request, 'user/profile.html', context)
 
 
 def get_profile_form(request):
