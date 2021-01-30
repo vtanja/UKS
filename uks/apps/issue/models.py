@@ -16,3 +16,7 @@ class Issue(models.Model):
         choices=IssueStatus.choices,
         default=IssueStatus.TODO
     )
+
+class IssueChange(models.Model):
+    message = models.CharField(max_length=100)
+    date = models.DateTimeField(auto_now_add=True)
