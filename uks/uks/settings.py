@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'apps.repository',
     'security',
     'crispy_forms',
+    'apps.issue',
 ]
 
 MIDDLEWARE = [
