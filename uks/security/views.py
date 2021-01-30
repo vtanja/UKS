@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 
 # Create your views here.
 from .forms import RegisterForm
+from .models import SiteUser
 
 
 def welcome(request):
@@ -14,7 +15,11 @@ def register(request):
         form = RegisterForm(request.POST)
 
         if form.is_valid():
-            form.save()
+            user = form.save()
+            site_user = SiteUser()
+            site_user.user = user
+            site_user.save()
+
             messages.success(request, 'Registration successful! You are being redirected to login page.')
             return redirect('login')
     else:
