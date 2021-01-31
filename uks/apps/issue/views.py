@@ -1,3 +1,17 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.views.generic import ListView, DetailView
+from .models import Issue
+from apps.repository.models import Repository
 
-# Create your views here.
+
+class IssuesListView(ListView):
+    model = Issue
+
+    def get_queryset(self):
+        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        return Issue.objects.filter(repository=self.repository)
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(IssuesListView, self).get_context_data(**kwargs)
+        context['repository'] = self.repository
+        return context
