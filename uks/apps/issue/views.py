@@ -15,3 +15,14 @@ class IssuesListView(ListView):
         context = super(IssuesListView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
         return context
+
+
+class IssueDetailView(DetailView):
+    model = Issue
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+
+        context = super(IssueDetailView, self).get_context_data(**kwargs)
+        context['repository'] = self.repository
+        return context
