@@ -1,0 +1,16 @@
+{% extends 'repoDetail.html' %}
+
+{% block repo-content %}
+
+    <div class="container">
+        <div class="col">
+            <h4>Issue</h4>
+            <br>
+            <p><strong>Title</strong> {{ issue.title }}</p>
+            <p><strong>Created by</strong> {{ user.username }}</p>
+            <p><strong>Status</strong> {{ issue.issue_status.title }}</p>
+            <p><strong>Description</strong> {{ issue.description }}</p>
+        </div>
+    </div>
+
+{% endblock %}
