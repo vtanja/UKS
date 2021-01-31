@@ -1,0 +1,22 @@
+{% extends 'repoDetail.html' %}
+
+{% block repo-content %}
+
+    <table class="table table-hover">
+        <thead>
+            <th scope="col">Status</th>
+            <th scope="col">Title</th>
+            <th scope="col">Created by</th>
+        </thead>
+        <tbody>
+            {% for issue in object_list %}
+                <tr>
+                    <td>{{ issue.issue_status.title }}</td>
+                    <td>{{ issue.title }}</td>
+                    <td>{{ user.username }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
