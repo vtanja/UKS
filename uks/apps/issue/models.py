@@ -10,6 +10,7 @@ class Issue(models.Model):
         TODO = 'TODO', _('To do')
         ONGOING = 'ONGOING', _('Ongoing')
         DONE =  'DONE', _('Done')
+        CLOSED = 'CLOSED', _('Closed')
 
     title = models.CharField(max_length=30)
     description = models.CharField(max_length=100)
