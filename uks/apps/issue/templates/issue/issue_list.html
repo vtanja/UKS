@@ -12,7 +12,7 @@
             {% for issue in object_list %}
                 <tr>
                     <td>{{ issue.issue_status.title }}</td>
-                    <td>{{ issue.title }}</td>
+                    <td><a href="{% url 'issue_details' repository.id issue.id %}">{{ issue.title }}</a></td>
                     <td>{{ user.username }}</td>
                 </tr>
             {% endfor %}
