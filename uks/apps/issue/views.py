@@ -50,3 +50,22 @@ class CreateIssueView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse_lazy('repository-issues', kwargs={'id': self.kwargs['id']})
+
+
+class IssueUpdateView(LoginRequiredMixin, UpdateView):
+    model = Issue
+    fields = ['title', 'description']
+
+    def form_valid(self, form):
+        # Add issue change for actual changes
+        return super().form_valid(form)
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+
+        context = super(IssueUpdateView, self).get_context_data(**kwargs)
+        context['repository'] = self.repository
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('repository-issues', kwargs={'id': self.kwargs['id']})

@@ -25,6 +25,7 @@ class Issue(models.Model):
     # milestone
     # board list
 
+
 class IssueChange(models.Model):
     message = models.CharField(max_length=100)
     date = models.DateTimeField(auto_now_add=True)

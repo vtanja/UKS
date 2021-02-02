@@ -3,6 +3,9 @@
 {% block repo-content %}
 
     <div class="container">
+        <div class="row p-2 justify-content-md-end">
+            <a class="btn btn-success" href="{% url 'issue-update' repository.id issue.id %}">Edit</a>
+        </div>
         <div class="col">
             <h4>Issue</h4>
             <br>
