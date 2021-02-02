@@ -1,3 +1,6 @@
+import datetime
+
+from django.db.models.functions import Coalesce
 from django.shortcuts import render, redirect
 from apps.repository.forms import RepositoryForm
 from django.contrib import messages
@@ -6,9 +9,15 @@ from apps.user.forms import ProfileImageUpdateForm
 
 
 # Create your views here.
+from apps.user.models import UserHistoryItem
+
+
 def dashboard(request):
     repositories = request.user.siteuser.repositories.all()
-    context = {'repositories': repositories}
+    history = request.user.siteuser.userhistoryitem_set.all().order_by('-dateChanged')
+    context = {}
+    context['repositories'] = repositories
+    context['history'] = history
     return render(request, 'user/dashboard.html', context)
 
 
@@ -18,30 +27,11 @@ def profile(request):
     if(context == "redirect"):
         return redirect('profile')
 
-    return render(request, 'user/profile.html', context)
-
-def repos(request):
-    context = get_profile_form(request)
-
-    if (context == "redirect"):
-        return redirect('repos')
-
     repositories = request.user.siteuser.repositories.all()
     context['repos'] = repositories
-
-    return render(request, 'user/profile_info.html', context)
-
-def issues(request):
-    context = get_profile_form(request)
-
-    if (context == "redirect"):
-        return redirect('issues')
-
-    # issues = request.user.siteuser.issues.all()
-    # context['issues'] = issues
     context['issues'] = []
 
-    return render(request, 'user/profile_info.html', context)
+    return render(request, 'user/profile.html', context)
 
 
 def get_profile_form(request):
@@ -72,7 +62,14 @@ def addRepository(request):
             print('Forma je validna')
             # form.save()
             repositories = request.user.siteuser.repositories.add(form.save())
-            messages.success(request, 'Successfully')
+
+            change = UserHistoryItem()
+            change.dateChanged = datetime.datetime.now()
+            change.belongsTo = request.user.siteuser
+            change.message = 'added new repository'
+            change.save()
+
+            messages.success(request, 'Successfully added new repository!')
             return redirect('dashboard')
         else:
             print('Forma nije validna')
