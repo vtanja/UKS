@@ -6,14 +6,30 @@
         <div class="row p-2 justify-content-md-end">
             <a class="btn btn-success" href="{% url 'issue-update' repository.id issue.id %}">Edit</a>
         </div>
-        <div class="col">
-            <h4>Issue</h4>
-            <br>
-            <p><strong>Title</strong> {{ issue.title }}</p>
-            <p><strong>Created by</strong> {{ user.username }}</p>
-            <p><strong>Status</strong> {{ issue.issue_status.title }}</p>
-            <p><strong>Description</strong> {{ issue.description }}</p>
+        <div class="row">
+            <div class="col">
+                <h4>Issue</h4>
+                <br>
+                <p><strong>Title</strong> {{ issue.title }}</p>
+                <p><strong>Created by</strong> {{ user.username }}</p>
+                <p><strong>Status</strong> {{ issue.issue_status.title }}</p>
+                <p><strong>Description</strong> {{ issue.description }}</p>
+                <!-- Labels, Milestone, Project, Assignee -->
+            </div>
+            {% if changes.exists %}
+            <div class="col">
+                <h4>History of changes</h4>
+                <br>
+                <div style="justify-content: flex-start">
+                    {% for change in changes %}
+                        <small>{{ change.date }}</small>
+                        <p>{{ change.message }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
         </div>
+
     </div>
 
 {% endblock %}

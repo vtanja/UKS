@@ -1,6 +1,7 @@
+from django.utils import timezone
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from .models import Issue, IssueChange
 from apps.repository.models import Repository
@@ -25,9 +26,10 @@ class IssueDetailView(DetailView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
-
+        self.changes = IssueChange.objects.filter(issue=self.kwargs['pk'])
         context = super(IssueDetailView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
+        context['changes'] = self.changes
         return context
 
 
