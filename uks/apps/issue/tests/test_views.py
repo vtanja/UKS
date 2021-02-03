@@ -72,7 +72,24 @@ class IssueListViewTest(TestCase):
         response = self.client.get(reverse('repository_issues', kwargs={'id': repository.id}))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.context['object_list']) != 0)
+
+    def test_HTTP404_if_repository_doesnt_exist(self):
+        repositories = Repository.objects.all()
+        non_existent_repository = repositories[len(repositories) - 1].id + 1
+        response = self.client.get(reverse('repository_issues', kwargs={'id': non_existent_repository}))
+        self.assertEqual(response.status_code, 404)
+        self.assertRaisesMessage(Http404, 'No Repository matches the given query.')
+
+    def test_only_issues_from_current_repository_in_list(self):
+        repository = Repository.objects.all()[0]
         response = self.client.get(reverse('repository_issues', kwargs={'id': repository.id}))
+        self.assertTrue(response.context['object_list'] != 0)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(len(response.context['object_list']) == 2)
+        for issue in response.context['object_list']:
+            self.assertEqual(issue.repository, repository)
+
+
         self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.context['object_list']) == 3)
 
