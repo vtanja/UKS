@@ -90,10 +90,36 @@ class IssueListViewTest(TestCase):
             self.assertEqual(issue.repository, repository)
 
 
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(len(response.context['object_list']) == 3)
+class IssueDetailView(TestCase):
 
-    def test_repository_doesnt_exist(self):
-        response = self.client.get(reverse('repository_issues', kwargs={'id': 42}))
+    @classmethod
+    def setUpTestData(cls):
+        fill_test_db()
+
+    def test_view_url_exists_at_desired_location(self):
+        response = self.client.get('/repository/{}/issues/{}/'.format(1, 1))
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_url_accessible_by_name(self):
+        response = self.client.get(reverse('issue_details', kwargs={'id': 1, 'pk': 1}))
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_uses_correct_template(self):
+        response = self.client.get(reverse('issue_details', kwargs={'id': 1, 'pk': 1}))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'issue/issue_detail.html')
+
+    def test_HTTP404_if_issue_doesnt_exist(self):
+        response = self.client.get(reverse('issue_details', kwargs={'id': 1, 'pk': 42}))
         self.assertEqual(response.status_code, 404)
-        self.assertRaisesMessage(Http404, expected_message='No Issue matches the given query.')
+        self.assertRaisesMessage(Http404, 'No Issue matches the given query.')
+
+    def test_HTTP404_if_repository_doesnt_exist(self):
+        response = self.client.get(reverse('issue_details', kwargs={'id': 42, 'pk': 101}))
+        self.assertEqual(response.status_code, 404)
+        self.assertRaisesMessage(Http404, 'No Repository matches the given query.')
+
+    def test_view_for_issue_that_exists(self):
+        response = self.client.get(reverse('issue_details', kwargs={'id': 1, 'pk': 1}))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['issue'] is not None)
