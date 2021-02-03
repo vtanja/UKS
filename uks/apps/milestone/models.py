@@ -2,7 +2,7 @@ from django.db import models
 
 
 # Create your models here.
-from app.user.models import Repository
+from apps.repository.models import Repository
 
 
 class Milestone(models.Model):

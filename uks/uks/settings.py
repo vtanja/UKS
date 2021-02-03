@@ -39,10 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app',
-    'app.user',
+    'apps',
+    'apps.user',
     'apps.repository',
-    'app.milestone',
+    'apps.milestone',
     'apps.issue',
     'security',
     'crispy_forms',
@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'uks.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'uks',
+        'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         # 'USER': os.getenv('POSTGRES_USER'),
