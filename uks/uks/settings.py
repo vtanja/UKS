@@ -144,8 +144,8 @@ MESSAGE_TAGS = {
         messages.ERROR: 'alert-danger',
  }
 
-LOGIN_REDIRECT_URL = '/user/dashboard'
-
+LOGIN_REDIRECT_URL = '/user/dashboard/'
+LOGIN_URL = '/welcome/login/'
 
 MEDIA_URL = '/images/'
 
