@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'apps.issue',
     'security',
     'crispy_forms',
+    'fontawesome-free',
 ]
 
 MIDDLEWARE = [
