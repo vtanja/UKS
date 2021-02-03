@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from apps.repository.models import Repository
 from security.models import SiteUser
 
-# Create your models here.
+
 class Issue(models.Model):
 
     class IssueStatus(models.TextChoices):
@@ -20,7 +20,8 @@ class Issue(models.Model):
         default=IssueStatus.TODO
     )
     repository = models.ForeignKey(Repository, on_delete=models.CASCADE)
-    site_user = models.ForeignKey(SiteUser, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(SiteUser, on_delete=models.CASCADE, related_name='created_by')
+    assignees = models.ManyToManyField(SiteUser, related_name='assignees')
     # labels
     # milestone
     # board list
