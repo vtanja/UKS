@@ -58,14 +58,28 @@ class IssueUpdateView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         # Add issue change for actual changes
-        return super().form_valid(form)
+        original_issue = get_object_or_404(Issue, id=form.instance.id)
+        response = super(IssueUpdateView, self).form_valid(form)
+        for changed_field in form.changed_data:
+            ch = IssueChange()
+            ch.issue = original_issue
+            ch.date = timezone.now()
+            if changed_field == 'title':
+                ch.message = '{} changed title from {} to {}'.format(self.request.user.username, original_issue.title,
+                                                                     form.cleaned_data[changed_field])
+            elif changed_field == 'description':
+                ch.message = self.request.user.username + ' changed description'
+            ch.save()
+
+        return response
 
     def get_context_data(self, *, object_list=None, **kwargs):
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
-
         context = super(IssueUpdateView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
         return context
 
     def get_success_url(self):
+        if self.request.path.find('edit') != -1:
+            return reverse_lazy('issue-details', kwargs={'id': self.kwargs['id'], 'pk': self.kwargs['pk']})
         return reverse_lazy('repository-issues', kwargs={'id': self.kwargs['id']})
