@@ -9,11 +9,13 @@ from ..models import Issue
 
 
 def fill_test_db():
+    # Create users
     test_user = User.objects.create_user(username='testuser', password='1E4@DAc#a1p')
     test_user1 = User.objects.create_user(username='testuser1', password='4XC%4@1LSp')
     test_user.save()
     test_user1.save()
 
+    # Create repositories
     test_repository = Repository.objects.create(name='test_repository', description='test')
     test_repository1 = Repository.objects.create(name='test_repository1', description='test2')
     test_repository2 = Repository.objects.create(name='test_repository2', description='desc')
@@ -21,6 +23,7 @@ def fill_test_db():
     test_repository1.save()
     test_repository2.save()
 
+    # Create site users - WILL BE REMOVED WHEN REPOSITORIES CHANGE
     test_site_user = SiteUser.objects.create(user=test_user)
     test_site_user1 = SiteUser.objects.create(user=test_user1)
     test_site_user.repositories.add(test_repository, test_repository1)
@@ -28,6 +31,7 @@ def fill_test_db():
     test_site_user.save()
     test_site_user1.save()
 
+    # Create issues and add them to repositories
     test_issue1 = Issue.objects.create(title='test issue', description='test', repository=test_repository,
                                        created_by=test_user)
     test_issue2 = Issue.objects.create(title='test issue', description='test desc', repository=test_repository,
@@ -90,36 +94,52 @@ class IssueListViewTest(TestCase):
             self.assertEqual(issue.repository, repository)
 
 
-class IssueDetailView(TestCase):
+class IssueDetailViewTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
         fill_test_db()
 
     def test_view_url_exists_at_desired_location(self):
-        response = self.client.get('/repository/{}/issues/{}/'.format(1, 1))
+        repository_id = Repository.objects.all()[0].id
+        issue_id = Issue.objects.all()[0].id
+        response = self.client.get('/repository/{}/issues/{}/'.format(repository_id, issue_id))
         self.assertEqual(response.status_code, 200)
 
     def test_view_url_accessible_by_name(self):
-        response = self.client.get(reverse('issue_details', kwargs={'id': 1, 'pk': 1}))
+        self.get_existing_issue()
+
+    def get_existing_issue(self):
+        repository_id = Repository.objects.all()[0].id
+        issue_id = Issue.objects.all()[0].id
+        response = self.client.get(reverse('issue_details', kwargs={'id': repository_id, 'pk': issue_id}))
         self.assertEqual(response.status_code, 200)
+        return response
 
     def test_view_uses_correct_template(self):
-        response = self.client.get(reverse('issue_details', kwargs={'id': 1, 'pk': 1}))
-        self.assertEqual(response.status_code, 200)
+        response = self.get_existing_issue()
         self.assertTemplateUsed(response, 'issue/issue_detail.html')
 
     def test_HTTP404_if_issue_doesnt_exist(self):
-        response = self.client.get(reverse('issue_details', kwargs={'id': 1, 'pk': 42}))
+        repositories = Repository.objects.all()
+        non_existing_repository_id = repositories[len(repositories) - 1].id + 1
+        issues = Issue.objects.all()
+        issue_id = issues[0].id
+        response = self.client.get(reverse('issue_details', kwargs={'id': non_existing_repository_id, 'pk': issue_id}))
         self.assertEqual(response.status_code, 404)
         self.assertRaisesMessage(Http404, 'No Issue matches the given query.')
 
     def test_HTTP404_if_repository_doesnt_exist(self):
-        response = self.client.get(reverse('issue_details', kwargs={'id': 42, 'pk': 101}))
+        repositories = Repository.objects.all()
+        repository_id = repositories[0].id
+        issues = Issue.objects.all()
+        non_existing_issue_id = issues[len(issues) - 1].id + 1
+        response = self.client.get(reverse('issue_details', kwargs={'id': repository_id, 'pk': non_existing_issue_id}))
         self.assertEqual(response.status_code, 404)
         self.assertRaisesMessage(Http404, 'No Repository matches the given query.')
 
     def test_view_for_issue_that_exists(self):
-        response = self.client.get(reverse('issue_details', kwargs={'id': 1, 'pk': 1}))
+        response = self.get_existing_issue()
+        self.assertTrue(response.context['issue'] is not None)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context['issue'] is not None)
