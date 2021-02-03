@@ -1,7 +1,7 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from apps.repository.models import Repository
-from security.models import SiteUser
 
 
 class Issue(models.Model):
@@ -12,16 +12,16 @@ class Issue(models.Model):
         DONE =  'DONE', _('Done')
         CLOSED = 'CLOSED', _('Closed')
 
-    title = models.CharField(max_length=30)
-    description = models.CharField(max_length=100)
+    title = models.CharField(max_length=100)
+    description = models.CharField(max_length=200)
     issue_status = models.CharField(
         max_length=8,
         choices=IssueStatus.choices,
         default=IssueStatus.TODO
     )
     repository = models.ForeignKey(Repository, on_delete=models.CASCADE)
-    created_by = models.ForeignKey(SiteUser, on_delete=models.CASCADE, related_name='created_by')
-    assignees = models.ManyToManyField(SiteUser, related_name='assignees')
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_by')
+    assignees = models.ManyToManyField(User, related_name='assignees')
     # labels
     # milestone
     # board list

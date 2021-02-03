@@ -36,7 +36,7 @@ class CreateIssueView(LoginRequiredMixin, CreateView):
     fields = ['title', 'description']
 
     def form_valid(self, form):
-        form.instance.site_user = get_object_or_404(SiteUser, user=self.request.user)
+        form.instance.created_by = self.request.user
         form.instance.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         form.instance.issue_status = Issue.IssueStatus.TODO
         return super().form_valid(form)
