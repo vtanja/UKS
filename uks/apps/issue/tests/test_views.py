@@ -141,5 +141,44 @@ class IssueDetailViewTest(TestCase):
     def test_view_for_issue_that_exists(self):
         response = self.get_existing_issue()
         self.assertTrue(response.context['issue'] is not None)
+
+
+class CreateIssueViewTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        fill_test_db()
+
+    def test_redirect_if_user_not_logged_in(self):
+        response = self.client.get('/repository/{}/issues/add/'.format(1))
+        self.assertRedirects(response, '/welcome/login/?next=/repository/1/issues/add/')
+
+    def test_logged_in_user_can_access(self):
+        login = self.client.login(username='testuser', password='1E4@DAc#a1p')
+        response = self.client.get(reverse('issue_add', kwargs={'id': 1}))
+
+        self.assertEqual(str(response.context['user']), 'testuser')
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.context['issue'] is not None)
+        self.assertTemplateUsed(response, 'issue/issue_form.html')
+
+    def test_view_shows_correct_template(self):
+        login = self.client.login(username='testuser', password='1E4@DAc#a1p')
+        response = self.client.get(reverse('issue_add', kwargs={'id': 1}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'issue/issue_form.html')
+
+    def test_logged_in_user_adding_to_non_existent_repository(self):
+        login = self.client.login(username='testuser', password='1E4@DAc#a1p')
+        response = self.client.get(reverse('issue_add', kwargs={'id': 101}))
+
+        self.assertEqual(response.status_code, 404)
+        self.assertRaisesMessage(Http404, 'No Repository matches given query.')
+
+    def test_redirects_to_repository_issues_on_success(self):
+        login = self.client.login(username='testuser', password='1E4@DAc#a1p')
+        response = self.client.post(reverse('issue_add', kwargs={'id': 1}),
+                                    {'title': 'Test issue', 'description': 'Test description'})
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/repository/1/issues/')
+
