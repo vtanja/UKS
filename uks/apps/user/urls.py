@@ -2,6 +2,7 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 
 from apps.user import views
+from .views import AllIssuesListView
 
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
@@ -17,4 +18,5 @@ urlpatterns = [
         name='password_reset_complete'),
     path('repository/', views.addRepository, name='repository'),
     path('detail/?P<int:id>/', views.detail, name='detail'),
+    path('issues/', AllIssuesListView.as_view(), name='all-user-issues')
 ]

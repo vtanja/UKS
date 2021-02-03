@@ -1,15 +1,12 @@
 import datetime
-
-from django.db.models.functions import Coalesce
 from django.shortcuts import render, redirect
-from apps.repository.forms import RepositoryForm
 from django.contrib import messages
-from apps.repository.models import Repository
+from django.views.generic import ListView
+
+from apps.repository.forms import RepositoryForm
 from apps.user.forms import ProfileImageUpdateForm
-
-
-# Create your views here.
-from apps.user.models import UserHistoryItem
+from apps.repository.models import Repository
+from apps.issue.models import Issue
 
 
 def dashboard(request):
@@ -87,3 +84,8 @@ def detail(request, id):
     print(repository.name)
     context = {'repositories': repositories, 'repository': repository}
     return render(request, '../repository/templates/repoDetail.html', context)
+
+
+class AllIssuesListView(ListView):
+    model = Issue
+    template_name = 'user/issue_list.html'
