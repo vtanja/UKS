@@ -7,17 +7,28 @@
             <a class="btn btn-success" href="{% url 'issue-update' repository.id issue.id %}">Edit</a>
         </div>
         <div class="row">
-            <div class="col">
+            <div class="col" style="text-align: start">
                 <h4>Issue</h4>
                 <br>
-                <p><strong>Title</strong> {{ issue.title }}</p>
-                <p><strong>Created by</strong> {{ user.username }}</p>
-                <p><strong>Status</strong> {{ issue.issue_status.title }}</p>
-                <p><strong>Description</strong> {{ issue.description }}</p>
-                <!-- Labels, Milestone, Project, Assignee -->
+                <div class="row">
+                    <div class="col-sm-4">
+                        <p><strong>Title</strong></p>
+                        <p><strong>Created by</strong></p>
+                        <p><strong>Status</strong></p>
+                        <p><strong>Description</strong></p>
+                        <!-- Labels, Milestone, Project, Assignee -->
+                    </div>
+                    <div class="col">
+                        <p>{{ issue.title }}</p>
+                        <p>{{ user.username }}</p>
+                        <p>{{ issue.issue_status.title }}</p>
+                        <p>{{ issue.description }}</p>
+                        <!-- Labels, Milestone, Project, Assignee -->
+                    </div>
+                </div>
             </div>
             {% if changes.exists %}
-            <div class="col">
+            <div class="col" style="text-align: start">
                 <h4>History of changes</h4>
                 <br>
                 <div style="justify-content: flex-start">
