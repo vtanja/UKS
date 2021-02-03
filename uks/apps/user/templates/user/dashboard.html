@@ -1,4 +1,5 @@
 {% extends "home.html" %}
+{% load crispy_forms_tags %}
 
 {% block dashboard %}
     <div class="container-fluid" style="width: 80%">
@@ -62,12 +63,23 @@
                         <label for="description">Description</label>
                         <textarea class="form-control" id="description" rows="5" name="description" required></textarea>
                     </div>
+                    <div>
+                        <label for="url">Repository url:</label>
+                        <input type="text" class="form-control" id="url" name="repo_url" required/>
+                    </div>
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-primary">Add</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
        </form>
+{#        <div class="modal-body">#}
+{#            <form method="post" action="{% url 'repository' %}">#}
+{#                {% csrf_token %}#}
+{#                {form|crispy}#}
+{#                <button type="submit" class="btn btn-success">Add</button>#}
+{#            </form>#}
+{#        </div>#}
     </div>
   </div>
 </div>
