@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'apps.user',
     'apps.repository',
     'apps.issue',
+    'apps.branch',
+    'apps.commit',
     'security',
     'crispy_forms',
 ]
