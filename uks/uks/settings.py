@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'apps.issue',
     'security',
     'crispy_forms',
-    'apps.issue',
 ]
 
 MIDDLEWARE = [
@@ -84,7 +83,7 @@ WSGI_APPLICATION = 'uks.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'uks',
+        'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         # 'USER': os.getenv('POSTGRES_USER'),
