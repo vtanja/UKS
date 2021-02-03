@@ -9,7 +9,7 @@ class Issue(models.Model):
     class IssueStatus(models.TextChoices):
         TODO = 'TODO', _('To do')
         ONGOING = 'ONGOING', _('Ongoing')
-        DONE =  'DONE', _('Done')
+        DONE = 'DONE', _('Done')
         CLOSED = 'CLOSED', _('Closed')
 
     title = models.CharField(max_length=100)
