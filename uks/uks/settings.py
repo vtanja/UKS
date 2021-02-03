@@ -41,7 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app',
     'app.user',
+    'apps.repository',
     'app.milestone',
+    'apps.issue',
     'security',
     'crispy_forms',
 ]
@@ -83,7 +85,7 @@ WSGI_APPLICATION = 'uks.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'uks',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         # 'USER': os.getenv('POSTGRES_USER'),
@@ -144,7 +146,7 @@ MESSAGE_TAGS = {
         messages.ERROR: 'alert-danger',
  }
 
-LOGIN_REDIRECT_URL = '/api/user/dashboard'
+LOGIN_REDIRECT_URL = '/user/dashboard'
 
 
 MEDIA_URL = '/images/'

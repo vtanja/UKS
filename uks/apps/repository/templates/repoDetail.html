@@ -1,0 +1,34 @@
+{% extends "user/dashboard.html" %}
+
+{% block dashboard %}
+<div class="card text-center">
+  <div class="card-header">
+    <ul class="nav nav-tabs card-header-tabs">
+      <li class="nav-item" style="color: green">
+        <a class="nav-link disabled" href="#">Repository {{repository.name}}</a>
+      </li>
+      <li class="nav-item" style="color: green">
+        <a  class="nav-link text-success" id="one-tab" data-toggle="tab" href="#one" role="tab" aria-controls="One" aria-selected="true">Overview</a>
+      </li>
+      <li class="nav-item" >
+        <a  class="nav-link text-success" id="two-tab" data-toggle="tab" href="#two" role="tab" aria-controls="Two" aria-selected="false">Issues</a>
+      </li>
+      <li class="nav-item" >
+        <a  class="nav-link text-success">Projects</a>
+      </li>
+      <li class="nav-item" >
+        <a  class="nav-link text-success">Wiki</a>
+      </li>
+    </ul>
+  </div>
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active p-3" id="one" role="tabpanel" aria-labelledby="one-tab">
+            <h5 class="card-title">Repository {{repository.name}}</h5>
+            <textarea rows="10" cols="180" readonly>{{repository.description}}</textarea>
+    </div>
+    <div class="tab-pane fade p-3" id="two" role="tabpanel" aria-labelledby="two-tab">
+            <h5 class="card-title">Issues</h5>
+    </div>
+  </div>
+</div>
+{% endblock %}

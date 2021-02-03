@@ -10,7 +10,6 @@ class ProfileImageUpdateForm(forms.ModelForm):
         fields = ['profile_img']
 
 class RepositoryForm(forms.ModelForm):
-
     class Meta:
         model = Repository
         fields = ['name', 'description']

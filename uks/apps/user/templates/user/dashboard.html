@@ -1,9 +1,9 @@
 {% extends "home.html" %}
 
-{% block repos %}
-    <div class="container-fluid">
+{% block dashboard %}
+    <div class="container-fluid" style="width: 80%">
     <div class="row">
-        <div class="col-md-3" style="text-align: center" >
+        <div class="col-md-4" style="text-align: center" >
             <br><br>
             <h5>Repositories &nbsp; &nbsp;
                 <button type="button" class="btn btn-success" data-toggle="modal" data-target="#repoDialog">Add new repository</button>
@@ -12,19 +12,31 @@
 
             <ul class="list-group list-group-flush" style="align-self: center">
                 {% for repository in repositories %}
-                        <li class="list-group-item">{{ repository.name }}</li>
-{#                        Bottom line should be uncommented when repo detail is implemente#}
-{#                        <li class="list-group-item"><a href="{% url 'profile' %}">{{ repository.name }}</a></li#}
+                        <li class="list-group-item"><a class="text text-success font-weight-bold"  href="{% url 'detail' id=repository.id %}">{{ repository.name }}</a></li>
                 {% endfor %}
             </ul>
 
         </div>
-        <div class="col-md-9"  >
+        <div class="col-md-8" style="text-align: center"  >
             {% block repoDetail %}
-            {#        This is place where should be placed repo detail.#}
-            {#        To implement that, repo detail page should extend dashboard.html#}
-            {#        like this template extends home.#}
-
+                <br>
+                <h4>Recent activity</h4>
+                <br>
+                {% if history|length == 0 %}
+                    <p style="font-style: italic">User has no activity!</p>
+                {% endif %}
+                <div style="text-align: start; margin-left: 5%">
+                    {% for item in history %}
+                        <div class="card" >
+                            <div class="card-body">
+                                <div class="card-text" >
+                                    <div style="float:left">{{ item.belongsTo.user.username }} &nbsp;{{ item.message }}</div>
+                                <i style="float: right">{{  item.get_time_of_change}}</i>
+                                </div>
+                            </div>
+                        </div> <br>
+                    {% endfor %}
+                </div>
             {% endblock %}
         </div>
     </div>
