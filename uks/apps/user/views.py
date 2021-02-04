@@ -1,5 +1,6 @@
 import datetime
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -94,6 +95,9 @@ def detail(request, id):
     return render(request, '../repository/templates/repoDetail.html', context)
 
 
-class AllIssuesListView(ListView):
+class AllIssuesListView(LoginRequiredMixin, ListView):
     model = Issue
     template_name = 'user/issue_list.html'
+
+    def get_queryset(self):
+        return Issue.objects.filter(Q(assignees__in=[self.request.user]) | Q(created_by=self.request.user))
