@@ -14,7 +14,7 @@
                     <a  class="nav-link text-success" id="two-tab" >Issues</a>
                 </li>
                 <li class="nav-item" >
-                    <a  class="nav-link text-success" id="three-tab" {%if 'milestones' in request.path%}active{% endif %}
+                    <a  class="nav-link text-success {%if 'milestones' in request.path%}active{% endif %}" id="three-tab"
                         href="{% url 'repository_milestones' repository.id %}">Milestones</a>
                 </li>
                 <li class="nav-item" >
