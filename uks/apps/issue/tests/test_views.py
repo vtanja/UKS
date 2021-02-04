@@ -190,3 +190,54 @@ class CreateIssueViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/repository/{}/issues/'.format(repository))
 
+
+class AllIssuesListView(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        fill_test_db()
+
+    def test_redirect_if_user_not_logged_in(self):
+        response = self.client.get('/user/issues/')
+        self.assertRedirects(response, '/welcome/login/?next=/user/issues/')
+
+    def test_logged_in_user_can_access(self):
+        self.client.login(username='testuser', password='1E4@DAc#a1p')
+        response = self.client.get(reverse('all-user-issues'))
+
+        self.assertEqual(str(response.context['user']), 'testuser')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'user/issue_list.html')
+
+    def test_view_shows_correct_template(self):
+        self.client.login(username='testuser', password='1E4@DAc#a1p')
+        response = self.client.get(reverse('all-user-issues'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'user/issue_list.html')
+
+    def test_logged_in_user_with_no_issues_on_any_repository(self):
+        self.client.login(username='testuser2', password='4*uxX#sd23')
+        response = self.client.get(reverse('all-user-issues'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(len(response.context['object_list']) == 0)
+
+    def test_logged_in_user_with_assigned_issues(self):
+        self.client.login(username='testuser', password='1E4@DAc#a1p')
+        response = self.client.get(reverse('all-user-issues'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(len(response.context['object_list']) == 2)
+        for issue in response.context['object_list']:
+            self.assertIn(response.wsgi_request.user, issue.assignees.all())
+
+    def test_logged_in_user_with_only_created_issues(self):
+        self.client.login(username='testuser1', password='4XC%4@1LSp')
+        response = self.client.get(reverse('all-user-issues'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(len(response.context['object_list']) == 1)
+        for issue in response.context['object_list']:
+            self.assertEqual(response.wsgi_request.user, issue.created_by)
+
