@@ -12,8 +12,10 @@ def fill_test_db():
     # Create users
     test_user = User.objects.create_user(username='testuser', password='1E4@DAc#a1p')
     test_user1 = User.objects.create_user(username='testuser1', password='4XC%4@1LSp')
+    test_user2 = User.objects.create_user(username='testuser2', password='4*uxX#sd23')
     test_user.save()
     test_user1.save()
+    test_user2.save()
 
     # Create repositories
     test_repository = Repository.objects.create(name='test_repository', description='test', owner=test_user)
@@ -39,6 +41,8 @@ def fill_test_db():
     test_issue1.save()
     test_issue2.save()
     test_issue3.save()
+    test_issue1.assignees.add(test_user)
+    test_issue2.assignees.add(test_user)
 
 
 class IssueListViewTest(TestCase):
