@@ -41,6 +41,7 @@ class CreateIssueView(LoginRequiredMixin, CreateView):
         form.instance.created_by = self.request.user
         form.instance.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         form.instance.issue_status = Issue.IssueStatus.TODO
+        form.instance.closed = False
         return super().form_valid(form)
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -52,7 +53,7 @@ class CreateIssueView(LoginRequiredMixin, CreateView):
 
     def get_form_kwargs(self):
         kwargs = super(CreateIssueView, self).get_form_kwargs()
-        kwargs['repository'] = self.repository
+        kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['id'])
         return kwargs
 
     def get_success_url(self):
