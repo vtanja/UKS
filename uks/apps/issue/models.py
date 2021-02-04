@@ -10,7 +10,6 @@ class Issue(models.Model):
         TODO = 'TODO', _('To do')
         ONGOING = 'ONGOING', _('Ongoing')
         DONE = 'DONE', _('Done')
-        CLOSED = 'CLOSED', _('Closed')
 
     title = models.CharField(max_length=100)
     description = models.CharField(max_length=200)
@@ -19,6 +18,7 @@ class Issue(models.Model):
         choices=IssueStatus.choices,
         default=IssueStatus.TODO
     )
+    closed = models.BooleanField()
     repository = models.ForeignKey(Repository, on_delete=models.CASCADE)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_by')
     assignees = models.ManyToManyField(User, related_name='assignees', blank=True)
