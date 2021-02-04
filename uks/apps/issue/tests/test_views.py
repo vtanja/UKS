@@ -16,9 +16,9 @@ def fill_test_db():
     test_user1.save()
 
     # Create repositories
-    test_repository = Repository.objects.create(name='test_repository', description='test')
-    test_repository1 = Repository.objects.create(name='test_repository1', description='test2')
-    test_repository2 = Repository.objects.create(name='test_repository2', description='desc')
+    test_repository = Repository.objects.create(name='test_repository', description='test', owner=test_user)
+    test_repository1 = Repository.objects.create(name='test_repository1', description='test2', owner=test_user)
+    test_repository2 = Repository.objects.create(name='test_repository2', description='desc', owner=test_user1)
     test_repository.save()
     test_repository1.save()
     test_repository2.save()
@@ -26,8 +26,6 @@ def fill_test_db():
     # Create site users - WILL BE REMOVED WHEN REPOSITORIES CHANGE
     test_site_user = SiteUser.objects.create(user=test_user)
     test_site_user1 = SiteUser.objects.create(user=test_user1)
-    test_site_user.repositories.add(test_repository, test_repository1)
-    test_site_user1.repositories.add(test_repository1, test_repository2)
     test_site_user.save()
     test_site_user1.save()
 
