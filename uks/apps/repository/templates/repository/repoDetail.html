@@ -1,0 +1,32 @@
+{% extends "home.html" %}
+
+{% block dashboard %}
+    <br>
+<div class="card text-center" style="width: 90%; margin:auto">
+  <div class="card-header">
+    <ul class="nav nav-tabs card-header-tabs">
+      <li class="nav-item" style="color: green">
+        <a class="nav-link disabled" href="#">Repository {{repository.name}}</a>
+      </li>
+      <li class="nav-item" style="color: green">
+        <a  class="nav-link text-success {%if 'repository' in request.path%}active{% endif %}" id="one-tab" href="{% url 'detail' repository.id   %}">Overview</a>
+      </li>
+      <li class="nav-item" >
+        <a  class="nav-link text-success" id="two-tab" >Issues</a>
+      </li>
+      <li class="nav-item" >
+        <a  class="nav-link text-success">Projects</a>
+      </li>
+      <li class="nav-item" >
+        <a  class="nav-link text-success">Wiki</a>
+      </li>
+    </ul>
+  </div>
+  <div class="tab-content" id="myTabContent">
+    {% block repo-content %}
+        <h5 class="card-title">Repository {{repository.name}}</h5>
+        <h6>{{repository.description}}</h6>
+    {% endblock %}
+  </div>
+</div>
+{% endblock %}
