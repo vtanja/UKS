@@ -1,7 +1,9 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
 from apps.repository.models import Repository
+from apps.milestone.models import Milestone
 
 
 class Issue(models.Model):
@@ -23,8 +25,9 @@ class Issue(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_by')
     assignees = models.ManyToManyField(User, related_name='assignees', blank=True)
     # labels
-    # milestone
+    milestone = models.ForeignKey(Milestone, on_delete=models.CASCADE, null=True, blank=True)
     # board list
+
 
 class IssueChange(models.Model):
     message = models.CharField(max_length=100)
