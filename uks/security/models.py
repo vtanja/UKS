@@ -1,9 +1,11 @@
 from django.contrib.auth.models import User
 from django.db import models
-from apps.repository.models import Repository
 
 
 # Create your models here.
+from apps.repository.models import Repository
+
+
 class SiteUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     repositories = models.ManyToManyField(Repository)
