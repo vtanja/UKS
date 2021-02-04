@@ -23,7 +23,7 @@ def fill_test_db():
     test_repository1.save()
     test_repository2.save()
 
-    # Create site users - WILL BE REMOVED WHEN REPOSITORIES CHANGE
+    # Create site users
     test_site_user = SiteUser.objects.create(user=test_user)
     test_site_user1 = SiteUser.objects.create(user=test_user1)
     test_site_user.save()
