@@ -13,7 +13,7 @@
 
             <ul class="list-group list-group-flush" style="align-self: center">
                 {% for repository in repositories %}
-                        <li class="list-group-item"><a class="text text-success font-weight-bold"  href="{% url 'detail' id=repository.id %}">{{ repository.name }}</a></li>
+                        <li class="list-group-item"><a class="text text-success font-weight-bold"  href="{% url 'detail' repository.id %}">{{ repository.name }}</a></li>
                 {% endfor %}
             </ul>
 
@@ -52,7 +52,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-       <form method="post" action="{% url 'repository' %}">
+       <form method="post" action="{% url 'add' %}">
             <div class="modal-body">
                  {% csrf_token %}
                     <div>
