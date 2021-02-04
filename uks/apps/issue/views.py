@@ -1,10 +1,12 @@
+from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView
+
+from .forms import CreateIssueForm
 from .models import Issue
 from apps.repository.models import Repository
-from security.models import SiteUser
 
 
 class IssuesListView(ListView):
@@ -33,7 +35,7 @@ class IssueDetailView(DetailView):
 
 class CreateIssueView(LoginRequiredMixin, CreateView):
     model = Issue
-    fields = ['title', 'description']
+    form_class = CreateIssueForm
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
@@ -47,6 +49,11 @@ class CreateIssueView(LoginRequiredMixin, CreateView):
         context = super(CreateIssueView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
         return context
+
+    def get_form_kwargs(self):
+        kwargs = super(CreateIssueView, self).get_form_kwargs()
+        kwargs['repository'] = self.repository
+        return kwargs
 
     def get_success_url(self):
         return reverse_lazy('repository_issues', kwargs={'id': self.kwargs['id']})
