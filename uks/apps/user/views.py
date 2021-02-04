@@ -53,37 +53,4 @@ def get_profile_form(request):
     return context
 
 
-def addRepository(request):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        form = RepositoryForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            print('Forma je validna')
-            # form.save()
-            repositories = request.user.siteuser.repositories.add(form.save())
 
-            change = UserHistoryItem()
-            change.dateChanged = datetime.datetime.now()
-            change.belongsTo = request.user.siteuser
-            change.message = 'added new repository'
-            change.save()
-
-            messages.success(request, 'Successfully added new repository!')
-            return redirect('dashboard')
-        else:
-            print('Forma nije validna')
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = RepositoryForm()
-
-    return render(request, 'user/dashboard.html', {'form': form})
-
-
-def detail(request, id):
-    repositories = request.user.siteuser.repositories.all()
-    repository = Repository.objects.get(id=id)
-    print(repository.name)
-    context = {'repositories': repositories, 'repository': repository}
-    return render(request, '../repository/templates/repoDetail.html', context)
