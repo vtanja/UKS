@@ -1,4 +1,6 @@
 import datetime
+
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.generic import ListView
@@ -10,21 +12,26 @@ from apps.issue.models import Issue
 
 
 def dashboard(request):
-    repositories = request.user.siteuser.repositories.all()
+    repositories = all_users_repositories(request)
     history = request.user.siteuser.userhistoryitem_set.all().order_by('-dateChanged')
-    context = {}
-    context['repositories'] = repositories
-    context['history'] = history
+    context = {'repositories': repositories, 'history': history}
     return render(request, 'user/dashboard.html', context)
+
+
+def all_users_repositories(request):
+    repositories = Repository.objects.filter(
+        Q(owner=request.user) | Q(collaborators__username__in=[str(request.user)])
+    ).distinct()
+    return repositories
 
 
 def profile(request):
     context = get_profile_form(request)
 
-    if(context == "redirect"):
+    if (context == "redirect"):
         return redirect('profile')
 
-    repositories = request.user.siteuser.repositories.all()
+    repositories = all_users_repositories(request)
     context['repos'] = repositories
     context['issues'] = []
 
@@ -58,7 +65,7 @@ def addRepository(request):
         if form.is_valid():
             print('Forma je validna')
             # form.save()
-            repositories = request.user.siteuser.repositories.add(form.save())
+            repositories = all_users_repositories(request)
 
             change = UserHistoryItem()
             change.dateChanged = datetime.datetime.now()
@@ -79,7 +86,7 @@ def addRepository(request):
 
 
 def detail(request, id):
-    repositories = request.user.siteuser.repositories.all()
+    repositories = all_users_repositories()
     repository = Repository.objects.get(id=id)
     print(repository.name)
     context = {'repositories': repositories, 'repository': repository}
