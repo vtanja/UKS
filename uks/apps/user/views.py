@@ -9,6 +9,7 @@ from apps.repository.forms import RepositoryForm
 from apps.user.forms import ProfileImageUpdateForm
 from apps.repository.models import Repository
 from apps.issue.models import Issue
+from apps.user.models import UserHistoryItem
 
 
 def dashboard(request):
