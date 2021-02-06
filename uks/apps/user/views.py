@@ -90,7 +90,7 @@ def add_repository(request):
 
 
 def detail(request, id):
-    repositories = all_users_repositories()
+    repositories = all_users_repositories(request)
     repository = Repository.objects.get(id=id)
     print(repository.name)
     context = {'repositories': repositories, 'repository': repository}
