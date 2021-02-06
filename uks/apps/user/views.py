@@ -59,7 +59,7 @@ def get_profile_form(request):
     return context
 
 
-def addRepository(request):
+def add_repository(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         form = RepositoryForm(request.POST)
@@ -67,7 +67,9 @@ def addRepository(request):
         if form.is_valid():
             print('Forma je validna')
             # form.save()
-            repositories = all_users_repositories(request)
+
+            form.instance.owner = request.user
+            form.save()
 
             change = UserHistoryItem()
             change.dateChanged = datetime.datetime.now()
