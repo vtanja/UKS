@@ -1,0 +1,28 @@
+{% extends 'repository/repoDetail.html' %}
+
+{% block repo-content %}
+    {% if object_list %}
+        <br>
+        <div class="container">
+            {% for branch in object_list %}
+                <div class="card" style="width: 100%" >
+                    <div class="card-body">
+                        <div style="display: flex; height: fit-content" class="row">
+                            <div class="col" style="text-align: left;">
+                                <a href="#" class="text-success">  {{ branch.name }} </a>
+                            </div>
+                            <div class="col" style="text-align: right">
+                                <a style="cursor: pointer"><i class="far fa-edit"></i></a>&nbsp;&nbsp;
+                                <a style="color: red; cursor: pointer"><i class="far fa-trash-alt"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div> <br>
+            {% endfor %}
+        </div>
+        {% else %}
+        <br>
+        <h5>There are no branches for current repository</h5>
+    {% endif %}
+{% endblock %}
+
