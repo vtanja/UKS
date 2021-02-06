@@ -29,7 +29,7 @@
             </div>
          &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
                 <div class="col-md-6 align-text-bottom" style="text-align: left; height: 100%">
-                     <a  class="text-success"  style="cursor: pointer; position:absolute; margin-top: 2%">{{ branches|length}} branches</a>
+                     <a  class="text-success"  style="cursor: pointer; position:absolute; margin-top: 2%" href="{% url 'branch_list' repository.id %}">{{ branches|length}} branches</a>
                 </div>
         </div>
     <br>
