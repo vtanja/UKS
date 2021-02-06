@@ -4,6 +4,8 @@ import os
 
 import requests
 from django.contrib import messages
+from django.core import serializers
+from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import DetailView
 
@@ -18,33 +20,15 @@ class RepositoryDetailView(DetailView):
     model = Repository
     template_name = 'repository/overview.html'
 
-    def get_branches(self):
-        parts = self.repository.repo_url.split('/')
-        user = parts[3]
-        repo_name = parts[4]
-        request = 'https://api.github.com/repos/'+user+'/'+repo_name+'/branches'
-
-        self.api_token = os.getenv("GITHUB_TOKEN")
-        response = requests.get(request, auth=('uks', self.api_token)).text
-
-        return response
-
-    def parse(self):
-        branches = []
-        for obj in json.loads(self.branches):
-            branch = Branch()
-            branch.name = obj['name']
-            branches.append(branch)
-        return branches
-
     def get_context_data(self, *, object_list=None, **kwargs):
         self.repository = get_object_or_404(Repository, id=self.kwargs['pk'])
-        self.branches = self.get_branches()
 
         context = super(RepositoryDetailView, self).get_context_data(**kwargs)
-        context['branches'] = self.parse()
-        context["qs_json"] = self.branches
-        context['first'] = self.parse()[0]
+        context['branches'] = Branch.objects.filter(repository=self.repository)
+
+        qs = Branch.objects.filter(repository=self.repository)
+        context["qs_json"] = json.dumps([obj.as_dict() for obj in qs])
+        context['first'] = Branch.objects.filter(Q(repository_id=self.repository.id)).first()
         return context
 
 
@@ -55,6 +39,25 @@ def detail(request, id):
     context = {'repositories': repositories, 'repository': repository}
     return render(request, 'repository/repoDetail.html', context)
 
+
+def get_branches(repository):
+    parts = repository.repo_url.split('/')
+    user = parts[3]
+    repo_name = parts[4]
+    request = 'https://api.github.com/repos/' + user + '/' + repo_name + '/branches'
+
+    api_token = os.getenv("GITHUB_TOKEN")
+    response = requests.get(request, auth=('uks', api_token)).text
+
+    branches = []
+    for obj in json.loads(response):
+        branch = Branch()
+        branch.name = obj['name']
+        branch.repository = repository
+        branch.save()
+        branches.append(branch)
+
+
 def addRepository(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -63,7 +66,12 @@ def addRepository(request):
         if form.is_valid():
             print('Forma je validna')
             # form.save()
-            repositories = request.user.siteuser.repositories.add(form.save())
+            repository = form.save()
+
+            get_branches(repository)
+            # repository.branch_set.set(branches)
+
+            request.user.siteuser.repositories.add(repository)
 
             change = UserHistoryItem()
             change.dateChanged = datetime.datetime.now()
