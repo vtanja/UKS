@@ -7,10 +7,12 @@ from security.models import SiteUser
 from ...repository.models import Repository
 from ..models import Issue
 
+USER_PASSWORD = '1E4@DAc#a1p'
+
 
 def fill_test_db():
     # Create users
-    test_user = User.objects.create_user(username='testuser', password='1E4@DAc#a1p')
+    test_user = User.objects.create_user(username='testuser', password=USER_PASSWORD)
     test_user1 = User.objects.create_user(username='testuser1', password='4XC%4@1LSp')
     test_user2 = User.objects.create_user(username='testuser2', password='4*uxX#sd23')
     test_user.save()
@@ -158,7 +160,7 @@ class CreateIssueViewTest(TestCase):
 
     def test_logged_in_user_can_access(self):
         repository = Repository.objects.all()[0].id
-        self.client.login(username='testuser', password='1E4@DAc#a1p')
+        self.client.login(username='testuser', password=USER_PASSWORD)
         response = self.client.get(reverse('issue_add', kwargs={'id': repository}))
 
         self.assertEqual(str(response.wsgi_request.user), 'testuser')
@@ -167,7 +169,7 @@ class CreateIssueViewTest(TestCase):
 
     def test_view_shows_correct_template(self):
         repository = Repository.objects.all()[0].id
-        self.client.login(username='testuser', password='1E4@DAc#a1p')
+        self.client.login(username='testuser', password=USER_PASSWORD)
         response = self.client.get(reverse('issue_add', kwargs={'id': repository}))
 
         self.assertEqual(response.status_code, 200)
@@ -176,7 +178,7 @@ class CreateIssueViewTest(TestCase):
     def test_logged_in_user_adding_to_non_existent_repository(self):
         repositories = Repository.objects.all()
         non_existent_id = repositories[len(repositories) - 1].id + 1
-        self.client.login(username='testuser', password='1E4@DAc#a1p')
+        self.client.login(username='testuser', password=USER_PASSWORD)
         response = self.client.get(reverse('issue_add', kwargs={'id': non_existent_id}))
 
         self.assertEqual(response.status_code, 404)
@@ -184,7 +186,7 @@ class CreateIssueViewTest(TestCase):
 
     def test_redirects_to_repository_issues_on_success(self):
         repository = Repository.objects.all()[0].id
-        self.client.login(username='testuser', password='1E4@DAc#a1p')
+        self.client.login(username='testuser', password=USER_PASSWORD)
         response = self.client.post(reverse('issue_add', kwargs={'id': repository}),
                                     {'title': 'Test issue', 'description': 'Test description'})
         self.assertEqual(response.status_code, 302)
@@ -202,7 +204,7 @@ class AllIssuesListView(TestCase):
         self.assertRedirects(response, '/welcome/login/?next=/user/issues/')
 
     def test_logged_in_user_can_access(self):
-        self.client.login(username='testuser', password='1E4@DAc#a1p')
+        self.client.login(username='testuser', password=USER_PASSWORD)
         response = self.client.get(reverse('all-user-issues'))
 
         self.assertEqual(str(response.context['user']), 'testuser')
@@ -210,7 +212,7 @@ class AllIssuesListView(TestCase):
         self.assertTemplateUsed(response, 'user/issue_list.html')
 
     def test_view_shows_correct_template(self):
-        self.client.login(username='testuser', password='1E4@DAc#a1p')
+        self.client.login(username='testuser', password=USER_PASSWORD)
         response = self.client.get(reverse('all-user-issues'))
 
         self.assertEqual(response.status_code, 200)
@@ -224,7 +226,7 @@ class AllIssuesListView(TestCase):
         self.assertTrue(len(response.context['object_list']) == 0)
 
     def test_logged_in_user_with_assigned_issues(self):
-        self.client.login(username='testuser', password='1E4@DAc#a1p')
+        self.client.login(username='testuser', password=USER_PASSWORD)
         response = self.client.get(reverse('all-user-issues'))
 
         self.assertEqual(response.status_code, 200)
