@@ -5,12 +5,8 @@ import requests
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 
-# Create your views here.
-from django.template.loader import render_to_string
-from django.urls import reverse_lazy
-from django.views.generic import DetailView, ListView, DeleteView, UpdateView
+from django.views.generic import DetailView, ListView
 
-from apps.branch.forms import BranchForm
 from apps.branch.models import Branch
 from apps.repository.models import Repository
 
