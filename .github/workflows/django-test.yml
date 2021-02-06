@@ -49,6 +49,6 @@ jobs:
     - name: Run migrations
       run: |
         python ./uks/manage.py migrate
-#    - name: Run Tests
-#      run: |
-#        python ./uks/manage.py test apps.issue
+    - name: Run Tests
+      run: |
+        python ./uks/manage.py test apps.issue
