@@ -9,6 +9,10 @@ on:
 jobs:
   build:
 
+    env:
+      SECRET_KEY: some_key
+      DEBUG_MODE: True
+
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
