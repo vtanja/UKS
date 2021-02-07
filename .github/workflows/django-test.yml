@@ -10,11 +10,10 @@ jobs:
   build:
 
     env:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: github_actions
       SECRET_KEY: some_key
       DEBUG_MODE: True
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
 
     runs-on: ubuntu-latest
     strategy:
@@ -25,6 +24,10 @@ jobs:
     services:
       postgres:
         image: postgres:10.8
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: github_actions
         ports:
           - 5432:5432
         # needed because the postgres container does not provide a healthcheck
