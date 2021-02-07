@@ -8,13 +8,15 @@ from ...repository.models import Repository
 from ..models import Issue
 
 USER_PASSWORD = '1E4@DAc#a1p'
+USER1_PASSWORD = '4XC%4@1LSp'
+USER2_PASSWORD = '4*uxX#sd23'
 
 
 def fill_test_db():
     # Create users
     test_user = User.objects.create_user(username='testuser', password=USER_PASSWORD)
-    test_user1 = User.objects.create_user(username='testuser1', password='4XC%4@1LSp')
-    test_user2 = User.objects.create_user(username='testuser2', password='4*uxX#sd23')
+    test_user1 = User.objects.create_user(username='testuser1', password=USER1_PASSWORD)
+    test_user2 = User.objects.create_user(username='testuser2', password=USER2_PASSWORD)
     test_user.save()
     test_user1.save()
     test_user2.save()
@@ -219,7 +221,7 @@ class AllIssuesListView(TestCase):
         self.assertTemplateUsed(response, 'user/issue_list.html')
 
     def test_logged_in_user_with_no_issues_on_any_repository(self):
-        self.client.login(username='testuser2', password='4*uxX#sd23')
+        self.client.login(username='testuser2', password=USER2_PASSWORD)
         response = self.client.get(reverse('all-user-issues'))
 
         self.assertEqual(response.status_code, 200)
@@ -235,7 +237,7 @@ class AllIssuesListView(TestCase):
             self.assertIn(response.wsgi_request.user, issue.assignees.all())
 
     def test_logged_in_user_with_only_created_issues(self):
-        self.client.login(username='testuser1', password='4XC%4@1LSp')
+        self.client.login(username='testuser1', password=USER1_PASSWORD)
         response = self.client.get(reverse('all-user-issues'))
 
         self.assertEqual(response.status_code, 200)
