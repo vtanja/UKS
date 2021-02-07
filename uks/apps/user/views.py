@@ -1,33 +1,39 @@
 import datetime
 
-from django.db.models.functions import Coalesce
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.shortcuts import render, redirect
-from apps.repository.forms import RepositoryForm
 from django.contrib import messages
-from apps.repository.models import Repository
+from django.views.generic import ListView
+
+from apps.repository.forms import RepositoryForm
 from apps.user.forms import ProfileImageUpdateForm
-
-
-# Create your views here.
+from apps.repository.models import Repository
+from apps.issue.models import Issue
 from apps.user.models import UserHistoryItem
 
 
 def dashboard(request):
-    repositories = request.user.siteuser.repositories.all()
+    repositories = all_users_repositories(request)
     history = request.user.siteuser.userhistoryitem_set.all().order_by('-dateChanged')
-    context = {}
-    context['repositories'] = repositories
-    context['history'] = history
+    context = {'repositories': repositories, 'history': history}
     return render(request, 'user/dashboard.html', context)
+
+
+def all_users_repositories(request):
+    repositories = Repository.objects.filter(
+        Q(owner=request.user) | Q(collaborators__username__in=[str(request.user)])
+    ).distinct()
+    return repositories
 
 
 def profile(request):
     context = get_profile_form(request)
 
-    if(context == "redirect"):
+    if (context == "redirect"):
         return redirect('profile')
 
-    repositories = request.user.siteuser.repositories.all()
+    repositories = all_users_repositories(request)
     context['repos'] = repositories
     context['issues'] = []
 
@@ -61,7 +67,9 @@ def add_repository(request):
         if form.is_valid():
             print('Forma je validna')
             # form.save()
-            request.user.siteuser.repositories.add(form.save())
+
+            form.instance.owner = request.user
+            form.save()
 
             change = UserHistoryItem()
             change.dateChanged = datetime.datetime.now()
@@ -82,8 +90,16 @@ def add_repository(request):
 
 
 def detail(request, id):
-    repositories = request.user.siteuser.repositories.all()
+    repositories = all_users_repositories(request)
     repository = Repository.objects.get(id=id)
     print(repository.name)
     context = {'repositories': repositories, 'repository': repository}
     return render(request, '../repository/templates/repoDetail.html', context)
+
+
+class AllIssuesListView(LoginRequiredMixin, ListView):
+    model = Issue
+    template_name = 'user/issue_list.html'
+
+    def get_queryset(self):
+        return Issue.objects.filter(Q(assignees__in=[self.request.user]) | Q(created_by=self.request.user))
