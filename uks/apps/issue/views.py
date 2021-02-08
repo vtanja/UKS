@@ -1,20 +1,13 @@
-<<<<<<< HEAD
 from django.utils import timezone
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
-from .models import Issue, IssueChange
-=======
 from django.contrib.auth.models import User
-from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView
 
 from .forms import CreateIssueForm
-from .models import Issue
->>>>>>> feature-issues
+from .models import Issue, IssueChange
 from apps.repository.models import Repository
 
 
@@ -51,12 +44,8 @@ class CreateIssueView(LoginRequiredMixin, CreateView):
         form.instance.created_by = self.request.user
         form.instance.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         form.instance.issue_status = Issue.IssueStatus.TODO
-<<<<<<< HEAD
-        return super(CreateIssueView, self).form_valid(form)
-=======
         form.instance.closed = False
-        return super().form_valid(form)
->>>>>>> feature-issues
+        return super(CreateIssueView, self).form_valid(form)
 
     def get_context_data(self, *, object_list=None, **kwargs):
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
