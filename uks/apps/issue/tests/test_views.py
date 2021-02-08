@@ -11,6 +11,8 @@ USER_PASSWORD = '1E4@DAc#a1p'
 USER1_PASSWORD = '4XC%4@1LSp'
 USER2_PASSWORD = '4*uxX#sd23'
 
+ISSUE_FORM = 'issue/issue_form.html'
+
 
 def fill_test_db():
     # Create users
@@ -161,7 +163,7 @@ class CreateIssueViewTest(TestCase):
 
         self.assertEqual(str(response.wsgi_request.user), 'testuser')
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'issue/issue_form.html')
+        self.assertTemplateUsed(response, ISSUE_FORM)
 
     def test_view_shows_correct_template(self):
         repository = Repository.objects.all()[0].id
@@ -169,7 +171,7 @@ class CreateIssueViewTest(TestCase):
         response = self.client.get(reverse('issue-add', kwargs={'id': repository}))
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'issue/issue_form.html')
+        self.assertTemplateUsed(response, ISSUE_FORM)
 
     def test_HTTP404_if_adding_to_non_existent_repository(self):
         repositories = Repository.objects.all()
@@ -265,14 +267,14 @@ class IssueUpdateViewTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(str(response.wsgi_request.user), 'testuser')
-        self.assertTemplateUsed(response, 'issue/issue_form.html')
+        self.assertTemplateUsed(response, ISSUE_FORM)
 
     def test_view_shows_correct_template(self):
         self.client.login(username='testuser', password=USER_PASSWORD)
         response, repository_id, issue_id = self.get_edit_existing_issue()
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'issue/issue_form.html')
+        self.assertTemplateUsed(response, ISSUE_FORM)
 
     def test_HTTP404_changing_issue_from_non_existent_repository(self):
         self.client.login(username='testuser', password=USER_PASSWORD)
