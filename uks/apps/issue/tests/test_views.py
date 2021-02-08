@@ -170,7 +170,7 @@ class CreateIssueViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'issue/issue_form.html')
 
-    def test_logged_in_user_adding_to_non_existent_repository(self):
+    def test_HTTP404_if_adding_to_non_existent_repository(self):
         repositories = Repository.objects.all()
         non_existent_id = repositories[len(repositories) - 1].id + 1
         self.client.login(username='testuser', password=USER_PASSWORD)
