@@ -238,3 +238,55 @@ class AllIssuesListView(TestCase):
         for issue in response.context['object_list']:
             self.assertEqual(response.wsgi_request.user, issue.created_by)
 
+
+class IssueUpdateViewTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        fill_test_db()
+
+    def get_edit_existing_issue(self, repository_id=-1, issue_id=-1):
+        if repository_id == -1:
+            repository_id = Repository.objects.all()[0].id
+        if issue_id == -1:
+            issue_id = Issue.objects.filter(repository_id=repository_id)[0].id
+        response = self.client.get(reverse('issue-update', kwargs={'id': repository_id, 'pk': issue_id}))
+        return response, repository_id, issue_id
+
+    def test_redirect_id_user_not_logged_in(self):
+        response, repository_id, issue_id = self.get_edit_existing_issue()
+        self.assertRedirects(response,
+                             '/welcome/login/?next=/repository/{}/issues/{}/edit/'.format(repository_id, issue_id))
+
+    def test_logged_in_user_can_access(self):
+        self.client.login(username='testuser', password=USER_PASSWORD)
+        response, repository_id, issue_id = self.get_edit_existing_issue()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(str(response.wsgi_request.user), 'testuser')
+        self.assertTemplateUsed(response, 'issue/issue_form.html')
+
+    def test_view_shows_correct_template(self):
+        self.client.login(username='testuser', password=USER_PASSWORD)
+        response, repository_id, issue_id = self.get_edit_existing_issue()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'issue/issue_form.html')
+
+    def test_HTTP404_changing_issue_from_non_existent_repository(self):
+        self.client.login(username='testuser', password=USER_PASSWORD)
+        repositories = Repository.objects.all()
+        non_existant_repository = repositories[len(repositories) - 1].id + 1
+        response = self.client.get(reverse('issue-update', kwargs={'id': non_existant_repository, 'pk': 1}))
+
+        self.assertEqual(response.status_code, 404)
+        self.assertRaises(Http404)
+
+    def test_HTTP404_changing_non_existing_issue(self):
+        self.client.login(username='testuser', password=USER_PASSWORD)
+        issues = Issue.objects.all()
+        non_existing_issue = issues[len(issues) - 1].id + 1
+        response, repository_id, issue_id = self.get_edit_existing_issue(issue_id=non_existing_issue)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertRaises(Http404)
