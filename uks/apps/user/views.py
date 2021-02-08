@@ -35,7 +35,7 @@ def profile(request):
 
     repositories = all_users_repositories(request)
     context['repos'] = repositories
-    context['issues'] = []
+    context['issues'] = Issue.objects.filter(created_by=request.user)
 
     return render(request, 'user/profile.html', context)
 
