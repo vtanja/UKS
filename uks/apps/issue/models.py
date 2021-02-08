@@ -28,6 +28,7 @@ class Issue(models.Model):
     # labels
     milestone = models.ForeignKey(Milestone, on_delete=models.CASCADE, null=True, blank=True)
     # board list
+    # project
 
 
 class IssueChange(models.Model):
