@@ -1,0 +1,21 @@
+{% extends 'repoDetail.html' %}
+
+{% block repo-content %}
+
+{% load crispy_forms_tags %}
+
+<div class="container">
+    <div class="col">
+        <form method="post" action="{% url 'issue_add' repository.id %}" class="col-sm-4">
+            {% csrf_token %}
+
+            {{ form | crispy }}
+
+            <input class="btn btn-primary m-3" type="submit" value="Submit">
+            <input type="hidden" name="next" value="{{ next }}">
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}

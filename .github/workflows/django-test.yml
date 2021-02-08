@@ -9,6 +9,12 @@ on:
 jobs:
   build:
 
+    env:
+      SECRET_KEY: some_key
+      DEBUG_MODE: True
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
@@ -49,6 +55,6 @@ jobs:
     - name: Run migrations
       run: |
         python ./uks/manage.py migrate
-#    - name: Run Tests
-#      run: |
-#        python ./uks/manage.py test apps.issue
+    - name: Run Tests
+      run: |
+        python ./uks/manage.py test apps.issue

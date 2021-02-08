@@ -1,0 +1,20 @@
+{% extends 'repoDetail.html' %}
+
+{% block repo-content %}
+
+    <div class="container">
+        <div class="col">
+            <h4>Issue</h4>
+            <br>
+            <p><strong>Title</strong> {{ issue.title }}</p>
+            <p><strong>Created by</strong> {{ user.username }}</p>
+            <p><strong>Status</strong> {{ issue.issue_status.title }}</p>
+            <p><strong>Description</strong> {{ issue.description }}</p>
+            <p><strong>Assignees</strong> {% for assignee in issue.assignees.all %} {{ assignee.username }}
+            {% empty %} No one is assigned to this issue {% endfor %}</p>
+            <p><strong>Milestone</strong> {% if issue.milestone %} {{ issue.milestone.title }}
+            {% else %} This issue isn't in any milestone {% endif %}</p>
+        </div>
+    </div>
+
+{% endblock %}

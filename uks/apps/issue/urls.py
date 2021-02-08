@@ -1,8 +1,8 @@
 from django.urls import path
-
-from apps.issue import views
+from .views import IssuesListView, IssueDetailView, CreateIssueView
 
 urlpatterns = [
-    # path('', views.issues, name='all-issues'),
-    path('all', views.issues, name='all-issues'),
+    path('', IssuesListView.as_view(), name='repository_issues'),
+    path('<int:pk>/', IssueDetailView.as_view(), name='issue_details'),
+    path('add/', CreateIssueView.as_view(), name='issue_add'),
 ]
