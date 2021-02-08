@@ -2,9 +2,10 @@ from django.contrib.auth.models import User
 from django.http import Http404
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from ...repository.models import Repository
-from ..models import Issue
+from ..models import Issue, IssueChange
 
 USER_PASSWORD = '1E4@DAc#a1p'
 USER1_PASSWORD = '4XC%4@1LSp'
@@ -301,3 +302,19 @@ class IssueUpdateViewTest(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/repository/{}/issues/{}/'.format(repository_id, issue_id))
+
+    def test_issue_change_created_for_every_change(self):
+        start_of_test = timezone.now()
+        self.client.login(username='testuser', password=USER_PASSWORD)
+        _, repository_id, issue_id = self.get_edit_existing_issue()
+
+        response = self.client.post(reverse('issue-update', kwargs={'id': repository_id, 'pk': issue_id}),
+                                    {'title': 'Changed test title', 'description': 'test',
+                                     'assignees': [], 'milestone': ''})
+
+        self.assertEqual(response.status_code, 302)
+        # Find all objects that have been changed since start of the test process
+        issue_change_objects = IssueChange.objects.filter(date__gt=start_of_test,
+                                                          message__contains=response.wsgi_request.user)
+        # Changed title and assignee list
+        self.assertEqual(len(issue_change_objects), 2)
