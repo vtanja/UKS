@@ -290,3 +290,14 @@ class IssueUpdateViewTest(TestCase):
 
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
+
+    def test_redirects_to_issue_details_on_success(self):
+        self.client.login(username='testuser', password=USER_PASSWORD)
+        _, repository_id, issue_id = self.get_edit_existing_issue()
+
+        response = self.client.post(reverse('issue-update', kwargs={'id': repository_id, 'pk': issue_id}),
+                                    {'title': 'Changed test title', 'description': 'changed test desc',
+                                     'assignees': [], 'milestone': ''})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/repository/{}/issues/{}/'.format(repository_id, issue_id))
