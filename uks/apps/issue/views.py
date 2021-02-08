@@ -65,7 +65,7 @@ class CreateIssueView(LoginRequiredMixin, CreateView):
 
 class IssueUpdateView(LoginRequiredMixin, UpdateView):
     model = Issue
-    fields = ['title', 'description']
+    form_class = CreateIssueForm
 
     def form_valid(self, form):
         # Add issue change for actual changes
@@ -80,6 +80,11 @@ class IssueUpdateView(LoginRequiredMixin, UpdateView):
                                                                      form.cleaned_data[changed_field])
             elif changed_field == 'description':
                 ch.message = self.request.user.username + ' changed description'
+            elif changed_field == 'assignees':
+                ch.message = '{} changed assignees'.format(self.request.user.username)
+            elif changed_field == 'milestone':
+                ch.message = '{} changed milestone from {} to {}'.format(self.request.user.username, original_issue.milestone.title,
+                                                                         form.cleaned_data[changed_field])
             ch.save()
 
         return response
@@ -89,6 +94,11 @@ class IssueUpdateView(LoginRequiredMixin, UpdateView):
         context = super(IssueUpdateView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
         return context
+
+    def get_form_kwargs(self):
+        kwargs = super(IssueUpdateView, self).get_form_kwargs()
+        kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['id'])
+        return kwargs
 
     def get_success_url(self):
         if self.request.path.find('edit') != -1:
