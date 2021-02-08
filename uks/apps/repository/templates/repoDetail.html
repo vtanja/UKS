@@ -1,31 +1,35 @@
-{% extends "user/dashboard.html" %}
+{% extends "home.html" %}
 
-{% block repos %}
-<div class="card text-center">
-  <div class="card-header">
-    <ul class="nav nav-tabs card-header-tabs">
-      <li class="nav-item" style="color: green">
-        <a class="nav-link disabled" href="#">Repository {{repository.name}}</a>
-      </li>
-      <li class="nav-item" style="color: green">
-        <a  class="nav-link text-success" id="one-tab"href="#one">Overview</a>
-      </li>
-      <li class="nav-item" >
-        <a  class="nav-link text-success" id="two-tab" href="{% url 'repository-issues' repository.id %}">Issues</a>
-      </li>
-      <li class="nav-item" >
-        <a  class="nav-link text-success">Projects</a>
-      </li>
-      <li class="nav-item" >
-        <a  class="nav-link text-success">Wiki</a>
-      </li>
-    </ul>
-  </div>
-  <div class="tab-content" id="myTabContent">
-    {% block repo-content %}
-        <h5 class="card-title">Repository {{repository.name}}</h5>
-        <h6>{{repository.description}}</h6>
-    {% endblock %}
-  </div>
-</div>
+{% block dashboard %}
+    <div class="card text-center">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item" style="color: green">
+                    <a class="nav-link disabled" href="#">Repository {{repository.name}}</a>
+                </li>
+                <li class="nav-item" style="color: green">
+                    <a  class="nav-link text-success" id="one-tab"href="#one">Overview</a>
+                </li>
+                <li class="nav-item" >
+                    <a  class="nav-link text-success {% if 'issues' in request.path %} active {% endif %}" id="two-tab" href="{% url 'repository-issues' repository.id %}">Issues</a>
+                </li>
+                <li class="nav-item" >
+                    <a  class="nav-link text-success {%if 'milestones' in request.path%}active{% endif %}" id="three-tab"
+                        href="{% url 'repository_milestones' repository.id %}">Milestones</a>
+                </li>
+                <li class="nav-item" >
+                    <a  class="nav-link text-success">Projects</a>
+                </li>
+                <li class="nav-item" >
+                    <a  class="nav-link text-success">Wiki</a>
+                </li>
+            </ul>
+        </div>
+        <div class="tab-content" id="myTabContent">
+            {% block repo-content %}
+                <h5 class="card-title">Repository {{repository.name}}</h5>
+                <h6>{{repository.description}}</h6>
+            {% endblock %}
+        </div>
+    </div>
 {% endblock %}

@@ -1,27 +1,32 @@
 {% extends 'repoDetail.html' %}
 
 {% block repo-content %}
-<div class="container">
-    <div class="row p-2 justify-content-md-end">
-        <a class="btn btn-success" href="{% url 'issue-add' repository.id %}">New issue</a>
-    </div>
-    <div class="row">
-    <table class="table table-hover">
-        <thead>
-            <th scope="col">Status</th>
-            <th scope="col">Title</th>
-            <th scope="col">Created by</th>
-        </thead>
-        <tbody>
-            {% for issue in object_list %}
-                <tr>
-                    <td>{{ issue.issue_status.title }}</td>
-                    <td><a href="{% url 'issue-details' repository.id issue.id %}">{{ issue.title }}</a></td>
-                    <td>{{ user.username }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    </div>
-</div>
+    {% if object_list %}
+        <div class="container">
+            <div class="row p-2 justify-content-md-end">
+                <a class="btn btn-success" href="{% url 'issue_add' repository.id %}">New issue</a>
+            </div>
+            <div class="row">
+            <table class="table table-hover">
+                <caption>Repository issues</caption>
+                <thead>
+                    <th scope="col">Status</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Created by</th>
+                </thead>
+                <tbody>
+                    {% for issue in object_list %}
+                        <tr>
+                            <td>{{ issue.issue_status.title }}</td>
+                            <td><a href="{% url 'issue_details' repository.id issue.id %}">{{ issue.title }}</a></td>
+                            <td>{{ user.username }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    {% else %}
+        <p>There are no issues for current repository</p>
+    {% endif %}
 {% endblock %}

@@ -16,6 +16,8 @@
                         <p><strong>Created by</strong></p>
                         <p><strong>Status</strong></p>
                         <p><strong>Description</strong></p>
+                        <p><strong>Assignees</strong></p>
+                        <p><strong>Milestone</strong></p>
                         <!-- Labels, Milestone, Project, Assignee -->
                     </div>
                     <div class="col">
@@ -23,6 +25,10 @@
                         <p>{{ user.username }}</p>
                         <p>{{ issue.issue_status.title }}</p>
                         <p>{{ issue.description }}</p>
+                        <p> {% for assignee in issue.assignees.all %} {{ assignee.username }}
+                            {% empty %} No one is assigned to this issue {% endfor %} </p>
+                        <p> {% if issue.milestone %} {{ issue.milestone.title }}
+                            {% else %} This issue isn't in any milestone {% endif %} </p>
                         <!-- Labels, Milestone, Project, Assignee -->
                     </div>
                 </div>
