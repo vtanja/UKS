@@ -62,37 +62,37 @@ class IssueListViewTest(TestCase):
 
     def test_view_url_accessible_by_name(self):
         repository = Repository.objects.all()[0]
-        response = self.client.get(reverse('repository_issues', kwargs={'id': repository.id}))
+        response = self.client.get(reverse('repository-issues', kwargs={'id': repository.id}))
         self.assertEqual(response.status_code, 200)
 
     def test_view_uses_correct_template(self):
         repository = Repository.objects.all()[0]
-        response = self.client.get(reverse('repository_issues', kwargs={'id': repository.id}))
+        response = self.client.get(reverse('repository-issues', kwargs={'id': repository.id}))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'issue/issue_list.html')
 
     def test_repository_with_no_issues(self):
         repository = Repository.objects.all()[2]
-        response = self.client.get(reverse('repository_issues', kwargs={'id': repository.id}))
+        response = self.client.get(reverse('repository-issues', kwargs={'id': repository.id}))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.context['object_list']) == 0)
 
     def test_repository_with_issues_added_to_it(self):
         repository = Repository.objects.all()[0]
-        response = self.client.get(reverse('repository_issues', kwargs={'id': repository.id}))
+        response = self.client.get(reverse('repository-issues', kwargs={'id': repository.id}))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.context['object_list']) != 0)
 
     def test_HTTP404_if_repository_doesnt_exist(self):
         repositories = Repository.objects.all()
         non_existent_repository = repositories[len(repositories) - 1].id + 1
-        response = self.client.get(reverse('repository_issues', kwargs={'id': non_existent_repository}))
+        response = self.client.get(reverse('repository-issues', kwargs={'id': non_existent_repository}))
         self.assertEqual(response.status_code, 404)
         self.assertRaisesMessage(Http404, 'No Repository matches the given query.')
 
     def test_only_issues_from_current_repository_in_list(self):
         repository = Repository.objects.all()[0]
-        response = self.client.get(reverse('repository_issues', kwargs={'id': repository.id}))
+        response = self.client.get(reverse('repository-issues', kwargs={'id': repository.id}))
         self.assertTrue(response.context['object_list'] != 0)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.context['object_list']) == 2)
@@ -118,7 +118,7 @@ class IssueDetailViewTest(TestCase):
     def get_existing_issue(self):
         repository_id = Repository.objects.all()[0].id
         issue_id = Issue.objects.all()[0].id
-        response = self.client.get(reverse('issue_details', kwargs={'id': repository_id, 'pk': issue_id}))
+        response = self.client.get(reverse('issue-details', kwargs={'id': repository_id, 'pk': issue_id}))
         self.assertEqual(response.status_code, 200)
         return response
 
@@ -131,7 +131,7 @@ class IssueDetailViewTest(TestCase):
         non_existing_repository_id = repositories[len(repositories) - 1].id + 1
         issues = Issue.objects.all()
         issue_id = issues[0].id
-        response = self.client.get(reverse('issue_details', kwargs={'id': non_existing_repository_id, 'pk': issue_id}))
+        response = self.client.get(reverse('issue-details', kwargs={'id': non_existing_repository_id, 'pk': issue_id}))
         self.assertEqual(response.status_code, 404)
         self.assertRaisesMessage(Http404, 'No Issue matches the given query.')
 
@@ -140,7 +140,7 @@ class IssueDetailViewTest(TestCase):
         repository_id = repositories[0].id
         issues = Issue.objects.all()
         non_existing_issue_id = issues[len(issues) - 1].id + 1
-        response = self.client.get(reverse('issue_details', kwargs={'id': repository_id, 'pk': non_existing_issue_id}))
+        response = self.client.get(reverse('issue-details', kwargs={'id': repository_id, 'pk': non_existing_issue_id}))
         self.assertEqual(response.status_code, 404)
         self.assertRaisesMessage(Http404, 'No Repository matches the given query.')
 
@@ -163,7 +163,7 @@ class CreateIssueViewTest(TestCase):
     def test_logged_in_user_can_access(self):
         repository = Repository.objects.all()[0].id
         self.client.login(username='testuser', password=USER_PASSWORD)
-        response = self.client.get(reverse('issue_add', kwargs={'id': repository}))
+        response = self.client.get(reverse('issue-add', kwargs={'id': repository}))
 
         self.assertEqual(str(response.wsgi_request.user), 'testuser')
         self.assertEqual(response.status_code, 200)
@@ -172,7 +172,7 @@ class CreateIssueViewTest(TestCase):
     def test_view_shows_correct_template(self):
         repository = Repository.objects.all()[0].id
         self.client.login(username='testuser', password=USER_PASSWORD)
-        response = self.client.get(reverse('issue_add', kwargs={'id': repository}))
+        response = self.client.get(reverse('issue-add', kwargs={'id': repository}))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'issue/issue_form.html')
@@ -181,7 +181,7 @@ class CreateIssueViewTest(TestCase):
         repositories = Repository.objects.all()
         non_existent_id = repositories[len(repositories) - 1].id + 1
         self.client.login(username='testuser', password=USER_PASSWORD)
-        response = self.client.get(reverse('issue_add', kwargs={'id': non_existent_id}))
+        response = self.client.get(reverse('issue-add', kwargs={'id': non_existent_id}))
 
         self.assertEqual(response.status_code, 404)
         self.assertRaisesMessage(Http404, 'No Repository matches given query.')
@@ -189,7 +189,7 @@ class CreateIssueViewTest(TestCase):
     def test_redirects_to_repository_issues_on_success(self):
         repository = Repository.objects.all()[0].id
         self.client.login(username='testuser', password=USER_PASSWORD)
-        response = self.client.post(reverse('issue_add', kwargs={'id': repository}),
+        response = self.client.post(reverse('issue-add', kwargs={'id': repository}),
                                     {'title': 'Test issue', 'description': 'Test description'})
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/repository/{}/issues/'.format(repository))

@@ -4,7 +4,7 @@
     {% if object_list %}
         <div class="container">
             <div class="row p-2 justify-content-md-end">
-                <a class="btn btn-success" href="{% url 'issue_add' repository.id %}">New issue</a>
+                <a class="btn btn-success" href="{% url 'issue-add' repository.id %}">New issue</a>
             </div>
             <div class="row">
             <table class="table table-hover">
@@ -18,7 +18,7 @@
                     {% for issue in object_list %}
                         <tr>
                             <td>{{ issue.issue_status.title }}</td>
-                            <td><a href="{% url 'issue_details' repository.id issue.id %}">{{ issue.title }}</a></td>
+                            <td><a href="{% url 'issue-details' repository.id issue.id %}">{{ issue.title }}</a></td>
                             <td>{{ user.username }}</td>
                         </tr>
                     {% endfor %}
