@@ -3,7 +3,6 @@ from django.http import Http404
 from django.test import TestCase
 from django.urls import reverse
 
-from security.models import SiteUser
 from ...repository.models import Repository
 from ..models import Issue
 
@@ -28,12 +27,6 @@ def fill_test_db():
     test_repository.save()
     test_repository1.save()
     test_repository2.save()
-
-    # Create site users
-    test_site_user = SiteUser.objects.create(user=test_user)
-    test_site_user1 = SiteUser.objects.create(user=test_user1)
-    test_site_user.save()
-    test_site_user1.save()
 
     # Create issues and add them to repositories
     test_issue1 = Issue.objects.create(title='test issue', description='test', repository=test_repository,
