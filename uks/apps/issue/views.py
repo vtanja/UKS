@@ -69,7 +69,7 @@ class IssueUpdateView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         # Add issue change for actual changes
-        original_issue = get_object_or_404(Issue, id=form.instance.id)
+        original_issue = self.object
         response = super(IssueUpdateView, self).form_valid(form)
         for changed_field in form.changed_data:
             ch = IssueChange()
