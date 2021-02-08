@@ -18,6 +18,10 @@
                         href="{% url 'repository_milestones' repository.id %}">Milestones</a>
                 </li>
                 <li class="nav-item" >
+                    <a  class="nav-link text-success {%if 'labels' in request.path%}active{% endif %}" id="four-tab"
+                        href="{% url 'repository_labels' repository.id %}">Labels</a>
+                </li>
+                <li class="nav-item" >
                     <a  class="nav-link text-success">Projects</a>
                 </li>
                 <li class="nav-item" >
