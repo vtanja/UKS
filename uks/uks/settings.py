@@ -42,9 +42,11 @@ INSTALLED_APPS = [
     'apps.repository',
     'apps.milestone',
     'apps.issue',
+    'apps.label',
     'security',
     'crispy_forms',
     'fontawesome-free',
+    'colorfield',
 ]
 
 MIDDLEWARE = [
