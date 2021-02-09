@@ -244,12 +244,8 @@ class AllIssuesListView(TestCase):
 
 class IssueUpdateViewTest(TestCase):
 
-    # @classmethod
-    # def setUpTestData(cls):
-    #     fill_test_db()
-
     @classmethod
-    def setUp(cls):
+    def setUpTestData(cls):
         fill_test_db()
 
     def get_edit_existing_issue(self, repository_id=-1, issue_id=-1):
