@@ -32,7 +32,6 @@ class MilestoneListView(ListView):
 class CreateMilestoneView(LoginRequiredMixin, CreateView):
     model = Milestone
     template_name = 'milestone/milestone_create.html'
-    #fields = ['title', 'description', 'dueDate']
     form_class = CreateMilestoneForm
 
     def form_valid(self, form):

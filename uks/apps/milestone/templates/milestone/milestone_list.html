@@ -22,7 +22,7 @@
                     <div style="display: flex; height: fit-content" class="row">
                         <div class="col" style="text-align: left;">
                             <h4>
-                                <i class="fas fa-map-signs"></i>&nbsp;&nbsp;
+                                <em class="fas fa-map-signs"></em>&nbsp;&nbsp;
                                 <a href="{% url 'milestone_details' repository.id milestone.id %}">{{ milestone.title }}</a>
                                 {% if milestone.closed %}
                                     <span class="badge badge-pill badge-secondary">Closed</span>
@@ -40,8 +40,8 @@
                     </div>
                     <div class="row">
                         <div class="col" style="text-align: left;">
-                            <i>Due by: {{ milestone.dueDate }}</i>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <i>Last updated: {{ milestone.dateUpdated }}</i>
+                            <em>Due by: {{ milestone.dueDate }}</em>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <em>Last updated: {{ milestone.dateUpdated }}</em>
                         </div>
                         <div class="col" style="text-align: left">
                             <a>Edit</a>&nbsp;&nbsp;
