@@ -1,0 +1,32 @@
+{% extends 'repository/repoDetail.html' %}
+
+{% block repo-content %}
+    <div class="container" style="padding: 7mm;">
+        <div class="row">
+            <div class="col">
+                <a style="float: right" class="btn btn-success">New label</a>
+            </div>
+        </div>
+
+    </div>
+    <div class="container">
+         <div class="card-header" style="text-align: left">{{label_list.count}} labels</div>
+        {% for label in label_list %}
+            <div class="card" style="width: 100%" >
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col" style="text-align: left">
+                             <h5><span class="badge badge-light" style="background-color: {{label.color}}!important;color:white">{{label.name}}</span></h5>
+                        </div>
+                        <div class="col" style="text-align: left">{{label.description}} </div>
+                        <div class="col" style="text-align: right">
+                            <a href="#" type="button" class="btn btn-link">Edit</a>
+                            <a href="#" type="button" class="btn btn-link">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+         <br>
+    </div>
+{% endblock %}

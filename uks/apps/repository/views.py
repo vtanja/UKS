@@ -1,6 +1,8 @@
 import datetime
 import json
 import os
+from django.db.models import Q
+from django.shortcuts import render
 
 import requests
 from django.contrib import messages
@@ -33,7 +35,9 @@ class RepositoryDetailView(DetailView):
 
 
 def detail(request, id):
-    repositories = request.user.siteuser.repositories.all()
+    repositories = Repository.objects.filter(
+        Q(owner=request.user) | Q(collaborators__username__in=[str(request.user)])
+    )
     repository = Repository.objects.get(id=id)
     print(repository.name)
     context = {'repositories': repositories, 'repository': repository}
@@ -66,16 +70,15 @@ def addRepository(request):
         if form.is_valid():
             print('Forma je validna')
             # form.save()
+            form.instance.owner = request.user
             repository = form.save()
 
             get_branches(repository)
             # repository.branch_set.set(branches)
 
-            request.user.siteuser.repositories.add(repository)
-
             change = UserHistoryItem()
             change.dateChanged = datetime.datetime.now()
-            change.belongsTo = request.user.siteuser
+            change.belongsTo = request.user
             change.message = 'added new repository'
             change.save()
 

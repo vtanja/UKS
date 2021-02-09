@@ -12,11 +12,16 @@
         <a  class="nav-link text-success {%if 'repository' in request.path%}active{% endif %}" id="one-tab" href="{% url 'detail' repository.id   %}">Overview</a>
       </li>
       <li class="nav-item" >
-        <a  class="nav-link text-success" id="two-tab" >Issues</a>
-      </li>
-      <li class="nav-item" >
-        <a  class="nav-link text-success">Projects</a>
-      </li>
+                    <a  class="nav-link text-success {% if 'issues' in request.path %} active {% endif %}" id="two-tab" href="{% url 'repository_issues' repository.id %}">Issues</a>
+                </li>
+                <li class="nav-item" >
+                    <a  class="nav-link text-success {%if 'milestones' in request.path%}active{% endif %}" id="three-tab"
+                        href="{% url 'repository_milestones' repository.id %}">Milestones</a>
+                </li>
+                <li class="nav-item" >
+                    <a  class="nav-link text-success {%if 'labels' in request.path%}active{% endif %}" id="four-tab"
+                        href="{% url 'repository_labels' repository.id %}">Labels</a>
+                </li>
       <li class="nav-item" >
         <a  class="nav-link text-success">Wiki</a>
       </li>
