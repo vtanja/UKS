@@ -23,7 +23,7 @@
                         <div class="col" style="text-align: left;">
                             <h4>
                                 <i class="fas fa-map-signs"></i>&nbsp;&nbsp;
-                                {{ milestone.title }}
+                                <a href="{% url 'milestone_details' repository.id milestone.id %}">{{ milestone.title }}</a>
                                 {% if milestone.closed %}
                                     <span class="badge badge-pill badge-secondary">Closed</span>
                                 {% else %}
