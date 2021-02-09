@@ -295,7 +295,7 @@ class IssueUpdateViewTest(TestCase):
         self.assertRaises(Http404)
 
     def test_issue_change_created_for_every_change_and_redirect(self):
-        start_of_test = timezone.now()
+        start_of_the_test = timezone.now()
         self.client.login(username='testuser', password=USER_PASSWORD)
         _, repository_id, issue_id = self.get_edit_existing_issue()
 
@@ -306,7 +306,7 @@ class IssueUpdateViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/repository/{}/issues/{}/'.format(repository_id, issue_id))
         # Find all objects that have been changed since start of the test process
-        issue_change_objects = IssueChange.objects.filter(date__gt=start_of_test,
+        issue_change_objects = IssueChange.objects.filter(date__gt=start_of_the_test,
                                                           message__contains=response.wsgi_request.user)
         # Changed title and assignee list
         self.assertEqual(len(issue_change_objects), 2)
