@@ -6,9 +6,7 @@ from apps.repository.models import Repository
 from apps.milestone.models import Milestone
 
 
-
 class Issue(models.Model):
-
     class IssueStatus(models.TextChoices):
         TODO = 'TODO', _('To do')
         ONGOING = 'ONGOING', _('Ongoing')
