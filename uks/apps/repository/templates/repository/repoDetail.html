@@ -9,7 +9,7 @@
         <a class="nav-link disabled" href="#">Repository {{repository.name}}</a>
       </li>
       <li class="nav-item" style="color: green">
-        <a  class="nav-link text-success {%if 'repository' in request.path%}active{% endif %}" id="one-tab" href="{% url 'detail' repository.id   %}">Overview</a>
+        <a class="nav-link text-success {% if show %} active {% endif %}" id="one-tab" href="{% url 'detail' repository.id   %}" >Overview</a>
       </li>
       <li class="nav-item" >
                     <a  class="nav-link text-success {% if 'issues' in request.path %} active {% endif %}" id="two-tab" href="{% url 'repository_issues' repository.id %}">Issues</a>

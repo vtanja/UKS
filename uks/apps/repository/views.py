@@ -31,6 +31,7 @@ class RepositoryDetailView(DetailView):
         qs = Branch.objects.filter(repository=self.repository)
         context["qs_json"] = json.dumps([obj.as_dict() for obj in qs])
         context['first'] = Branch.objects.filter(Q(repository_id=self.repository.id)).first()
+        context['show'] = True
         return context
 
 
