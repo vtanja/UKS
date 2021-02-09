@@ -294,24 +294,24 @@ class IssueUpdateViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
 
-    def test_redirects_to_issue_details_on_success(self):
+    def issue_test_redirects_to_issue_details_on_success(self):
         self.client.login(username='testuser', password=USER_PASSWORD)
         _, repository_id, issue_id = self.get_edit_existing_issue()
 
         response = self.client.post(reverse('issue-update', kwargs={'id': repository_id, 'pk': issue_id}),
-                                    {'title': 'Changed test title', 'description': 'changed test desc',
+                                    {'title': 'test issue', 'description': 'test',
                                      'assignees': [], 'milestone': ''})
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/repository/{}/issues/{}/'.format(repository_id, issue_id))
 
-    def test_issue_change_created_for_every_change(self):
+    def issue_test_issue_change_created_for_every_change(self):
         start_of_test = timezone.now()
         self.client.login(username='testuser', password=USER_PASSWORD)
         _, repository_id, issue_id = self.get_edit_existing_issue()
 
         response = self.client.post(reverse('issue-update', kwargs={'id': repository_id, 'pk': issue_id}),
-                                    {'title': 'Changed test title', 'description': 'Changed test',
+                                    {'title': 'Changed test title', 'description': 'test',
                                      'assignees': [], 'milestone': ''})
 
         self.assertEqual(response.status_code, 302)
@@ -319,4 +319,8 @@ class IssueUpdateViewTest(TestCase):
         issue_change_objects = IssueChange.objects.filter(date__gt=start_of_test,
                                                           message__contains=response.wsgi_request.user)
         # Changed title and assignee list
-        self.assertEqual(len(issue_change_objects), 3)
+        self.assertEqual(len(issue_change_objects), 2)
+
+    def test_changing_issue_and_creating_issue_change_objects(self):
+        self.issue_test_issue_change_created_for_every_change()
+        self.issue_test_redirects_to_issue_details_on_success()
