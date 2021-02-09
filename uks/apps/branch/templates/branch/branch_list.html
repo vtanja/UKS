@@ -1,5 +1,5 @@
 {% extends 'repository/repoDetail.html' %}
-
+{% load crispy_forms_tags %}
 {% block repo-content %}
     {% if object_list %}
         <br>
@@ -12,8 +12,8 @@
                                 <a href="#" class="text-success">  {{ branch.name }} </a>
                             </div>
                             <div class="col" style="text-align: right">
-                                <a style="cursor: pointer"><i class="far fa-edit"></i></a>&nbsp;&nbsp;
-                                <a style="color: red; cursor: pointer" data-toggle="modal" data-target="#{{ branch.id }}"><i class="far fa-trash-alt"></i></a>
+                                <a style="cursor: pointer"  data-toggle="modal"data-target="#{{ branch.id }}" onclick="hide_or_show('update', {{ branch.id }})" ><i class="far fa-edit"></i></a>&nbsp;&nbsp;
+                                <a style="color: red; cursor: pointer" data-toggle="modal" data-target="#{{ branch.id }}" onclick="hide_or_show('delete', {{ branch.id }})"  ><i class="far fa-trash-alt"></i></a>
                             </div>
                         </div>
                     </div>
@@ -22,18 +22,24 @@
                   <div class="modal-dialog" role="document">
                     <div class="modal-content">
                       <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Delete</h5>
+                        <h5 class="modal-title text-success" id="exampleModalLabel">Branch: {{ branch.name }}</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                           <span aria-hidden="true">&times;</span>
                         </button>
                       </div>
                       <div class="modal-body">
-                          <h5>Are you sure that you want to delete branch {{ branch.name }}? </h5>
+                          <h5 id="del-message-{{ branch.id }}">Are you sure that you want to delete branch {{ branch.name }}? </h5>
+
+                          <form id="update-form-{{ branch.id }}" method="POST" action="{% url 'branch_update' repository.id branch.id %}" >
+                            {% csrf_token %}
+                            {{p_form | crispy}}
+                             <br>
+                            <button class="btn btn-outline-success" type="submit" >Update profile</button>
+                        </form>
                       </div>
                       <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 
-                          <form action="{% url 'branch_delete' repository.id branch.id %}" method="post" style="display: inline">
+                          <form id="del-form-{{ branch.id }}" action="{% url 'branch_delete' repository.id branch.id %}" method="post" style="display: inline">
                               {% csrf_token %}
                               <input type="hidden" name="branch_id" value="{{ branch.id }}">
                               <button type="submit" class="btn btn-success">Delete</button>
@@ -50,3 +56,29 @@
     {% endif %}
 {% endblock %}
 
+{% block scripts %}
+    <script>
+        function hide_or_show(prop, branch_id) {
+          var del_form = document.getElementById("del-form-"+branch_id);
+          var del_message = document.getElementById("del-message-"+branch_id);
+          var update_form = document.getElementById("update-form-"+branch_id);
+
+          del_form.style.display="none";
+          del_message.style.display="none";
+          update_form.style.display="none";
+
+          if(prop === 'update'){
+              update_form.style.display="block";
+          }
+          else if(prop === 'delete'){
+              del_form.style.display="block";
+              del_message.style.display="block";
+          }
+
+          console.log(del_form)
+            console.log(del_message)
+            console.log(update_form)
+
+        }
+    </script>
+{% endblock %}
