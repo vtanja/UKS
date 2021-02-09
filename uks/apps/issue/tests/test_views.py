@@ -194,7 +194,7 @@ class CreateIssueViewTest(TestCase):
 class AllIssuesListView(TestCase):
 
     @classmethod
-    def setUp(cls):
+    def setUpTestData(cls):
         fill_test_db()
 
     def test_redirect_if_user_not_logged_in(self):
@@ -244,8 +244,12 @@ class AllIssuesListView(TestCase):
 
 class IssueUpdateViewTest(TestCase):
 
+    # @classmethod
+    # def setUpTestData(cls):
+    #     fill_test_db()
+
     @classmethod
-    def setUpTestData(cls):
+    def setUp(cls):
         fill_test_db()
 
     def get_edit_existing_issue(self, repository_id=-1, issue_id=-1):
