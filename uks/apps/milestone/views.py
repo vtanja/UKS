@@ -9,6 +9,7 @@ from django.http import HttpResponse
 from apps.milestone.models import Milestone
 from apps.repository.models import Repository
 from apps.milestone.forms import CreateMilestoneForm
+from apps.issue.models import Issue
 
 
 def index(request):
@@ -60,5 +61,7 @@ class MilestoneDetailView(DetailView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(MilestoneDetailView, self).get_context_data(**kwargs)
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        self.milestone = get_object_or_404(Milestone, id=self.kwargs['pk'])
         context['repository'] = self.repository
+        context['issues'] = Issue.objects.filter(milestone=self.milestone)
         return context
