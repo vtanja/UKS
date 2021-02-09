@@ -1,0 +1,28 @@
+{% extends 'repoDetail.html' %}
+
+
+{% block repo-content %}
+    <div class="container" style="text-align: left; padding: 5mm">
+        <h3>
+            {{ milestone.title }}
+        </h3>
+        <div class="container row" style="text-align: left" >
+            <div class="col" style="background-color: #6DDCBD; width: 30%">
+                <p>{{ milestone.dateCreated }} - {{ milestone.dueDate }}</p>
+                <h6 style="color: #949393">
+                    {% if milestone.closed %}
+                        <i>Closed</i>
+                    {% else %}
+                        <i>Open</i>
+                    {% endif %}
+                </h6>
+                <h4>{{ milestone.description }}</h4>
+            </div>
+            <div class="col" style="background-color: #79aec8; width: 70%">
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
