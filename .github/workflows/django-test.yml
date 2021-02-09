@@ -57,4 +57,10 @@ jobs:
         python ./uks/manage.py migrate
     - name: Run Tests
       run: |
-        python ./uks/manage.py test apps.issue
+        coverage run --source='./uks' ./uks/manage.py test apps.issue
+        coverage xml -i -o coverage-reports/coverage.xml
+    - name: SonarCloud Scan
+      uses: sonarsource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
