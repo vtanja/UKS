@@ -17,6 +17,7 @@
                         <p><strong>Status</strong></p>
                         <p><strong>Description</strong></p>
                         <p><strong>Assignees</strong></p>
+                        <p><strong>Labels</strong></p>
                         <p><strong>Milestone</strong></p>
                         <!-- Labels, Milestone, Project, Assignee -->
                     </div>
@@ -27,6 +28,8 @@
                         <p>{{ issue.description }}</p>
                         <p> {% for assignee in issue.assignees.all %} {{ assignee.username }}
                             {% empty %} No one is assigned to this issue {% endfor %} </p>
+                        <p> {% for label in issue.labels.all %} <span class="badge badge-light" style="background-color: {{label.color}}!important;color:white">{{label.name}}</span>
+                            {% empty %} This issue has no labels {% endfor %} </p>
                         <p> {% if issue.milestone %} {{ issue.milestone.title }}
                             {% else %} This issue isn't in any milestone {% endif %} </p>
                         <!-- Labels, Milestone, Project, Assignee -->
