@@ -315,7 +315,7 @@ class IssueUpdateViewTest(TestCase):
         _, repository_id, issue_id = self.get_edit_existing_issue()
 
         response = self.client.post(reverse('issue-update', kwargs={'id': repository_id, 'pk': issue_id}),
-                                    {'title': 'Changed test title', 'description': 'test',
+                                    {'title': 'Changed test title', 'description': 'Changed test',
                                      'assignees': [], 'milestone': ''})
 
         self.assertEqual(response.status_code, 302)
@@ -323,4 +323,4 @@ class IssueUpdateViewTest(TestCase):
         issue_change_objects = IssueChange.objects.filter(date__gt=start_of_test,
                                                           message__contains=response.wsgi_request.user)
         # Changed title and assignee list
-        self.assertEqual(len(issue_change_objects), 2)
+        self.assertEqual(len(issue_change_objects), 3)
