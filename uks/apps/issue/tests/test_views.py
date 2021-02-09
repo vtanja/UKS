@@ -194,7 +194,7 @@ class CreateIssueViewTest(TestCase):
 class AllIssuesListView(TestCase):
 
     @classmethod
-    def setUpTestData(cls):
+    def setUp(cls):
         fill_test_db()
 
     def test_redirect_if_user_not_logged_in(self):
