@@ -33,9 +33,9 @@
                         </div>
                         <div class="col" style="vertical-align: center">
                             <div class="progress" style="vertical-align: center">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ 25 }}%" aria-valuenow="{{ 25 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ milestone.get_completed_percentage }}%" aria-valuenow="{{ milestone.getCompletedPercentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
-                            <p style="float: left; color: dimgray">7 of 10 issues completed</p>
+                            <p style="float: left; color: dimgray">{{ milestone.get_closed_issues_count }} of {{ milestone.get_issue_count }} issues completed</p>
                         </div>
                     </div>
                     <div class="row">
