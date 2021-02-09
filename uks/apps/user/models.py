@@ -28,7 +28,6 @@ class UserHistoryItem(models.Model):
                     return ' Few moments ago '
         else:
             diff = datetime.datetime.now().date() - self.dateChanged.date()
-            print(diff.days)
             if diff.days > 365:
                 return repr(diff.days // 365).__str__() + ' years ago '
             elif diff.days > 30:
