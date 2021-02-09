@@ -1,7 +1,7 @@
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, DetailView
 
 # Create your views here.
 from django.http import HttpResponse
@@ -52,3 +52,14 @@ class CreateMilestoneView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse_lazy('repository_milestones', kwargs={'id': self.kwargs['id']})
+
+
+class MilestoneDetailView(DetailView):
+    model = Milestone
+    template_name = 'milestone/milestone_detail.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(MilestoneDetailView, self).get_context_data(**kwargs)
+        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        context['repository'] = self.repository
+        return context
