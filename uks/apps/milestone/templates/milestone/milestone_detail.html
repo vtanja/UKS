@@ -1,5 +1,4 @@
-{% extends 'repoDetail.html' %}
-
+{% extends 'repository/repoDetail.html' %}
 
 {% block repo-content %}
     <div class="container" style="text-align: left; padding: 5mm;">
@@ -32,7 +31,7 @@
                                 {% else %}
                                     <em class="far fa-calendar-check"></em>&nbsp;&nbsp;
                                 {% endif %}
-                                <a style="color: #408f2f" href="{% url 'issue_details' repository.id issue.id %}">{{ issue.title }}</a>
+                                <a style="color: #408f2f" href="{% url 'issue-details' repository.id issue.id %}">{{ issue.title }}</a>
                             </p>
                         </div>
                         <div class="card-footer">
