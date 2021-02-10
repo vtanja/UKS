@@ -35,7 +35,7 @@ def profile(request):
 
     repositories = all_users_repositories(request)
     context['repos'] = repositories
-    context['issues'] = Issue.objects.filter(created_by=request.user)
+    context['issues'] = Issue.objects.filter(created_by=request.user, closed=False)
 
     return render(request, 'user/profile.html', context)
 
@@ -59,10 +59,10 @@ def get_profile_form(request):
     return context
 
 
-
 class AllIssuesListView(LoginRequiredMixin, ListView):
     model = Issue
     template_name = 'user/issue_list.html'
 
     def get_queryset(self):
-        return Issue.objects.filter(Q(assignees__in=[self.request.user]) | Q(created_by=self.request.user))
+        return Issue.objects.filter(Q(assignees__in=[self.request.user]) | Q(created_by=self.request.user))\
+            .filter(closed=False)
