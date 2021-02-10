@@ -10,4 +10,5 @@ urlpatterns = [
     path('<int:id>/issues/', include('apps.issue.urls')),
     path('<int:id>/milestones/', include('apps.milestone.urls')),
     path('<int:id>/labels/', include('apps.label.urls')),
+    path('<int:id>/wiki/', include('apps.wiki.urls')),
 ]
