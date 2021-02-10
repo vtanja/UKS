@@ -32,6 +32,10 @@ class Issue(models.Model):
     def __str__(self):
         return self.title
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('issue-details', args=[str(self.repository_id), str(self.id)])
+
 
 class IssueChange(models.Model):
     message = models.CharField(max_length=100)
