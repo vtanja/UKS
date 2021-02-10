@@ -36,6 +36,13 @@ class Issue(models.Model):
         from django.urls import reverse
         return reverse('issue-details', args=[str(self.repository_id), str(self.id)])
 
+    def toggle_issue_close(self):
+        if self.closed:
+            self.closed = False
+        else:
+            self.closed = True
+        self.save()
+
 
 class IssueChange(models.Model):
     message = models.CharField(max_length=100)

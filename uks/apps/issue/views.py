@@ -105,10 +105,5 @@ class IssueUpdateView(LoginRequiredMixin, UpdateView):
 
 
 def close_issue(request, id, pk):
-    issue = Issue.objects.get(pk=pk)
-    if issue.closed:
-        issue.closed = False
-    else:
-        issue.closed = True
-    issue.save()
+    Issue.objects.get(pk=pk).toggle_issue_close()
     return redirect(reverse_lazy('issue-details', kwargs={'id': id, 'pk': pk}))
