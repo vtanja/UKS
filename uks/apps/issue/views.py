@@ -2,9 +2,7 @@ from django.utils import timezone
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
-from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
-from django.views.generic import ListView, DetailView, CreateView
+from django.shortcuts import get_object_or_404, redirect
 
 from .forms import CreateIssueForm
 from .models import Issue, IssueChange
@@ -104,3 +102,13 @@ class IssueUpdateView(LoginRequiredMixin, UpdateView):
         if self.request.path.find('edit') != -1:
             return reverse_lazy('issue-details', kwargs={'id': self.kwargs['id'], 'pk': self.kwargs['pk']})
         return reverse_lazy('repository-issues', kwargs={'id': self.kwargs['id']})
+
+
+def close_issue(request, id, pk):
+    issue = Issue.objects.get(pk=pk)
+    if issue.closed:
+        issue.closed = False
+    else:
+        issue.closed = True
+    issue.save()
+    return redirect(reverse_lazy('issue-details', kwargs={'id': id, 'pk': pk}))
