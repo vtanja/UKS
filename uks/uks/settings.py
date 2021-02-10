@@ -13,7 +13,6 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-from sys import path
 
 from django.contrib import messages
 
