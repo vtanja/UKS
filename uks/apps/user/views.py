@@ -15,7 +15,7 @@ from apps.user.models import UserHistoryItem
 
 def dashboard(request):
     repositories = all_users_repositories(request)
-    history = request.user.siteuser.userhistoryitem_set.all().order_by('-dateChanged')
+    history = request.user.userhistoryitem_set.all().order_by('-dateChanged')
     context = {'repositories': repositories, 'history': history}
     return render(request, 'user/dashboard.html', context)
 
@@ -58,43 +58,6 @@ def get_profile_form(request):
 
     return context
 
-
-def add_repository(request):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        form = RepositoryForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            print('Forma je validna')
-            # form.save()
-
-            form.instance.owner = request.user
-            form.save()
-
-            change = UserHistoryItem()
-            change.dateChanged = datetime.datetime.now()
-            change.belongsTo = request.user.siteuser
-            change.message = 'added new repository'
-            change.save()
-
-            messages.success(request, 'Successfully added new repository!')
-            return redirect('dashboard')
-        else:
-            print('Forma nije validna')
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = RepositoryForm()
-
-    return render(request, 'user/dashboard.html', {'form': form})
-
-
-def detail(request, id):
-    repositories = all_users_repositories(request)
-    repository = Repository.objects.get(id=id)
-    print(repository.name)
-    context = {'repositories': repositories, 'repository': repository}
-    return render(request, '../repository/templates/repoDetail.html', context)
 
 
 class AllIssuesListView(LoginRequiredMixin, ListView):

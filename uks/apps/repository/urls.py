@@ -1,9 +1,12 @@
 from django.urls import path, include
 
 from apps.repository import views
+from apps.repository.views import RepositoryDetailView
 
 urlpatterns = [
-    path('<int:id>/', views.detail, name='detail'),
+    path('<int:pk>/', RepositoryDetailView.as_view(), name='detail'),
+    path('add/', views.add_repository, name='add'),
+    path('<int:id>/branch/', include('apps.branch.urls')),
     path('<int:id>/issues/', include('apps.issue.urls')),
     path('<int:id>/milestones/', include('apps.milestone.urls')),
     path('<int:id>/labels/', include('apps.label.urls')),

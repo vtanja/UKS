@@ -57,7 +57,7 @@
                                     {% for repo in repos %}
                                         <div class="card" >
                                           <div class="card-body">
-                                            <h5 class="card-title">{{ repo.name }}</h5>
+                                            <a class="card-title" href="{% url 'detail' repo.id %}">{{ repo.name }}</a>
                                             <p class="card-text">{{ repo.description }}</p>
                                           </div>
                                         </div> <br>
@@ -70,8 +70,8 @@
                                          <table class="table table-hover">
                                              <caption>Issues created by you</caption>
                                              <colgroup>
-                                                 <col style="width 20%">
-                                                 <col style="width 80%">
+                                                 <col style="width: 20%">
+                                                 <col style="width: 80%">
                                              </colgroup>
                                              <thead>
                                                  <th scope="col">Status</th>
