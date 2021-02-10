@@ -21,7 +21,7 @@
                         </div>
                         <div class="col" style="text-align: right">
                             <a href="{% url 'project_update' repository.id project.id %}">Edit</a>&nbsp;&nbsp;
-                            <a style="color: red" >Delete</a>
+                            <a style="color: red" href="{% url 'project_delete' repository.id project.id %}">Delete</a>
                         </div>
                     </div>
                 </div>
