@@ -61,37 +61,37 @@ class IssueListViewTest(TestCase):
 
     def test_view_url_accessible_by_name(self):
         repository = Repository.objects.all()[0]
-        response = self.client.get(reverse('repository-issues', kwargs={'id': repository.id}))
+        response = self.client.get(reverse('repository-issues', kwargs={'repository_id': repository.id}))
         self.assertEqual(response.status_code, 200)
 
     def test_view_uses_correct_template(self):
         repository = Repository.objects.all()[0]
-        response = self.client.get(reverse('repository-issues', kwargs={'id': repository.id}))
+        response = self.client.get(reverse('repository-issues', kwargs={'repository_id': repository.id}))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'issue/issue_list.html')
 
     def test_repository_with_no_issues(self):
         repository = Repository.objects.all()[2]
-        response = self.client.get(reverse('repository-issues', kwargs={'id': repository.id}))
+        response = self.client.get(reverse('repository-issues', kwargs={'repository_id': repository.id}))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.context['object_list']) == 0)
 
     def test_repository_with_issues_added_to_it(self):
         repository = Repository.objects.all()[0]
-        response = self.client.get(reverse('repository-issues', kwargs={'id': repository.id}))
+        response = self.client.get(reverse('repository-issues', kwargs={'repository_id': repository.id}))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.context['object_list']) != 0)
 
     def test_HTTP404_if_repository_doesnt_exist(self):
         repositories = Repository.objects.all()
         non_existent_repository = repositories[len(repositories) - 1].id + 1
-        response = self.client.get(reverse('repository-issues', kwargs={'id': non_existent_repository}))
+        response = self.client.get(reverse('repository-issues', kwargs={'repository_id': non_existent_repository}))
         self.assertEqual(response.status_code, 404)
         self.assertRaisesMessage(Http404, 'No Repository matches the given query.')
 
     def test_only_issues_from_current_repository_in_list(self):
         repository = Repository.objects.all()[0]
-        response = self.client.get(reverse('repository-issues', kwargs={'id': repository.id}))
+        response = self.client.get(reverse('repository-issues', kwargs={'repository_id': repository.id}))
         self.assertTrue(response.context['object_list'] != 0)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.context['object_list']) == 2)
@@ -117,7 +117,7 @@ class IssueDetailViewTest(TestCase):
     def get_existing_issue(self):
         repository_id = Repository.objects.all()[0].id
         issue_id = Issue.objects.all()[0].id
-        response = self.client.get(reverse('issue-details', kwargs={'id': repository_id, 'pk': issue_id}))
+        response = self.client.get(reverse('issue-details', kwargs={'repository_id': repository_id, 'pk': issue_id}))
         self.assertEqual(response.status_code, 200)
         return response
 
@@ -130,7 +130,7 @@ class IssueDetailViewTest(TestCase):
         non_existing_repository_id = repositories[len(repositories) - 1].id + 1
         issues = Issue.objects.all()
         issue_id = issues[0].id
-        response = self.client.get(reverse('issue-details', kwargs={'id': non_existing_repository_id, 'pk': issue_id}))
+        response = self.client.get(reverse('issue-details', kwargs={'repository_id': non_existing_repository_id, 'pk': issue_id}))
         self.assertEqual(response.status_code, 404)
         self.assertRaisesMessage(Http404, 'No Issue matches the given query.')
 
@@ -139,7 +139,7 @@ class IssueDetailViewTest(TestCase):
         repository_id = repositories[0].id
         issues = Issue.objects.all()
         non_existing_issue_id = issues[len(issues) - 1].id + 1
-        response = self.client.get(reverse('issue-details', kwargs={'id': repository_id, 'pk': non_existing_issue_id}))
+        response = self.client.get(reverse('issue-details', kwargs={'repository_id': repository_id, 'pk': non_existing_issue_id}))
         self.assertEqual(response.status_code, 404)
         self.assertRaisesMessage(Http404, 'No Repository matches the given query.')
 
@@ -162,7 +162,7 @@ class CreateIssueViewTest(TestCase):
     def test_logged_in_user_can_access(self):
         repository = Repository.objects.all()[0].id
         self.client.login(username='testuser', password=USER_PASSWORD)
-        response = self.client.get(reverse('issue-add', kwargs={'id': repository}))
+        response = self.client.get(reverse('issue-add', kwargs={'repository_id': repository}))
 
         self.assertEqual(str(response.wsgi_request.user), 'testuser')
         self.assertEqual(response.status_code, 200)
@@ -171,7 +171,7 @@ class CreateIssueViewTest(TestCase):
     def test_view_shows_correct_template(self):
         repository = Repository.objects.all()[0].id
         self.client.login(username='testuser', password=USER_PASSWORD)
-        response = self.client.get(reverse('issue-add', kwargs={'id': repository}))
+        response = self.client.get(reverse('issue-add', kwargs={'repository_id': repository}))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, ISSUE_FORM)
@@ -180,7 +180,7 @@ class CreateIssueViewTest(TestCase):
         repositories = Repository.objects.all()
         non_existent_id = repositories[len(repositories) - 1].id + 1
         self.client.login(username='testuser', password=USER_PASSWORD)
-        response = self.client.get(reverse('issue-add', kwargs={'id': non_existent_id}))
+        response = self.client.get(reverse('issue-add', kwargs={'repository_id': non_existent_id}))
 
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
@@ -188,7 +188,7 @@ class CreateIssueViewTest(TestCase):
     def test_redirects_to_repository_issues_on_success(self):
         repository = Repository.objects.all()[0].id
         self.client.login(username='testuser', password=USER_PASSWORD)
-        response = self.client.post(reverse('issue-add', kwargs={'id': repository}),
+        response = self.client.post(reverse('issue-add', kwargs={'repository_id': repository}),
                                     {'title': 'Test issue', 'description': 'Test description'})
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/repository/{}/issues/'.format(repository))
@@ -256,7 +256,7 @@ class IssueUpdateViewTest(TestCase):
             repository_id = Repository.objects.all()[0].id
         if issue_id == -1:
             issue_id = Issue.objects.filter(repository_id=repository_id)[0].id
-        response = self.client.get(reverse('issue-update', kwargs={'id': repository_id, 'pk': issue_id}))
+        response = self.client.get(reverse('issue-update', kwargs={'repository_id': repository_id, 'pk': issue_id}))
         return response, repository_id, issue_id
 
     def test_redirect_id_user_not_logged_in(self):
@@ -283,7 +283,7 @@ class IssueUpdateViewTest(TestCase):
         self.client.login(username='testuser', password=USER_PASSWORD)
         repositories = Repository.objects.all()
         non_existant_repository = repositories[len(repositories) - 1].id + 1
-        response = self.client.get(reverse('issue-update', kwargs={'id': non_existant_repository, 'pk': 1}))
+        response = self.client.get(reverse('issue-update', kwargs={'repository_id': non_existant_repository, 'pk': 1}))
 
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
@@ -302,7 +302,7 @@ class IssueUpdateViewTest(TestCase):
         self.client.login(username='testuser', password=USER_PASSWORD)
         _, repository_id, issue_id = self.get_edit_existing_issue()
 
-        response = self.client.post(reverse('issue-update', kwargs={'id': repository_id, 'pk': issue_id}),
+        response = self.client.post(reverse('issue-update', kwargs={'repository_id': repository_id, 'pk': issue_id}),
                                     {'title': 'Changed test title', 'description': 'test',
                                      'assignees': [], 'milestone': ''})
 
@@ -333,9 +333,9 @@ class CloseIssueTet(TestCase):
         self.client.login(username='testuser', password=USER_PASSWORD)
         repository_id = Repository.objects.all()[0].id
         issue_id = Issue.objects.all()[0].id
-        response = self.client.get(reverse('issue-close', kwargs={'id': repository_id, 'pk': issue_id}))
+        response = self.client.get(reverse('issue-close', kwargs={'repository_id': repository_id, 'pk': issue_id}))
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('issue-details', kwargs={'id': repository_id, 'pk': issue_id}))
+        self.assertRedirects(response, reverse('issue-details', kwargs={'repository_id': repository_id, 'pk': issue_id}))
 
     def test_HTTP404_if_issue_doesnt_exist(self):
         self.client.login(username='testuser', password=USER_PASSWORD)
@@ -343,7 +343,7 @@ class CloseIssueTet(TestCase):
         non_existing_repository_id = repositories[len(repositories) - 1].id + 1
         issues = Issue.objects.all()
         issue_id = issues[0].id
-        response = self.client.get(reverse('issue-close', kwargs={'id': non_existing_repository_id, 'pk': issue_id}))
+        response = self.client.get(reverse('issue-close', kwargs={'repository_id': non_existing_repository_id, 'pk': issue_id}))
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
 
@@ -353,20 +353,20 @@ class CloseIssueTet(TestCase):
         repository_id = repositories[0].id
         issues = Issue.objects.all()
         non_existing_issue_id = issues[len(issues) - 1].id + 1
-        response = self.client.get(reverse('issue-close', kwargs={'id': repository_id, 'pk': non_existing_issue_id}))
+        response = self.client.get(reverse('issue-close', kwargs={'repository_id': repository_id, 'pk': non_existing_issue_id}))
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
 
     def test_close_opened_issue(self):
         self.client.login(username='testuser', password=USER_PASSWORD)
         issue = Issue.objects.filter(closed=False)[0]
-        self.client.get(reverse('issue-close', kwargs={'id': issue.repository.id, 'pk': issue.pk}))
+        self.client.get(reverse('issue-close', kwargs={'repository_id': issue.repository.id, 'pk': issue.pk}))
         issue.refresh_from_db()
         self.assertTrue(issue.closed)
 
     def test_open_closed_issue(self):
         self.client.login(username='testuser', password=USER_PASSWORD)
         issue = Issue.objects.filter(closed=True)[0]
-        self.client.get(reverse('issue-close', kwargs={'id': issue.repository.id, 'pk': issue.pk}))
+        self.client.get(reverse('issue-close', kwargs={'repository_id': issue.repository.id, 'pk': issue.pk}))
         issue.refresh_from_db()
         self.assertTrue(issue.closed is False)
