@@ -1,0 +1,29 @@
+{% extends 'repoDetail.html' %}
+
+{% block repo-content %}
+    <div class="container" style="padding: 7mm;">
+        <div class="row">
+            <div class="col">
+                <a style="float: right" class="btn btn-success" href="{% url 'create_milestone' repository.id %}">New milestone</a>
+            </div>
+        </div>
+
+    </div>
+    <div class="container">
+        {% for project in project_list %}
+            <div class="card" style="width: 100%" >
+                <div class="card-body">
+                    <div style="display: flex; height: fit-content" class="row">
+                        <div class="col" style="text-align: left;">
+                            <h4>
+                                <em class="fas fa-bookmark"></em>&nbsp;&nbsp;
+                                <a>{{ project.name }}</a>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+            </div> <br>
+        {% endfor %}
+    </div>
+
+{% endblock %}
