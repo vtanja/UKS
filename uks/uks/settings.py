@@ -17,7 +17,6 @@ from django.contrib import messages
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -27,7 +26,6 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = (os.getenv('DEBUG_MODE') == 'True')
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '0.0.0.0']
-
 
 # Application definition
 
@@ -81,7 +79,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'uks.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
@@ -110,7 +107,6 @@ if os.environ.get('GITHUB_WORKFLOW'):
         }
     }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
@@ -129,7 +125,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
@@ -145,7 +140,6 @@ USE_TZ = True
 
 DATETIME_FORMAT = 'd. N Y, H:i:s'
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
@@ -155,12 +149,12 @@ STATIC_ROOT = './static'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MESSAGE_TAGS = {
-        messages.DEBUG: 'alert-secondary',
-        messages.INFO: 'alert-info',
-        messages.SUCCESS: 'alert-success',
-        messages.WARNING: 'alert-warning',
-        messages.ERROR: 'alert-danger',
- }
+    messages.DEBUG: 'alert-secondary',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-success',
+    messages.WARNING: 'alert-warning',
+    messages.ERROR: 'alert-danger',
+}
 
 LOGIN_REDIRECT_URL = '/user/dashboard/'
 LOGIN_URL = '/welcome/login/'
@@ -176,7 +170,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USERNAME')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
-LOG_PATH = os.path.join(BASE_DIR, 'logs/debug.log')
+LOG_PATH = os.path.join(BASE_DIR, 'logs')
 
 if not os.path.join(LOG_PATH):
     os.mkdir(LOG_PATH)
@@ -200,7 +194,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': LOG_PATH,
+            'filename': os.path.join(LOG_PATH, 'debug.log'),
             'formatter': 'formatter'
         },
     },
@@ -210,5 +204,4 @@ LOGGING = {
             'style': '{',
         }
     },
-
 }
