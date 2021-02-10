@@ -4,8 +4,11 @@
 
     <div class="container">
         <div class="row p-2 justify-content-md-end">
-            <a class="btn btn-light m-2" href="{% url 'issue-update' repository.id issue.id %}"><em class="fas fa-edit"></em> Edit</a>
-            <a class="btn {% if issue.closed %}btn-success{% else %}btn-danger{% endif %} m-2" href="{% url 'issue-close' repository.id issue.id %}"><em class="fas fa-exclamation-circle"> </em> {% if issue.closed %}Reopen{% else %}Close{% endif %}</a>
+            <a class="btn btn-light m-2" href="{% url 'issue-update' repository.id issue.id %}">
+                <em class="fas fa-edit"></em> Edit</a>
+            <a class="btn {% if issue.closed %}btn-success{% else %}btn-danger{% endif %} m-2"
+               href="{% url 'issue-close' repository.id issue.id %}"><em class="fas fa-exclamation-circle"> </em>
+                {% if issue.closed %}Reopen{% else %}Close{% endif %}</a>
         </div>
         <div class="row">
             <div class="col m-2" style="text-align: start">
