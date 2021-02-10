@@ -172,6 +172,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USERNAME')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
+LOG_PATH = Path(__file__).resolve().parent.parent
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -191,7 +193,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': './logs/debug.log',
+            'filename': os.path.join(LOG_PATH, 'logs/debug.log'),
             'formatter': 'formatter'
         },
     },
