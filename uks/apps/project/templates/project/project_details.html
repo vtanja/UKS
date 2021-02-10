@@ -69,6 +69,13 @@
                             {% if issue.issue_status == 'ONGOING' and not issue.closed %}
                                 <div class="task" id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)">
                                     {{ issue.title }}
+                                    <br>
+                                    <br>
+                                    <p style="font-size: small">Assignee:
+                                        {% for assignee in issue.assignees.all %} {{ assignee.username }}
+                                            {% empty %} Not assigned
+                                        {% endfor %}
+                                    </p>
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -84,6 +91,13 @@
                             {% if issue.issue_status == 'DONE' and not issue.closed %}
                                 <div class="task" id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)">
                                     {{ issue.title }}
+                                    <br>
+                                    <br>
+                                    <p style="font-size: small">Assignee:
+                                        {% for assignee in issue.assignees.all %} {{ assignee.username }}
+                                            {% empty %} Not assigned
+                                        {% endfor %}
+                                    </p>
                                 </div>
                             {% endif %}
                         {% endfor %}
@@ -99,6 +113,13 @@
                             {% if issue.closed %}
                                 <div class="task" id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)">
                                     {{ issue.title }}
+                                    <br>
+                                    <br>
+                                    <p style="font-size: small">Assignee:
+                                        {% for assignee in issue.assignees.all %} {{ assignee.username }}
+                                            {% empty %} Not assigned
+                                        {% endfor %}
+                                    </p>
                                 </div>
                             {% endif %}
                         {% endfor %}
