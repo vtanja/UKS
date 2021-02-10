@@ -13,16 +13,18 @@
         function drop(ev) {
             console.log("dropped");
             ev.preventDefault();
-            var data = ev.dataTransfer.getData("text");
-            ev.target.appendChild(document.getElementById(data));
-            $.ajax({
-                url: '{% url "update_issue" repository.id %}',
-                data: {
-                    'id': ev.dataTransfer.getData("text"),
-                    'list_id': ev.target.id
-                },
-                dataType: 'json'
-            });
+            var data = ev.dataTransfer.getData("text")
+            if(ev.target.id === "TODO" || ev.target.id === "ONGOING" || ev.target.id === "DONE" || ev.target.id === "CLOSED") {
+                ev.target.appendChild(document.getElementById(data));
+                $.ajax({
+                    url: '{% url "update_issue" repository.id %}',
+                    data: {
+                        'id': ev.dataTransfer.getData("text"),
+                        'list_id': ev.target.id
+                    },
+                    dataType: 'json'
+                });
+            }
         }
     </script>
 {% endblock %}
@@ -46,7 +48,7 @@
                         {% for issue in issues %}
                             {% if issue.issue_status == 'TODO' and not issue.closed %}
                                 <div class="task" id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)">
-                                    {{ issue.title }}
+                                    <a style="color: #408f2f" href="{% url 'issue_details' repository.id issue.id %}">{{ issue.title }}</a>
                                 <br>
                                 <br>
                                 <p style="font-size: small">Assignee:
@@ -68,7 +70,7 @@
                         {% for issue in issues %}
                             {% if issue.issue_status == 'ONGOING' and not issue.closed %}
                                 <div class="task" id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)">
-                                    {{ issue.title }}
+                                    <a style="color: #408f2f" href="{% url 'issue_details' repository.id issue.id %}">{{ issue.title }}</a>
                                     <br>
                                     <br>
                                     <p style="font-size: small">Assignee:
@@ -90,7 +92,7 @@
                         {% for issue in issues %}
                             {% if issue.issue_status == 'DONE' and not issue.closed %}
                                 <div class="task" id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)">
-                                    {{ issue.title }}
+                                    <a style="color: #408f2f" href="{% url 'issue_details' repository.id issue.id %}">{{ issue.title }}</a>
                                     <br>
                                     <br>
                                     <p style="font-size: small">Assignee:
@@ -112,7 +114,7 @@
                         {% for issue in issues %}
                             {% if issue.closed %}
                                 <div class="task" id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)">
-                                    {{ issue.title }}
+                                    <a style="color: #2b6020" href="{% url 'issue_details' repository.id issue.id %}">{{ issue.title }}</a>
                                     <br>
                                     <br>
                                     <p style="font-size: small">Assignee:
