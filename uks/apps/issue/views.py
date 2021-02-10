@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -104,6 +105,7 @@ class IssueUpdateView(LoginRequiredMixin, UpdateView):
         return reverse_lazy('repository-issues', kwargs={'id': self.kwargs['id']})
 
 
+@login_required
 def close_issue(request, id, pk):
     Issue.objects.get(pk=pk).toggle_issue_close()
     return redirect(reverse_lazy('issue-details', kwargs={'id': id, 'pk': pk}))
