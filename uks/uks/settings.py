@@ -172,8 +172,7 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 LOG_PATH = os.path.join(BASE_DIR, 'logs')
 
-if not os.path.join(LOG_PATH):
-    os.mkdir(LOG_PATH)
+if os.path.isfile(os.path.join(LOG_PATH, 'debug.log')):
     with open(os.path.join(LOG_PATH, 'debug.log'), "a+") as f:
         f.write('#Starting again')
 
