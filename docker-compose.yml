@@ -30,6 +30,8 @@ services:
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
+      - SECRET_KEY=some_secret_key
+      - DEBUG_MODE=True
 
   nginx:
     image: nginx

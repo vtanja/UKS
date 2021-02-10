@@ -9,3 +9,6 @@ class Label(models.Model):
     description = models.TextField()
     color = ColorField(format='hexa')
     repository = models.ForeignKey(Repository, on_delete=models.CASCADE, null=False)
+
+    def __str__(self):
+        return self.name
