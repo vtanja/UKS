@@ -18,12 +18,7 @@ class BranchDetailView(DetailView):
     model = Branch
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        # self.repository = get_object_or_404(Repository, id=self.kwargs['pk'])
-        # self.branches = self.get_branches()
-
         context = super(BranchDetailView, self).get_context_data(**kwargs)
-        # context['branches'] = self.branches
-        # context['first'] = self.branches[0]
         return context
 
 
@@ -57,6 +52,5 @@ def update_branch(request, id, pk):
         if p_form.is_valid():
             p_form.save()
             messages.success(request, f'You have successfully updated branch!')
-            # return "redirect"
 
     return redirect('branch_list', id=id)
