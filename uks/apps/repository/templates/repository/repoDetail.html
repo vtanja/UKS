@@ -12,7 +12,7 @@
         <a class="nav-link text-success {% if show %} active {% endif %}" id="one-tab" href="{% url 'detail' repository.id   %}" >Overview</a>
       </li>
       <li class="nav-item" >
-                    <a  class="nav-link text-success {% if 'issues' in request.path %} active {% endif %}" id="two-tab" href="{% url 'repository_issues' repository.id %}">Issues</a>
+                    <a  class="nav-link text-success {% if 'issues' in request.path %} active {% endif %}" id="two-tab" href="{% url 'repository-issues' repository.id %}">Issues</a>
                 </li>
                 <li class="nav-item" >
                     <a  class="nav-link text-success {%if 'milestones' in request.path%}active{% endif %}" id="three-tab"
