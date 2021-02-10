@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 import os
 from django.db.models import Q
 from django.shortcuts import render
@@ -17,15 +18,18 @@ from .models import Repository
 from ..branch.models import Branch
 from ..user.models import UserHistoryItem
 
+logger = logging.getLogger('django')
 
 class RepositoryDetailView(DetailView):
     model = Repository
     template_name = 'repository/overview.html'
 
     def get_context_data(self, *, object_list=None, **kwargs):
+        logger.info('Getting repository with id: %s', self.kwargs['pk'])
         self.repository = get_object_or_404(Repository, id=self.kwargs['pk'])
 
         context = super(RepositoryDetailView, self).get_context_data(**kwargs)
+        logger.info('Retrieving branches that belong to repository with id: %s', self.kwargs['pk'])
         context['branches'] = Branch.objects.filter(repository=self.repository)
 
         qs = Branch.objects.filter(repository=self.repository)
@@ -51,9 +55,12 @@ def get_branches(repository):
     repo_name = parts[4]
     request = 'https://api.github.com/repos/' + user + '/' + repo_name + '/branches'
 
+    logger.info('Getting token for authorizing github api requests!')
     api_token = os.getenv("GITHUB_TOKEN")
+    logger.info('Sending request for getting all branches of repository [%s]', repo_name)
     response = requests.get(request, auth=('uks', api_token)).text
 
+    logger.info('Storing branches into db initialized!')
     branches = []
     for obj in json.loads(response):
         branch = Branch()
@@ -61,6 +68,7 @@ def get_branches(repository):
         branch.repository = repository
         branch.save()
         branches.append(branch)
+    logger.info('Storing branches into db done!')
 
 
 def add_repository(request):
