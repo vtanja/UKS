@@ -80,5 +80,6 @@ class ProjectUpdateView(UpdateView):
         self.project = get_object_or_404(Project, id=self.kwargs['pk'])
         context['repository'] = self.repository
         return context
+
     def get_success_url(self):
         return reverse_lazy('repository_projects', kwargs={'id': self.kwargs['id']})
