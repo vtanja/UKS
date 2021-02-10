@@ -63,7 +63,7 @@ def get_branches(repository):
         branches.append(branch)
 
 
-def addRepository(request):
+def add_repository(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         form = RepositoryForm(request.POST)

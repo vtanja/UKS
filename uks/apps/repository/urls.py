@@ -5,7 +5,7 @@ from apps.repository.views import RepositoryDetailView
 
 urlpatterns = [
     path('<int:pk>/', RepositoryDetailView.as_view(), name='detail'),
-    path('add/', views.addRepository, name='add'),
+    path('add/', views.add_repository, name='add'),
     path('<int:id>/branch/', include('apps.branch.urls')),
     path('<int:id>/issues/', include('apps.issue.urls')),
     path('<int:id>/milestones/', include('apps.milestone.urls')),
