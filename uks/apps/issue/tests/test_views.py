@@ -38,9 +38,12 @@ def fill_test_db():
                                        created_by=test_user)
     test_issue3 = Issue.objects.create(title='test issue 3', description='test', repository=test_repository1,
                                        created_by=test_user1)
+    test_issue4 = Issue.objects.create(title='test issue four', description='...', repository=test_repository1,
+                                       created_by=test_user1, closed=True)
     test_issue1.save()
     test_issue2.save()
     test_issue3.save()
+    test_issue4.save()
     test_issue1.assignees.add(test_user)
     test_issue2.assignees.add(test_user)
 
