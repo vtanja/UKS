@@ -183,7 +183,7 @@ class CreateIssueViewTest(TestCase):
         response = self.client.get(reverse('issue-add', kwargs={'id': non_existent_id}))
 
         self.assertEqual(response.status_code, 404)
-        self.assertRaisesMessage(Http404, 'No Repository matches given query.')
+        self.assertRaises(Http404)
 
     def test_redirects_to_repository_issues_on_success(self):
         repository = Repository.objects.all()[0].id
@@ -345,7 +345,7 @@ class CloseIssueTet(TestCase):
         issue_id = issues[0].id
         response = self.client.get(reverse('issue-close', kwargs={'id': non_existing_repository_id, 'pk': issue_id}))
         self.assertEqual(response.status_code, 404)
-        self.assertRaisesMessage(Http404, 'No Issue matches the given query.')
+        self.assertRaises(Http404)
 
     def test_HTTP404_if_repository_doesnt_exist(self):
         self.client.login(username='testuser', password=USER_PASSWORD)
@@ -355,7 +355,7 @@ class CloseIssueTet(TestCase):
         non_existing_issue_id = issues[len(issues) - 1].id + 1
         response = self.client.get(reverse('issue-close', kwargs={'id': repository_id, 'pk': non_existing_issue_id}))
         self.assertEqual(response.status_code, 404)
-        self.assertRaisesMessage(Http404, 'No Repository matches the given query.')
+        self.assertRaises(Http404)
 
     def test_close_opened_issue(self):
         self.client.login(username='testuser', password=USER_PASSWORD)
