@@ -174,6 +174,8 @@ LOG_PATH = os.path.join(BASE_DIR, 'logs')
 
 if not os.path.join(LOG_PATH):
     os.mkdir(LOG_PATH)
+    with open(os.path.join(LOG_PATH, 'debug.log'), "a+") as f:
+        f.write('#Starting again')
 
 LOGGING = {
     'version': 1,
