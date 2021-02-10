@@ -17,7 +17,7 @@
                         <div class="col" style="text-align: left;">
                             <h4>
                                 <em class="fas fa-bookmark"></em>&nbsp;&nbsp;
-                                <a>{{ project.name }}</a>
+                                <a href="{% url 'project_details' repository.id project.id %}">{{ project.name }}</a>
                             </h4>
                         </div>
                     </div>
