@@ -193,7 +193,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(LOG_PATH, 'logs/debug.log'),
+            'filename': os.path.join(LOG_PATH, 'logs\debug.log'),
             'formatter': 'formatter'
         },
     },
