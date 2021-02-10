@@ -1,0 +1,112 @@
+{% extends 'repoDetail.html' %}
+
+{% block javascript %}
+    <script>
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function drop(ev) {
+            console.log("dropped");
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            ev.target.appendChild(document.getElementById(data));
+            $.ajax({
+                url: '{% url "update_issue" repository.id %}',
+                data: {
+                    'id': ev.dataTransfer.getData("text"),
+                    'list_id': ev.target.id
+                },
+                dataType: 'json'
+            });
+        }
+    </script>
+{% endblock %}
+
+{% block repo-content %}
+    <div style="text-align: left; padding: 5mm; margin-left: 1cm; margin-right: 1cm">
+        <h3 style="padding: 3mm; text-align: center">
+            {{ project.name }}
+        </h3>
+        <div class="description">
+            <h5 style="margin-top: 3mm;">Description</h5>
+            <i>{{ project.description }}</i>
+        </div>
+        <hr style=" border-bottom: darkgray; border-bottom-style: solid; border-bottom-width: thin">
+        <div class="row" style="text-align: left;margin-left: 1cm; margin-right: 1cm" >
+            <div class="col-sm-3" style="padding: 1mm">
+                <div class="card">
+                    <h5 style="margin-top: 2mm; text-align: center;">To do</h5>
+                    <div id="TODO" class="list-div card"
+                         ondrop="drop(event)" ondragover="allowDrop(event)">
+                        {% for issue in issues %}
+                            {% if issue.issue_status == 'TODO' and not issue.closed %}
+                                <div class="task" id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)">
+                                    {{ issue.title }}
+                                <br>
+                                <br>
+                                <p style="font-size: small">Assignee:
+                                    {% for assignee in issue.assignees.all %} {{ assignee.username }}
+                                        {% empty %} Not assigned
+                                    {% endfor %}
+                                </p>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3" style="padding: 1mm">
+                <div class="card">
+                    <h5 style="margin-top: 2mm; text-align: center">Doing</h5>
+                    <div id="ONGOING" class="card list-div"
+                         ondrop="drop(event)" ondragover="allowDrop(event)">
+                        {% for issue in issues %}
+                            {% if issue.issue_status == 'ONGOING' and not issue.closed %}
+                                <div class="task" id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)">
+                                    {{ issue.title }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3" style="padding: 1mm">
+                <div class="card">
+                    <h5 style="margin-top: 2mm; text-align: center">Done</h5>
+                    <div id="DONE" class="card list-div"
+                         ondrop="drop(event)" ondragover="allowDrop(event)">
+                        {% for issue in issues %}
+                            {% if issue.issue_status == 'DONE' and not issue.closed %}
+                                <div class="task" id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)">
+                                    {{ issue.title }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3" style="padding: 1mm">
+                <div class="card">
+                    <h5 style="margin-top: 2mm; text-align: center">Closed</h5>
+                    <div id="CLOSED" class="card list-div"
+                         ondrop="drop(event)" ondragover="allowDrop(event)">
+                        {% for issue in issues %}
+                            {% if issue.closed %}
+                                <div class="task" id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)">
+                                    {{ issue.title }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
