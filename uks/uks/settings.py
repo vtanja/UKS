@@ -176,6 +176,11 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USERNAME')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
+LOG_PATH = os.path.join(BASE_DIR, 'logs/debug.log')
+
+if not os.path.join(LOG_PATH):
+    os.mkdir(LOG_PATH)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -195,7 +200,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/debug.log'),
+            'filename': LOG_PATH,
             'formatter': 'formatter'
         },
     },
