@@ -5,9 +5,10 @@ from django.utils.translation import gettext_lazy as _
 from apps.repository.models import Repository
 from apps.milestone.models import Milestone
 
+from apps.project.models import Project
+
 
 class Issue(models.Model):
-
     class IssueStatus(models.TextChoices):
         TODO = 'TODO', _('To do')
         ONGOING = 'ONGOING', _('Ongoing')
@@ -26,7 +27,16 @@ class Issue(models.Model):
     assignees = models.ManyToManyField(User, related_name='assignees', blank=True)
     # labels
     milestone = models.ForeignKey(Milestone, on_delete=models.CASCADE, null=True, blank=True)
-    # board list
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True)
+
+    def change_status(self, status):
+        if status != 'CLOSED':
+            self.issue_status = status
+            self.closed = False
+            self.save()
+        else:
+            self.closed = True
+            self.save()
 
 
 class IssueChange(models.Model):
