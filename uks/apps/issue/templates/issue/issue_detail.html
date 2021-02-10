@@ -11,33 +11,47 @@
                 <h4>Issue</h4>
                 <br>
                 <div class="row">
-                    <div class="col-sm-3">
-                        <p><strong>Title</strong></p>
-                        <p><strong>Created by</strong></p>
-                        <p><strong>Status</strong></p>
-                        <p><strong>Description</strong></p>
-                        <p><strong>Assignees</strong></p>
-                        <p><strong>Labels</strong></p>
-                        <p><strong>Milestone</strong></p>
-                        <!-- Labels, Milestone, Project, Assignee -->
-                    </div>
-                    <div class="col">
-                        <p>{{ issue.title }}</p>
-                        <p>{{ user.username }}</p>
-                        <p>{{ issue.issue_status.title }}</p>
-                        <p>{{ issue.description }}</p>
-                        <p> {% for assignee in issue.assignees.all %} {{ assignee.username }}
-                            {% empty %} No one is assigned to this issue {% endfor %} </p>
-                        <p> {% for label in issue.labels.all %} <span class="badge badge-light" style="background-color: {{label.color}}!important;color:white">{{label.name}}</span>
-                            {% empty %} This issue has no labels {% endfor %} </p>
-                        <p> {% if issue.milestone %} {{ issue.milestone.title }}
-                            {% else %} This issue isn't in any milestone {% endif %} </p>
-                        <!-- Labels, Milestone, Project, Assignee -->
-                    </div>
+                    <table class="table table-hover">
+                        <caption style="text-align: center">Issue details</caption>
+                        <tbody>
+                            <tr>
+                                <td><strong>Title</strong></td>
+                                <td>{{ issue.title }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Created by</strong></td>
+                                <td>{{ user.username }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Status</strong></td>
+                                <td>{{ issue.issue_status.title }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Description</strong></td>
+                                <td>{{ issue.description }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Assignees</strong></td>
+                                <td> {% for assignee in issue.assignees.all %} {{ assignee.username }}
+                                {% empty %} No one is assigned to this issue {% endfor %} </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Labels</strong></td>
+                                <td> {% for label in issue.labels.all %} <span class="badge badge-light" style="background-color: {{label.color}}!important;color:white">{{label.name}}</span>
+                                {% empty %} This issue has no labels {% endfor %} </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Milestone</strong></td>
+                                <td> {% if issue.milestone %} {{ issue.milestone.title }}
+                                {% else %} This issue isn't in any milestone {% endif %} </td>
+                            </tr>
+                            <!-- Labels, Milestone, Project, Assignee -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
             {% if changes.exists %}
-            <div class="col" style="text-align: start">
+            <div class="col m-2" style="text-align: start">
                 <h4>History of changes</h4>
                 <br>
                 <div style="justify-content: flex-start">
