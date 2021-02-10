@@ -12,8 +12,8 @@
                                 <a href="#" class="text-success">  {{ branch.name }} </a>
                             </div>
                             <div class="col" style="text-align: right">
-                                <a style="cursor: pointer"  data-toggle="modal"data-target="#{{ branch.id }}" onclick="hide_or_show('update', {{ branch.id }})" ><i class="far fa-edit"></i></a>&nbsp;&nbsp;
-                                <a style="color: red; cursor: pointer" data-toggle="modal" data-target="#{{ branch.id }}" onclick="hide_or_show('delete', {{ branch.id }})"  ><i class="far fa-trash-alt"></i></a>
+                                <a class="far fa-edit" style="cursor: pointer"  data-toggle="modal"data-target="#{{ branch.id }}" onclick="hide_or_show('update', {{ branch.id }})" ></a>&nbsp;&nbsp;
+                                <a style="color: red; cursor: pointer" class="far fa-trash-alt" data-toggle="modal" data-target="#{{ branch.id }}" onclick="hide_or_show('delete', {{ branch.id }})"  ></a>
                             </div>
                         </div>
                     </div>
