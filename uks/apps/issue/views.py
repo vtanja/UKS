@@ -107,5 +107,7 @@ class IssueUpdateView(LoginRequiredMixin, UpdateView):
 
 @login_required
 def close_issue(request, id, pk):
-    Issue.objects.get(pk=pk).toggle_issue_close()
+    issue = get_object_or_404(Issue, pk=pk)
+    get_object_or_404(Repository, pk=id)
+    issue.toggle_issue_close()
     return redirect(reverse_lazy('issue-details', kwargs={'id': id, 'pk': pk}))
