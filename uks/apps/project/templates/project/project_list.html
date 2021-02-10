@@ -7,7 +7,6 @@
                 <a style="float: right" class="btn btn-success" href="{% url 'create_project' repository.id %}">New project</a>
             </div>
         </div>
-
     </div>
     <div class="container">
         {% for project in project_list %}
@@ -16,9 +15,13 @@
                     <div style="display: flex; height: fit-content" class="row">
                         <div class="col" style="text-align: left;">
                             <h4>
-                                <em class="fas fa-bookmark"></em>&nbsp;&nbsp;
-                                <a href="{% url 'project_details' repository.id project.id %}">{{ project.name }}</a>
+                                <em style="color: darkgreen" class="fas fa-bookmark"></em>&nbsp;&nbsp;
+                                <a style="color: darkgreen" href="{% url 'project_details' repository.id project.id %}">{{ project.name }}</a>
                             </h4>
+                        </div>
+                        <div class="col" style="text-align: right">
+                            <a href="{% url 'project_update' repository.id project.id %}">Edit</a>&nbsp;&nbsp;
+                            <a style="color: red" >Delete</a>
                         </div>
                     </div>
                 </div>
