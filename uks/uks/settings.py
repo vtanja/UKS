@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'apps.milestone',
     'apps.issue',
     'apps.label',
+    'apps.project',
     'security',
     'crispy_forms',
     'fontawesome-free',
