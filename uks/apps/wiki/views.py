@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 
 from apps.repository.models import Repository
-from apps.user.models import UserHistoryItem
+from apps.user.models import HistoryItem
 from apps.wiki.forms import CreateWikiForm
 from apps.wiki.models import Wiki, WikiHistoryItem
 
@@ -55,7 +55,7 @@ class CreateWikiView(CreateView):
         logger.info('Wiki page created!')
 
         logger.info('Added user history item!')
-        change = UserHistoryItem()
+        change = HistoryItem()
         change.dateChanged = datetime.datetime.now()
         change.belongsTo = self.request.user
         change.message = 'created new wiki page'
