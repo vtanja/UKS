@@ -1,0 +1,55 @@
+{% extends 'repository/repoDetail.html' %}
+
+{% block repo-content %}
+
+    <div class="container">
+        <div class="row p-2 justify-content-md-end">
+            <a class="btn btn-success" href="{% url 'issue-update' repository.id issue.id %}">Edit</a>
+        </div>
+        <div class="row">
+            <div class="col" style="text-align: start">
+                <h4>Issue</h4>
+                <br>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <p><strong>Title</strong></p>
+                        <p><strong>Created by</strong></p>
+                        <p><strong>Status</strong></p>
+                        <p><strong>Description</strong></p>
+                        <p><strong>Assignees</strong></p>
+                        <p><strong>Labels</strong></p>
+                        <p><strong>Milestone</strong></p>
+                        <!-- Labels, Milestone, Project, Assignee -->
+                    </div>
+                    <div class="col">
+                        <p>{{ issue.title }}</p>
+                        <p>{{ user.username }}</p>
+                        <p>{{ issue.issue_status.title }}</p>
+                        <p>{{ issue.description }}</p>
+                        <p> {% for assignee in issue.assignees.all %} {{ assignee.username }}
+                            {% empty %} No one is assigned to this issue {% endfor %} </p>
+                        <p> {% for label in issue.labels.all %} <span class="badge badge-light" style="background-color: {{label.color}}!important;color:white">{{label.name}}</span>
+                            {% empty %} This issue has no labels {% endfor %} </p>
+                        <p> {% if issue.milestone %} {{ issue.milestone.title }}
+                            {% else %} This issue isn't in any milestone {% endif %} </p>
+                        <!-- Labels, Milestone, Project, Assignee -->
+                    </div>
+                </div>
+            </div>
+            {% if changes.exists %}
+            <div class="col" style="text-align: start">
+                <h4>History of changes</h4>
+                <br>
+                <div style="justify-content: flex-start">
+                    {% for change in changes %}
+                        <small>{{ change.date }}</small>
+                        <p>{{ change.message }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+{% endblock %}

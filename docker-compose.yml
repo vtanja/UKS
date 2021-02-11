@@ -19,8 +19,8 @@ services:
     command: ["./wait_for_postgres.sh"]
     expose:
       - 8000
-    ports:
-      - "8000:8000"
+    # ports:
+    #   - "8000:8000"
     volumes:
       - ./static:/uks/static
 #    logging:
@@ -30,3 +30,16 @@ services:
     environment:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
+      - SECRET_KEY=some_secret_key
+      - DEBUG_MODE=True
+
+  nginx:
+    image: nginx
+    container_name: uks_nginx
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./config/nginx:/etc/nginx/conf.d
+      - ./static:/uks/static
+    depends_on:
+      - web

@@ -1,35 +1,47 @@
-import datetime
+import logging
 
-from django.db.models.functions import Coalesce
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.shortcuts import render, redirect
-from apps.repository.forms import RepositoryForm
 from django.contrib import messages
-from apps.repository.models import Repository
+from django.views.generic import ListView
+
 from apps.user.forms import ProfileImageUpdateForm
+from apps.repository.models import Repository
+from apps.issue.models import Issue
 
-
-# Create your views here.
-from apps.user.models import UserHistoryItem
-
+logger = logging.getLogger('django')
 
 def dashboard(request):
-    repositories = request.user.siteuser.repositories.all()
-    history = request.user.siteuser.userhistoryitem_set.all().order_by('-dateChanged')
-    context = {}
-    context['repositories'] = repositories
-    context['history'] = history
+    logger.info('User dashboard entered!')
+    logger.info('Getting all repositories of user initialized!')
+    repositories = all_users_repositories(request)
+    logger.info('Getting user activity initialized!')
+    history = request.user.userhistoryitem_set.all().order_by('-dateChanged')
+    context = {'repositories': repositories, 'history': history}
     return render(request, 'user/dashboard.html', context)
 
 
+def all_users_repositories(request):
+    repositories = Repository.objects.filter(
+        Q(owner=request.user) | Q(collaborators__username__in=[str(request.user)])
+    ).distinct()
+    return repositories
+
+
 def profile(request):
+    logger.info('User profile entered!')
     context = get_profile_form(request)
 
-    if(context == "redirect"):
+    if (context == "redirect"):
         return redirect('profile')
 
-    repositories = request.user.siteuser.repositories.all()
+    logger.info('Getting all repositories of user initialized!')
+    repositories = all_users_repositories(request)
     context['repos'] = repositories
-    context['issues'] = []
+
+    logger.info('Getting all issues of user initialized!')
+    context['issues'] = Issue.objects.filter(created_by=request.user)
 
     return render(request, 'user/profile.html', context)
 
@@ -40,7 +52,9 @@ def get_profile_form(request):
                                         request.FILES,
                                         instance=request.user.siteuser)
         if p_form.is_valid():
+            logger.info('User profile form is valid!')
             p_form.save()
+            logger.info('Successfully updating profile!')
             messages.success(request, f'You have successfully updated your profile!')
             return "redirect"
     else:
@@ -53,37 +67,10 @@ def get_profile_form(request):
     return context
 
 
-def add_repository(request):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        form = RepositoryForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            print('Forma je validna')
-            # form.save()
-            request.user.siteuser.repositories.add(form.save())
 
-            change = UserHistoryItem()
-            change.dateChanged = datetime.datetime.now()
-            change.belongsTo = request.user.siteuser
-            change.message = 'added new repository'
-            change.save()
+class AllIssuesListView(LoginRequiredMixin, ListView):
+    model = Issue
+    template_name = 'user/issue_list.html'
 
-            messages.success(request, 'Successfully added new repository!')
-            return redirect('dashboard')
-        else:
-            print('Forma nije validna')
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = RepositoryForm()
-
-    return render(request, 'user/dashboard.html', {'form': form})
-
-
-def detail(request, id):
-    repositories = request.user.siteuser.repositories.all()
-    repository = Repository.objects.get(id=id)
-    print(repository.name)
-    context = {'repositories': repositories, 'repository': repository}
-    return render(request, '../repository/templates/repoDetail.html', context)
+    def get_queryset(self):
+        return Issue.objects.filter(Q(assignees__in=[self.request.user]) | Q(created_by=self.request.user))

@@ -34,4 +34,5 @@ virtualenv==20.4.0
 webencodings==0.5.1
 Pillow==8.1.0
 fontawesome-free==5.15.2
-
+coverage==5.4
+django-colorfield==0.4.1

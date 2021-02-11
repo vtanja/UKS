@@ -1,9 +1,9 @@
 {% extends "welcome.html" %}
 
 {% block stuff %}
-<div class="d-flex p-2 justify-content-center">
+<div class="container">
     {% load crispy_forms_tags %}
-
+        <div class="row justify-content-md-center">
         {% if next %}
             {% if user.is_authenticated %}
             <p>Your account doesn't have access to this page. To proceed,
@@ -12,8 +12,9 @@
             <p>Please login to see this page.</p>
             {% endif %}
         {% endif %}
-
-        <form method="post" action="{% url 'login' %}" class="col-sm-4">
+        </div>
+        <div class="row justify-content-md-center">
+        <form method="post" action="{% url 'login' %}" class="col-sm-6">
             {% csrf_token %}
 
             <div class="row">
@@ -32,7 +33,7 @@
             <input class="btn btn-primary m-3" type="submit" value="login">
             <input type="hidden" name="next" value="{{ next }}">
         </form>
-
+        </div>
 </div>
 
 {% endblock %}
