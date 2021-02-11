@@ -17,7 +17,7 @@ logger = logging.getLogger('django')
 class BranchDetailView(DetailView):
     model = Branch
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(BranchDetailView, self).get_context_data(**kwargs)
         return context
 
@@ -33,7 +33,7 @@ class BranchListView(ListView):
         logger.info('Getting all branches that belong to repository [name: %s]!', self.repository.name)
         return Branch.objects.filter(repository=self.repository).order_by('id')
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(BranchListView, self).get_context_data(**kwargs)
         logger.info('Initializing context!')
         context['repository'] = self.repository
