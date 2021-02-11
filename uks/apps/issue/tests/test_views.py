@@ -151,39 +151,38 @@ class CreateIssueViewTest(TestCase):
     def setUpTestData(cls):
         fill_test_db()
 
+    def get_create_issue_response(self, repository=0):
+        repository_id = get_repository_id(repository)
+        self.client.login(username='testuser', password=USER_PASSWORD)
+        response = self.client.get(reverse('issue-add', kwargs={'repository_id': repository_id}))
+        return response
+
     def test_redirect_if_user_not_logged_in(self):
         repository = Repository.objects.all()[0].id
         response = self.client.get('/repository/{}/issues/add/'.format(repository))
         self.assertRedirects(response, '/welcome/login/?next=/repository/{}/issues/add/'.format(repository))
 
     def test_logged_in_user_can_access(self):
-        repository = Repository.objects.all()[0].id
-        self.client.login(username='testuser', password=USER_PASSWORD)
-        response = self.client.get(reverse('issue-add', kwargs={'repository_id': repository}))
+        response = self.get_create_issue_response(0)
 
         self.assertEqual(str(response.wsgi_request.user), 'testuser')
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, ISSUE_FORM)
 
     def test_view_shows_correct_template(self):
-        repository = Repository.objects.all()[0].id
-        self.client.login(username='testuser', password=USER_PASSWORD)
-        response = self.client.get(reverse('issue-add', kwargs={'repository_id': repository}))
+        response = self.get_create_issue_response(0)
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, ISSUE_FORM)
 
     def test_HTTP404_if_adding_to_non_existent_repository(self):
-        repositories = Repository.objects.all()
-        non_existent_id = repositories[len(repositories) - 1].id + 1
-        self.client.login(username='testuser', password=USER_PASSWORD)
-        response = self.client.get(reverse('issue-add', kwargs={'repository_id': non_existent_id}))
+        response = self.get_create_issue_response(-1)
 
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
 
     def test_redirects_to_repository_issues_on_success(self):
-        repository = Repository.objects.all()[0].id
+        repository = get_repository_id(0)
         self.client.login(username='testuser', password=USER_PASSWORD)
         response = self.client.post(reverse('issue-add', kwargs={'repository_id': repository}),
                                     {'title': 'Test issue', 'description': 'Test description'})
