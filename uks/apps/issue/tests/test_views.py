@@ -73,19 +73,14 @@ class IssueListViewTest(TestCase):
     def setUpTestData(cls):
         fill_test_db()
 
-    def test_view_url_exists_at_desired_location(self):
-        repository = Repository.objects.all()[0]
-        response = self.client.get('/repository/{}/issues/'.format(repository.id))
-        self.assertEqual(response.status_code, 200)
+    def get_repository_issues(self, repository_id=0):
+        repository_id = get_repository_id(repository_id)
+        response = self.client.get(reverse('repository-issues', kwargs={'repository_id': repository_id}))
+        return response, repository_id
 
     def test_view_url_accessible_by_name(self):
         response, _ = self.get_repository_issues()
         self.assertEqual(response.status_code, 200)
-
-    def get_repository_issues(self):
-        repository = Repository.objects.all()[0]
-        response = self.client.get(reverse('repository-issues', kwargs={'repository_id': repository.id}))
-        return response, repository
 
     def test_view_uses_correct_template(self):
         response, _ = self.get_repository_issues()
@@ -93,8 +88,7 @@ class IssueListViewTest(TestCase):
         self.assertTemplateUsed(response, 'issue/issue_list.html')
 
     def test_repository_with_no_issues(self):
-        repository = Repository.objects.all()[2]
-        response = self.client.get(reverse('repository-issues', kwargs={'repository_id': repository.id}))
+        response, _ = self.get_repository_issues(2)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.context['object_list']) == 0)
 
@@ -104,9 +98,7 @@ class IssueListViewTest(TestCase):
         self.assertTrue(len(response.context['object_list']) != 0)
 
     def test_HTTP404_if_repository_doesnt_exist(self):
-        repositories = Repository.objects.all()
-        non_existent_repository = repositories[len(repositories) - 1].id + 1
-        response = self.client.get(reverse('repository-issues', kwargs={'repository_id': non_existent_repository}))
+        response, _ = self.get_repository_issues(-1)
         self.assertEqual(response.status_code, 404)
         self.assertRaisesMessage(Http404, 'No Repository matches the given query.')
 
@@ -116,7 +108,7 @@ class IssueListViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.context['object_list']) == 2)
         for issue in response.context['object_list']:
-            self.assertEqual(issue.repository, repository)
+            self.assertEqual(issue.repository.id, repository)
 
 
 class IssueDetailViewTest(TestCase):
