@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from django.shortcuts import  get_object_or_404
@@ -7,8 +8,9 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 
 from apps.repository.models import Repository
+from apps.user.models import UserHistoryItem
 from apps.wiki.forms import CreateWikiForm
-from apps.wiki.models import Wiki
+from apps.wiki.models import Wiki, WikiHistoryItem
 
 logger = logging.getLogger('django')
 
@@ -51,6 +53,21 @@ class CreateWikiView(CreateView):
         logger.info('Setting repository to wiki!')
         form.instance.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         logger.info('Wiki page created!')
+
+        logger.info('Added user history item!')
+        change = UserHistoryItem()
+        change.dateChanged = datetime.datetime.now()
+        change.belongsTo = self.request.user
+        change.message = 'created new wiki page'
+        change.save()
+
+        logger.info('Added wiki history item!')
+        wiki_change = WikiHistoryItem()
+        wiki_change.dateChanged = datetime.datetime.now()
+        wiki_change.belongsTo = self.request.user
+        wiki_change.message = 'created new wiki page'
+        wiki_change.save()
+
         return super(CreateWikiView, self).form_valid(form)
 
     def get_context_data(self, *, object_list=None, **kwargs):
