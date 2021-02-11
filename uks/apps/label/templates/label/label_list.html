@@ -1,10 +1,10 @@
-{% extends 'repoDetail.html' %}
+{% extends 'repository/repoDetail.html' %}
 
 {% block repo-content %}
     <div class="container" style="padding: 7mm;">
         <div class="row">
             <div class="col">
-                <a style="float: right" class="btn btn-success">New label</a>
+               <a style="float: right" class="btn btn-success" href="{% url 'create_label' repository.id %}">New label</a>
             </div>
         </div>
 
@@ -20,8 +20,8 @@
                         </div>
                         <div class="col" style="text-align: left">{{label.description}} </div>
                         <div class="col" style="text-align: right">
-                            <a href="#" type="button" class="btn btn-link">Edit</a>
-                            <a href="#" type="button" class="btn btn-link">Delete</a>
+                            <a class="btn btn-link" href="{% url 'label-edit' repository.id label.id %}">Edit</a>
+                            <a class="btn btn-link" href="{% url 'label-delete' repository.id label.id %}">Delete</a>
                         </div>
                     </div>
                 </div>

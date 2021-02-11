@@ -1,0 +1,14 @@
+{% extends 'repository/repoDetail.html' %}
+
+{% block repo-content %}
+    {% load crispy_forms_filters %}
+    {{ form.media }}
+    <div class="container" style="width: 50%">
+        <form method="post">
+             <h3 style="text-align: center">{% if 'add' in request.path %}Create new{% else %}Edit{% endif %} label</h3>
+            {% csrf_token %}
+            {{ form | crispy }}
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+{% endblock %}
