@@ -17,7 +17,7 @@ logger = logging.getLogger('django')
 class BranchDetailView(DetailView):
     model = Branch
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(BranchDetailView, self).get_context_data(**kwargs)
         return context
 
@@ -33,7 +33,7 @@ class BranchListView(ListView):
         logger.info('Getting all branches that belong to repository [name: %s]!', self.repository.name)
         return Branch.objects.filter(repository=self.repository).order_by('id')
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(BranchListView, self).get_context_data(**kwargs)
         logger.info('Initializing context!')
         context['repository'] = self.repository
@@ -60,7 +60,7 @@ def update_branch(request, id, pk):
             logger.info('Valid form for updating branch!')
             p_form.save()
             logger.info('Successfully updating branch[id: %s]', pk)
-            messages.success(request, f'You have successfully updated branch!')
+            messages.success(request, 'You have successfully updated branch!')
 
     logger.info('Routing to all branches after updating branch!')
     return redirect('branch_list', id=id)
