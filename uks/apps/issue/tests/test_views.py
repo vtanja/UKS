@@ -7,6 +7,9 @@ from django.utils import timezone
 from ...repository.models import Repository
 from ..models import Issue, IssueChange
 
+USER_USERNAME = 'testuser'
+USER1_USERNAME = 'testuser1'
+USER2_USERNAME = 'testuser2'
 USER_PASSWORD = '1E4@DAc#a1p'
 USER1_PASSWORD = '4XC%4@1LSp'
 USER2_PASSWORD = '4*uxX#sd23'
@@ -16,9 +19,9 @@ ISSUE_FORM = 'issue/issue_form.html'
 
 def fill_test_db():
     # Create users
-    test_user = User.objects.create_user(username='testuser', password=USER_PASSWORD)
-    test_user1 = User.objects.create_user(username='testuser1', password=USER1_PASSWORD)
-    test_user2 = User.objects.create_user(username='testuser2', password=USER2_PASSWORD)
+    test_user = User.objects.create_user(username=USER_USERNAME, password=USER_PASSWORD)
+    test_user1 = User.objects.create_user(username=USER1_USERNAME, password=USER1_PASSWORD)
+    test_user2 = User.objects.create_user(username=USER2_USERNAME, password=USER2_PASSWORD)
     test_user.save()
     test_user1.save()
     test_user2.save()
