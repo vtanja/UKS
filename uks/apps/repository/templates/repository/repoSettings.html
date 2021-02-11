@@ -1,0 +1,38 @@
+{% extends 'repository/repoDetail.html' %}
+
+{% block repo-content %}
+<div style="margin-left: 300pt;">
+<br>
+  <h3 style="text-align: left">Who has access</h3>
+  <br>
+  <div class="card-deck">
+    <div class="card col-3">
+      <div class="card-body">
+        <h5>Public repository <em class="fas fa-eye"></em></h5>
+        <p></p>
+        <p>This repository is public and visible to anyone.</p>
+        <a href="#">Manage</a>
+      </div>
+    </div>
+    <div class="card col-3">
+      <div class="card-body">
+        <h5>Direct access <em class="fas fa-user-friends"></em></h5>
+        <p></p>
+        <p>0 collaborators have access to this repository. Only you can contribute to this repository.</p>
+      </div>
+    </div>
+  </div>
+  <br>
+  <h3 style="text-align: left">Manage access</h3>
+  <div class="card col-8">
+    <div style="text-align: center">
+      <img src="https://github.githubassets.com/images/icons/permissions.png" class="mb-3" style="width: 65px; height: 65px; text-align: center;">
+      <h3>You haven't invited any collaborators yet</h3>
+      <button type="button" class="btn btn-success">Invite a collaborator</button>
+    </div>
+    <br>
+  </div>
+  <br><br><br>
+</div>
+{% endblock %}
+

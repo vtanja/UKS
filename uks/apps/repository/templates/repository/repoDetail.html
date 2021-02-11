@@ -27,6 +27,10 @@
                 <li class="nav-item" >
                     <a  class="nav-link text-success">Wiki</a>
                 </li>
+                <li class="nav-item" >
+                    <a  class="nav-link text-success {%if 'settings' in request.path%}active{% endif %}" id="seven-tab"
+                        href="{% url 'repository_settings' repository.id %}">Settings</a>
+                </li>
             </ul>
         </div>
         <div class="tab-content" id="myTabContent">

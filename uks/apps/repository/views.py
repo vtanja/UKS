@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.core import serializers
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import DetailView
+from django.views.generic import DetailView, View
 
 from .forms import RepositoryForm
 from .models import Repository
@@ -102,3 +102,14 @@ def add_repository(request):
         form = RepositoryForm()
 
     return render(request, 'user/dashboard.html', {'form': form})
+
+
+def RepositorySettings(request, id):
+    repositories = Repository.objects.filter(
+        Q(owner=request.user) | Q(collaborators__username__in=[str(request.user)])
+    )
+    repository = Repository.objects.get(id=id)
+    context = {'repository': repository}
+    return render(request, 'repository/repoSettings.html', context)
+
+
