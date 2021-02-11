@@ -248,7 +248,7 @@ class IssueUpdateViewTest(TestCase):
         fill_test_db()
 
     def get_edit_issue_view(self, repository_id=0, issue_id=0):
-        """ Get edit issue view for specified issue an repository id
+        """Get edit issue view for specified issue an repository id
 
         Helper function that returns response for editing existing issue view.
         If -1 is send for either repository_id or issue_id it returns id of non existent issue or repository.
@@ -258,7 +258,7 @@ class IssueUpdateViewTest(TestCase):
         return response, repository_id, issue_id
 
     def logged_in_user_get_edit_view(self, repository_id=0, issue_id=0):
-        """ Helper function that logs in user and calls get_edit_issue_view and returns its result """
+        """Helper function that logs in user and calls get_edit_issue_view and returns its result"""
         self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         return self.get_edit_issue_view(repository_id, issue_id)
 
@@ -293,7 +293,7 @@ class IssueUpdateViewTest(TestCase):
         self.assertRaises(Http404)
 
     def test_issue_change_created_for_every_change_and_redirect(self):
-        """ Test editing existing issue. Then it checks whether correct amount of IssueChange objects were created. """
+        """Test editing existing issue. Then it checks whether correct amount of IssueChange objects were created."""
         start_of_the_test = timezone.now()
         _, repository_id, issue_id = self.logged_in_user_get_edit_view()
 
