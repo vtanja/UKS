@@ -60,7 +60,7 @@ def update_branch(request, id, pk):
             logger.info('Valid form for updating branch!')
             p_form.save()
             logger.info('Successfully updating branch[id: %s]', pk)
-            messages.success(request, f'You have successfully updated branch!')
+            messages.success(request, 'You have successfully updated branch!')
 
     logger.info('Routing to all branches after updating branch!')
     return redirect('branch_list', id=id)
