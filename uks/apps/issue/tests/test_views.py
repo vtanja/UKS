@@ -156,7 +156,7 @@ class CreateIssueViewTest(TestCase):
 
     def get_create_issue_response(self, repository=0):
         repository_id = get_repository_id(repository)
-        self.client.login(username='testuser', password=USER_PASSWORD)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         response = self.client.get(reverse('issue-add', kwargs={'repository_id': repository_id}))
         return response
 
@@ -168,7 +168,7 @@ class CreateIssueViewTest(TestCase):
     def test_logged_in_user_can_access(self):
         response = self.get_create_issue_response(0)
 
-        self.assertEqual(str(response.wsgi_request.user), 'testuser')
+        self.assertEqual(str(response.wsgi_request.user), USER_USERNAME)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, ISSUE_FORM)
 
@@ -186,7 +186,7 @@ class CreateIssueViewTest(TestCase):
 
     def test_redirects_to_repository_issues_on_success(self):
         repository = get_repository_id(0)
-        self.client.login(username='testuser', password=USER_PASSWORD)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         response = self.client.post(reverse('issue-add', kwargs={'repository_id': repository}),
                                     {'title': 'Test issue', 'description': 'Test description'})
         self.assertEqual(response.status_code, 302)
@@ -203,42 +203,37 @@ class AllIssuesListView(TestCase):
         response = self.client.get('/user/issues/')
         self.assertRedirects(response, '/welcome/login/?next=/user/issues/')
 
-    def test_logged_in_user_can_access(self):
-        self.client.login(username='testuser', password=USER_PASSWORD)
+    def get_all_user_issues(self, username=USER_USERNAME, password=USER_PASSWORD):
+        self.client.login(username=username, password=password)
         response = self.client.get(reverse('all-user-issues'))
-
-        self.assertEqual(str(response.context['user']), 'testuser')
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'user/issue_list.html')
+        return response
+
+    def test_logged_in_user_can_access(self):
+        response = self.get_all_user_issues()
+
+        self.assertEqual(str(response.context['user']), USER_USERNAME)
 
     def test_view_shows_correct_template(self):
-        self.client.login(username='testuser', password=USER_PASSWORD)
-        response = self.client.get(reverse('all-user-issues'))
+        response = self.get_all_user_issues()
 
-        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'user/issue_list.html')
 
     def test_logged_in_user_with_no_issues_on_any_repository(self):
-        self.client.login(username='testuser2', password=USER2_PASSWORD)
-        response = self.client.get(reverse('all-user-issues'))
+        response = self.get_all_user_issues(USER2_USERNAME, USER2_PASSWORD)
 
-        self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.context['object_list']) == 0)
 
     def test_logged_in_user_with_assigned_issues(self):
-        self.client.login(username='testuser', password=USER_PASSWORD)
-        response = self.client.get(reverse('all-user-issues'))
+        response = self.get_all_user_issues()
 
-        self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.context['object_list']) == 2)
         for issue in response.context['object_list']:
             self.assertIn(response.wsgi_request.user, issue.assignees.all())
 
     def test_logged_in_user_with_only_created_issues(self):
-        self.client.login(username='testuser1', password=USER1_PASSWORD)
-        response = self.client.get(reverse('all-user-issues'))
+        response = self.get_all_user_issues(USER1_USERNAME, USER1_PASSWORD)
 
-        self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.context['object_list']) == 1)
         for issue in response.context['object_list']:
             self.assertEqual(response.wsgi_request.user, issue.created_by)
@@ -264,15 +259,15 @@ class IssueUpdateViewTest(TestCase):
                              '/welcome/login/?next=/repository/{}/issues/{}/edit/'.format(repository_id, issue_id))
 
     def test_logged_in_user_can_access(self):
-        self.client.login(username='testuser', password=USER_PASSWORD)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         response, repository_id, issue_id = self.get_edit_existing_issue()
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(str(response.wsgi_request.user), 'testuser')
+        self.assertEqual(str(response.wsgi_request.user), USER_USERNAME)
         self.assertTemplateUsed(response, ISSUE_FORM)
 
     def test_view_shows_correct_template(self):
-        self.client.login(username='testuser', password=USER_PASSWORD)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         response, repository_id, issue_id = self.get_edit_existing_issue()
 
         self.assertEqual(response.status_code, 200)
