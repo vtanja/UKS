@@ -117,46 +117,31 @@ class IssueDetailViewTest(TestCase):
     def setUpTestData(cls):
         fill_test_db()
 
-    def test_view_url_exists_at_desired_location(self):
-        repository_id = Repository.objects.all()[0].id
-        issue_id = Issue.objects.all()[0].id
-        response = self.client.get('/repository/{}/issues/{}/'.format(repository_id, issue_id))
-        self.assertEqual(response.status_code, 200)
-
-    def test_view_url_accessible_by_name(self):
-        self.get_existing_issue()
-
-    def get_existing_issue(self):
-        repository_id = Repository.objects.all()[0].id
-        issue_id = Issue.objects.all()[0].id
+    def get_repository_issue(self, repository=0, issue=0):
+        repository_id, issue_id = get_issue_and_repository_id(repository, issue)
         response = self.client.get(reverse('issue-details', kwargs={'repository_id': repository_id, 'pk': issue_id}))
-        self.assertEqual(response.status_code, 200)
         return response
 
+    def test_view_url_accessible_by_name(self):
+        response = self.get_repository_issue()
+        self.assertEqual(response.status_code, 200)
+
     def test_view_uses_correct_template(self):
-        response = self.get_existing_issue()
+        response = self.get_repository_issue()
         self.assertTemplateUsed(response, 'issue/issue_detail.html')
 
-    def test_HTTP404_if_issue_doesnt_exist(self):
-        repositories = Repository.objects.all()
-        non_existing_repository_id = repositories[len(repositories) - 1].id + 1
-        issues = Issue.objects.all()
-        issue_id = issues[0].id
-        response = self.client.get(reverse('issue-details', kwargs={'repository_id': non_existing_repository_id, 'pk': issue_id}))
-        self.assertEqual(response.status_code, 404)
-        self.assertRaisesMessage(Http404, 'No Issue matches the given query.')
-
     def test_HTTP404_if_repository_doesnt_exist(self):
-        repositories = Repository.objects.all()
-        repository_id = repositories[0].id
-        issues = Issue.objects.all()
-        non_existing_issue_id = issues[len(issues) - 1].id + 1
-        response = self.client.get(reverse('issue-details', kwargs={'repository_id': repository_id, 'pk': non_existing_issue_id}))
+        response = self.get_repository_issue(repository=-1)
         self.assertEqual(response.status_code, 404)
-        self.assertRaisesMessage(Http404, 'No Repository matches the given query.')
+        self.assertRaises(Http404)
+
+    def test_HTTP404_if_issue_doesnt_exist(self):
+        response = self.get_repository_issue(issue=-1)
+        self.assertEqual(response.status_code, 404)
+        self.assertRaises(Http404)
 
     def test_view_for_issue_that_exists(self):
-        response = self.get_existing_issue()
+        response = self.get_repository_issue()
         self.assertTrue(response.context['issue'] is not None)
 
 
