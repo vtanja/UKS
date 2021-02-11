@@ -1,15 +1,13 @@
 import datetime
 
+from django.contrib.auth.models import User
 from django.db import models
-from django.utils.timezone import utc
-
-from security.models import SiteUser
 
 
 class UserHistoryItem(models.Model):
     message = models.TextField()
     dateChanged = models.DateTimeField()
-    belongsTo = models.ForeignKey(SiteUser, on_delete=models.CASCADE)
+    belongsTo = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def get_time_of_change(self):
         if self.dateChanged.date() == datetime.datetime.now().date():

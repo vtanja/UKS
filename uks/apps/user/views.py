@@ -1,4 +1,4 @@
-import datetime
+import logging
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
@@ -6,16 +6,18 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.generic import ListView
 
-from apps.repository.forms import RepositoryForm
 from apps.user.forms import ProfileImageUpdateForm
 from apps.repository.models import Repository
 from apps.issue.models import Issue
-from apps.user.models import UserHistoryItem
 
+logger = logging.getLogger('django')
 
 def dashboard(request):
+    logger.info('User dashboard entered!')
+    logger.info('Getting all repositories of user initialized!')
     repositories = all_users_repositories(request)
-    history = request.user.siteuser.userhistoryitem_set.all().order_by('-dateChanged')
+    logger.info('Getting user activity initialized!')
+    history = request.user.userhistoryitem_set.all().order_by('-dateChanged')
     context = {'repositories': repositories, 'history': history}
     return render(request, 'user/dashboard.html', context)
 
@@ -28,14 +30,18 @@ def all_users_repositories(request):
 
 
 def profile(request):
+    logger.info('User profile entered!')
     context = get_profile_form(request)
 
     if (context == "redirect"):
         return redirect('profile')
 
+    logger.info('Getting all repositories of user initialized!')
     repositories = all_users_repositories(request)
     context['repos'] = repositories
-    context['issues'] = []
+
+    logger.info('Getting all issues of user initialized!')
+    context['issues'] = Issue.objects.filter(created_by=request.user)
 
     return render(request, 'user/profile.html', context)
 
@@ -46,7 +52,9 @@ def get_profile_form(request):
                                         request.FILES,
                                         instance=request.user.siteuser)
         if p_form.is_valid():
+            logger.info('User profile form is valid!')
             p_form.save()
+            logger.info('Successfully updating profile!')
             messages.success(request, f'You have successfully updated your profile!')
             return "redirect"
     else:
@@ -58,43 +66,6 @@ def get_profile_form(request):
 
     return context
 
-
-def add_repository(request):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        form = RepositoryForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            print('Forma je validna')
-            # form.save()
-
-            form.instance.owner = request.user
-            form.save()
-
-            change = UserHistoryItem()
-            change.dateChanged = datetime.datetime.now()
-            change.belongsTo = request.user.siteuser
-            change.message = 'added new repository'
-            change.save()
-
-            messages.success(request, 'Successfully added new repository!')
-            return redirect('dashboard')
-        else:
-            print('Forma nije validna')
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = RepositoryForm()
-
-    return render(request, 'user/dashboard.html', {'form': form})
-
-
-def detail(request, id):
-    repositories = all_users_repositories(request)
-    repository = Repository.objects.get(id=id)
-    print(repository.name)
-    context = {'repositories': repositories, 'repository': repository}
-    return render(request, '../repository/templates/repoDetail.html', context)
 
 
 class AllIssuesListView(LoginRequiredMixin, ListView):
