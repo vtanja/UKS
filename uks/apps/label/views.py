@@ -12,7 +12,7 @@ from apps.repository.models import Repository
 
 class ListLabelView(ListView):
     model = Label
-    template_name = 'label_list.html'
+    template_name = 'label/label_list.html'
 
     def get_queryset(self):
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
@@ -26,7 +26,7 @@ class ListLabelView(ListView):
 
 class CreateLabel(LoginRequiredMixin, CreateView):
     model = Label
-    template_name = 'create_label.html'
+    template_name = 'label/create_label.html'
     form_class = CreateLabelForm
 
     def form_valid(self, form):
@@ -50,7 +50,7 @@ class CreateLabel(LoginRequiredMixin, CreateView):
 
 class LabelEdit(LoginRequiredMixin, UpdateView):
     model = Label
-    template_name = 'create_label.html'
+    template_name = 'label/create_label.html'
     form_class = CreateLabelForm
 
     def form_valid(self, form):
@@ -84,14 +84,9 @@ class LabelEdit(LoginRequiredMixin, UpdateView):
         return reverse_lazy('repository_labels', kwargs={'id': self.kwargs['id']})
 
 
-def LabelDelete(request, pk, id):
-    Label.objects.filter(id=pk).delete()
-    return render(request, 'label_list.html', )
-
-
 class LabelDeleteView(LoginRequiredMixin, DeleteView):
     model = Label
-    template_name = 'delete_label.html'
+    template_name = 'label/delete_label.html'
 
     def form_valid(self):
         label = get_object_or_404(Label, id=self.kwargs['pk'])

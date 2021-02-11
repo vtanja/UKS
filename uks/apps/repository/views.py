@@ -14,4 +14,4 @@ def detail(request, id):
     repository = Repository.objects.get(id=id)
     print(repository.name)
     context = {'repositories': repositories, 'repository': repository}
-    return render(request, 'repoDetail.html', context)
+    return render(request, 'repository/repoDetail.html', context)

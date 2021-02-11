@@ -1,6 +1,6 @@
 from django.urls import path, include
 
-from .views import ListLabelView, CreateLabel, LabelEdit, LabelDelete, LabelDeleteView
+from .views import ListLabelView, CreateLabel, LabelEdit, LabelDeleteView
 
 urlpatterns = [
     path('', ListLabelView.as_view(), name='repository_labels'),
