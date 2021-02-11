@@ -3,12 +3,18 @@
 
 {% block dashboard %}
     <div class="container" style="width: 60%; align-self: center ">
-    <br>
-        <h3>{% if 'add' in request.path %}Create new{% else %}Edit{% endif %} page</h3>
+        <br>
+        {% if 'edit' in request.path %}
+            <h3 style="float: left">Edit page</h3>
+            <a class="btn btn-danger" style="width: 10%; color: white; float: right;" href="{% url 'wiki-delete' repository.id wiki.id %}">Delete</a> &nbsp;
+            <div style="float:right;">&nbsp; &nbsp;</div>
+            <a class="btn btn-secondary" style="width: 10%; color: white; float:right;" href="{% url 'wiki-history' repository.id wiki.id %}">Show history</a> &nbsp; &nbsp;
+        {% else %}
+            <h3>{% if 'add' in request.path %}Create new{% else %}Edit{% endif %} page</h3>
+        {% endif %}
         <hr><br>
         <form method="post" class="col-sm-6" style="text-align: left">
             {% csrf_token %}
-{#            <h3 style="text-align: center">{% if 'add' in request.path %}New{% else %}Edit{% endif %} page</h3>#}
 
             {{ form.media }}
             {{ form | crispy  }}
