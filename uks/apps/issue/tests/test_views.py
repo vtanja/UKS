@@ -251,8 +251,7 @@ class IssueUpdateViewTest(TestCase):
         """Get edit issue view for specified issue an repository id
 
         Helper function that returns response for editing existing issue view.
-        If -1 is send for either repository_id or issue_id it returns id of non existent issue or repository.
-        """
+        If -1 is send for either repository_id or issue_id it returns id of non existent issue or repository."""
         repository_id, issue_id = get_issue_and_repository_id(repository=repository_id, issue=issue_id)
         response = self.client.get(reverse('issue-update', kwargs={'repository_id': repository_id, 'pk': issue_id}))
         return response, repository_id, issue_id
