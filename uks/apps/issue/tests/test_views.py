@@ -135,13 +135,15 @@ class IssueDetailViewTest(TestCase):
 
     def test_HTTP404_if_repository_doesnt_exist(self):
         response = self.get_repository_issue(repository=-1)
+        self.assert_404_response(response)
+
+    def assert_404_response(self, response):
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
 
     def test_HTTP404_if_issue_doesnt_exist(self):
         response = self.get_repository_issue(issue=-1)
-        self.assertEqual(response.status_code, 404)
-        self.assertRaises(Http404)
+        self.assert_404_response(response)
 
     def test_view_for_issue_that_exists(self):
         response = self.get_repository_issue()
@@ -246,8 +248,9 @@ class IssueUpdateViewTest(TestCase):
         fill_test_db()
 
     def get_edit_issue_view(self, repository_id=0, issue_id=0):
-        """
-        Helper function that returns reponse for editingexisting issue.
+        """ Get edit issue view for specified issue an repository id
+
+        Helper function that returns response for editing existing issue view.
         If -1 is send for either repository_id or issue_id it returns id of non existent issue or repository.
         """
         repository_id, issue_id = get_issue_and_repository_id(repository=repository_id, issue=issue_id)
@@ -255,9 +258,7 @@ class IssueUpdateViewTest(TestCase):
         return response, repository_id, issue_id
 
     def logged_in_user_get_edit_view(self, repository_id=0, issue_id=0):
-        """
-        Helper function that logs in user and calls get_edit_issue_view and returns its result
-        """
+        """ Helper function that logs in user and calls get_edit_issue_view and returns its result """
         self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         return self.get_edit_issue_view(repository_id, issue_id)
 
@@ -280,21 +281,19 @@ class IssueUpdateViewTest(TestCase):
         self.assertTemplateUsed(response, ISSUE_FORM)
 
     def test_HTTP404_changing_issue_from_non_existent_repository(self):
-        response, repository_id, issue_id = self.logged_in_user_get_edit_view(-1)
+        response, _, _ = self.logged_in_user_get_edit_view(-1)
 
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
 
     def test_HTTP404_changing_non_existing_issue(self):
-        response, repository_id, issue_id = self.logged_in_user_get_edit_view(issue_id=-1)
+        response, _, _ = self.logged_in_user_get_edit_view(issue_id=-1)
 
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
 
     def test_issue_change_created_for_every_change_and_redirect(self):
-        """
-        Test editing existing issue. Then it checks whether correct amount of IssueChange objects were created.
-        """
+        """ Test editing existing issue. Then it checks whether correct amount of IssueChange objects were created. """
         start_of_the_test = timezone.now()
         _, repository_id, issue_id = self.logged_in_user_get_edit_view()
 
