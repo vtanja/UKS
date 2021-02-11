@@ -1,25 +1,23 @@
+from apps.issue.models import Issue
+from apps.project.models import Project
+from apps.repository.models import Repository
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render, get_object_or_404
-
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 # Create your views here.
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
-from apps.project.models import Project
-from apps.repository.models import Repository
-from apps.issue.models import Issue
-
 
 class ProjectListView(ListView):
     model = Project
-    template_name = 'project/project_list.html'
+    template_name_suffix = '_list'
 
     def get_queryset(self):
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         return Project.objects.filter(repository=self.repository)
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(ProjectListView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
         return context
@@ -27,7 +25,7 @@ class ProjectListView(ListView):
 
 class CreateProjectView(LoginRequiredMixin, CreateView):
     model = Project
-    template_name = 'project/project_create.html'
+    template_name_suffix = '_create'
     fields = ['name', 'description']
 
     def form_valid(self, form):
@@ -38,7 +36,7 @@ class CreateProjectView(LoginRequiredMixin, CreateView):
         kwargs = super(CreateProjectView, self).get_form_kwargs()
         return kwargs
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(CreateProjectView, self).get_context_data(**kwargs)
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         context['repository'] = self.repository
@@ -50,9 +48,9 @@ class CreateProjectView(LoginRequiredMixin, CreateView):
 
 class ProjectDetailView(DetailView):
     model = Project
-    template_name = 'project/project_details.html'
+    template_name_suffix = '_details'
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(ProjectDetailView, self).get_context_data(**kwargs)
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         self.project = get_object_or_404(Project, id=self.kwargs['pk'])
@@ -74,7 +72,7 @@ class ProjectUpdateView(UpdateView):
     fields = ['name', 'description']
     template_name_suffix = '_update'
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(ProjectUpdateView, self).get_context_data(**kwargs)
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         self.project = get_object_or_404(Project, id=self.kwargs['pk'])
@@ -89,7 +87,7 @@ class ProjectDeleteView(DeleteView):
     model = Project
     template_name_suffix = '_delete'
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(ProjectDeleteView, self).get_context_data(**kwargs)
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         self.project = get_object_or_404(Project, id=self.kwargs['pk'])
