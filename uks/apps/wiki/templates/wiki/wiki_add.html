@@ -1,0 +1,20 @@
+{% extends 'home.html' %}
+{% load crispy_forms_tags %}
+
+{% block dashboard %}
+    <div class="container" style="width: 60%; align-self: center ">
+    <br>
+        <h3>{% if 'add' in request.path %}Create new{% else %}Edit{% endif %} page</h3>
+        <hr><br>
+        <form method="post" class="col-sm-6" style="text-align: left">
+            {% csrf_token %}
+{#            <h3 style="text-align: center">{% if 'add' in request.path %}New{% else %}Edit{% endif %} page</h3>#}
+
+            {{ form.media }}
+            {{ form | crispy  }}
+
+            <input class="btn btn-success m-3" type="submit" value="Submit">
+            <input type="hidden" name="next" value="{{ next }}">
+        </form>
+    </div>
+{% endblock %}
