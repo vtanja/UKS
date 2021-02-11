@@ -101,15 +101,15 @@ class WikiUpdateView(UpdateView):
 
     def form_valid(self, form):
         # Add issue change for actual changes
-        logger.log('Wiki page [%s] change initializes!', self.object.title)
+        logger.info('Wiki page [%s] change initializes!', self.object.title)
         response = super(WikiUpdateView, self).form_valid(form)
-        logger.log('Creating wiki history item!')
+        logger.info('Creating wiki history item!')
         change = WikiHistoryItem()
         change.belongsTo = self.request.user
         change.message = 'changed wiki page'
         change.dateChanged = datetime.datetime.now()
         change.save()
-        logger.log('Wiki page [%s] change done!', self.object.title)
+        logger.info('Wiki page [%s] change done!', self.object.title)
         return response
 
     def get_context_data(self, *, object_list=None, **kwargs):
