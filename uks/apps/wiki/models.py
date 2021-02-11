@@ -1,5 +1,3 @@
-import datetime
-
 from ckeditor.fields import RichTextField
 from django.contrib.auth.models import User
 from django.db import models
