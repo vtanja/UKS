@@ -55,7 +55,7 @@ class WikiDetailPage(DetailView):
 class CreateWikiView(CreateView):
     model = Wiki
     form_class = CreateWikiForm
-    template_name = 'wiki/wiki_add.html'
+    template_name = 'wiki/wiki_form.html'
 
     def form_valid(self, form):
         logger.info('Setting repository to wiki!')
