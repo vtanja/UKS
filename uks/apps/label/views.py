@@ -1,15 +1,18 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404
 
 # Create your views here.
-from django.views.generic import ListView
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
-from apps.label.models import Label
+from .forms import CreateLabelForm
+from .models import Label
 from apps.repository.models import Repository
 
 
 class ListLabelView(ListView):
     model = Label
-    template_name = 'label_list.html'
+    template_name = 'label/label_list.html'
 
     def get_queryset(self):
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
@@ -20,3 +23,86 @@ class ListLabelView(ListView):
         context['repository'] = self.repository
         context['show'] = False
         return context
+
+
+class CreateLabel(LoginRequiredMixin, CreateView):
+    model = Label
+    template_name = 'label/create_label.html'
+    form_class = CreateLabelForm
+
+    def form_valid(self, form):
+        form.instance.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        return super().form_valid(form)
+
+    def get_form_kwargs(self):
+        kwargs = super(CreateLabel, self).get_form_kwargs()
+        kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['id'])
+        return kwargs
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(CreateLabel, self).get_context_data(**kwargs)
+        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        context['repository'] = self.repository
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('repository_labels', kwargs={'id': self.kwargs['id']})
+
+
+class LabelEdit(LoginRequiredMixin, UpdateView):
+    model = Label
+    template_name = 'label/create_label.html'
+    form_class = CreateLabelForm
+
+    def form_valid(self, form):
+        original_label = self.object
+        response = super(LabelEdit, self).form_valid(form)
+        for changed_field in form.changed_data:
+            label = original_label
+            if changed_field == 'name':
+                label.name = form.cleaned_data[changed_field]
+            elif changed_field == 'description':
+                label.description = form.cleaned_data[changed_field]
+            elif changed_field == 'color':
+                label.color = form.cleaned_data[changed_field]
+
+            label.save()
+
+        return response
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        context = super(LabelEdit, self).get_context_data(**kwargs)
+        context['repository'] = self.repository
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super(LabelEdit, self).get_form_kwargs()
+        kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['id'])
+        return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy('repository_labels', kwargs={'id': self.kwargs['id']})
+
+
+class LabelDeleteView(LoginRequiredMixin, DeleteView):
+    model = Label
+    template_name = 'label/delete_label.html'
+
+    def form_valid(self):
+        label = get_object_or_404(Label, id=self.kwargs['pk'])
+        Label.objects.filter(id=label.id).delete()
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+            self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+            context = super(LabelDeleteView, self).get_context_data(**kwargs)
+            context['repository'] = self.repository
+            return context
+
+    def get_form_kwargs(self):
+            kwargs = super(LabelDeleteView, self).get_form_kwargs()
+            kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['id'])
+            return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy('repository_labels', kwargs={'id': self.kwargs['id']})

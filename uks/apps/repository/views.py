@@ -20,6 +20,7 @@ from ..user.models import UserHistoryItem
 
 logger = logging.getLogger('django')
 
+
 class RepositoryDetailView(DetailView):
     model = Repository
     template_name = 'repository/overview.html'

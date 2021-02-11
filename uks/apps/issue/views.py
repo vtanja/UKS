@@ -1,10 +1,8 @@
 from django.utils import timezone
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
-from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
 from .forms import CreateIssueForm
 from .models import Issue, IssueChange
