@@ -17,3 +17,17 @@ class Milestone(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_completed_percentage(self):
+        all_count = self.issue_set.count()
+        if all_count == 0:
+            return 100
+        closed_count = self.issue_set.filter(closed=True).count()
+        res = (100*closed_count)/all_count
+        return round(res)
+
+    def get_issue_count(self):
+        return self.issue_set.count()
+
+    def get_closed_issues_count(self):
+        return self.issue_set.filter(closed=True).count()

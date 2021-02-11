@@ -1,10 +1,8 @@
 from django.utils import timezone
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
-from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
 from .forms import CreateIssueForm
 from .models import Issue, IssueChange
@@ -18,7 +16,7 @@ class IssuesListView(ListView):
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         return Issue.objects.filter(repository=self.repository)
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(IssuesListView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
         context['show'] = False
@@ -28,7 +26,7 @@ class IssuesListView(ListView):
 class IssueDetailView(DetailView):
     model = Issue
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         self.changes = IssueChange.objects.filter(issue=self.kwargs['pk'])
         context = super(IssueDetailView, self).get_context_data(**kwargs)
@@ -48,7 +46,7 @@ class CreateIssueView(LoginRequiredMixin, CreateView):
         form.instance.closed = False
         return super(CreateIssueView, self).form_valid(form)
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
 
         context = super(CreateIssueView, self).get_context_data(**kwargs)
@@ -90,7 +88,7 @@ class IssueUpdateView(LoginRequiredMixin, UpdateView):
 
         return response
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         context = super(IssueUpdateView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
