@@ -12,6 +12,3 @@ class CreateWikiForm(forms.ModelForm):
     class Meta:
         model = Wiki
         fields = ['title', 'content']
-        # widgets = {
-        #     'content': forms.Edi(attrs={'type': 'date'})
-        # }
