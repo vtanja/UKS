@@ -1,4 +1,4 @@
-{% extends 'repoDetail.html' %}
+{% extends 'repository/repoDetail.html' %}
 
 {% block javascript %}
     <script>
@@ -34,7 +34,7 @@
         <h3 style="padding: 3mm; text-align: center">
             {{ project.name }}
         </h3>
-        <div class="description">
+        <div style="margin-left: 1cm; margin-right: 1cm">
             <h5 style="margin-top: 3mm;">Description</h5>
             <i>{{ project.description }}</i>
         </div>
@@ -43,12 +43,13 @@
             <div class="col-sm-3" style="padding: 1mm">
                 <div class="card">
                     <h5 style="margin-top: 2mm; text-align: center;">To do</h5>
-                    <div id="TODO" class="list-div card"
+                    <div id="TODO" class="card" style="background-color: #d0e0bd; min-height: 10cm; padding-bottom: 2cm;"
                          ondrop="drop(event)" ondragover="allowDrop(event)">
                         {% for issue in issues %}
                             {% if issue.issue_status == 'TODO' and not issue.closed %}
-                                <div class="task" id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)">
-                                    <a style="color: #408f2f" href="{% url 'issue_details' repository.id issue.id %}">{{ issue.title }}</a>
+                                <div id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)"
+                                    style="margin-left: 2mm; margin-right: 2mm; margin-top: 2mm; padding: 2mm; background-color: #f2ffed;">
+                                    <a style="color: #408f2f" href="{% url 'issue-details' repository.id issue.id %}">{{ issue.title }}</a>
                                 <br>
                                 <br>
                                 <p style="font-size: small">Assignee:
@@ -65,12 +66,13 @@
             <div class="col-sm-3" style="padding: 1mm">
                 <div class="card">
                     <h5 style="margin-top: 2mm; text-align: center">Doing</h5>
-                    <div id="ONGOING" class="card list-div"
+                    <div id="ONGOING" class="card" style="background-color: #d0e0bd; min-height: 10cm; padding-bottom: 2cm;"
                          ondrop="drop(event)" ondragover="allowDrop(event)">
                         {% for issue in issues %}
                             {% if issue.issue_status == 'ONGOING' and not issue.closed %}
-                                <div class="task" id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)">
-                                    <a style="color: #408f2f" href="{% url 'issue_details' repository.id issue.id %}">{{ issue.title }}</a>
+                                <div id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)"
+                                     style="margin-left: 2mm; margin-right: 2mm; margin-top: 2mm; padding: 2mm; background-color: #f2ffed;">
+                                    <a style="color: #408f2f" href="{% url 'issue-details' repository.id issue.id %}">{{ issue.title }}</a>
                                     <br>
                                     <br>
                                     <p style="font-size: small">Assignee:
@@ -87,12 +89,13 @@
             <div class="col-sm-3" style="padding: 1mm">
                 <div class="card">
                     <h5 style="margin-top: 2mm; text-align: center">Done</h5>
-                    <div id="DONE" class="card list-div"
+                    <div id="DONE" class="card" style="background-color: #d0e0bd; min-height: 10cm; padding-bottom: 2cm;"
                          ondrop="drop(event)" ondragover="allowDrop(event)">
                         {% for issue in issues %}
                             {% if issue.issue_status == 'DONE' and not issue.closed %}
-                                <div class="task" id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)">
-                                    <a style="color: #408f2f" href="{% url 'issue_details' repository.id issue.id %}">{{ issue.title }}</a>
+                                <div id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)"
+                                     style="margin-left: 2mm; margin-right: 2mm; margin-top: 2mm; padding: 2mm; background-color: #f2ffed;">
+                                    <a style="color: #408f2f" href="{% url 'issue-details' repository.id issue.id %}">{{ issue.title }}</a>
                                     <br>
                                     <br>
                                     <p style="font-size: small">Assignee:
@@ -109,12 +112,13 @@
             <div class="col-sm-3" style="padding: 1mm">
                 <div class="card">
                     <h5 style="margin-top: 2mm; text-align: center">Closed</h5>
-                    <div id="CLOSED" class="card list-div"
+                    <div id="CLOSED" class="card" style="background-color: #d0e0bd; min-height: 10cm; padding-bottom: 2cm;"
                          ondrop="drop(event)" ondragover="allowDrop(event)">
                         {% for issue in issues %}
                             {% if issue.closed %}
-                                <div class="task" id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)">
-                                    <a style="color: #2b6020" href="{% url 'issue_details' repository.id issue.id %}">{{ issue.title }}</a>
+                                <div id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)"
+                                     style="margin-left: 2mm; margin-right: 2mm; margin-top: 2mm; padding: 2mm; background-color: #f2ffed;">
+                                    <a style="color: #2b6020" href="{% url 'issue-details' repository.id issue.id %}">{{ issue.title }}</a>
                                     <br>
                                     <br>
                                     <p style="font-size: small">Assignee:
