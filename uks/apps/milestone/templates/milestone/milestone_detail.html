@@ -1,0 +1,48 @@
+{% extends 'repository/repoDetail.html' %}
+
+{% block repo-content %}
+    <div class="container" style="text-align: left; padding: 5mm;">
+        <h3 style="padding: 3mm">
+            {{ milestone.title }}
+        </h3>
+        <hr style=" border-bottom: darkgray; border-bottom-style: solid; border-bottom-width: thin">
+        <div class="container row" style="text-align: left" >
+            <div class="col-sm-5" >
+                <p>{{ milestone.dateCreated }} - {{ milestone.dueDate }}</p>
+                {% if milestone.closed %}
+                    <span style="font-size: medium" class="badge badge-pill badge-secondary">Closed</span>
+                {% else %}
+                    <span style="font-size: medium" class="badge badge-pill badge-success">Open</span>
+                {% endif %}
+                <h5 style="margin-top: 3mm">Description</h5>
+                <em>{{ milestone.description }}</em>
+            </div>
+            <div class="col-sm-7" style="border-left: darkgray; border-left-style: solid; border-left-width: thin">
+                {% for issue in issues %}
+                    <div class="card" style="width: 100%" >
+                        <div style="padding-bottom: 5px;padding-top: 15px" class="card-body">
+                            <p style="font-size: 18px; font-weight: bold">
+                                {% if issue.closed %}
+                                    <em class="far fa-calendar-times"></em>&nbsp;&nbsp;
+                                {% elif issue.issue_status == 'TODO' %}
+                                    <em class="far fa-calendar"></em>&nbsp;&nbsp;
+                                {% elif issue.issue_status == 'ONGOING' %}
+                                    <em class="far fa-calendar-alt"></em>&nbsp;&nbsp;
+                                {% else %}
+                                    <em class="far fa-calendar-check"></em>&nbsp;&nbsp;
+                                {% endif %}
+                                <a style="color: #408f2f" href="{% url 'issue-details' repository.id issue.id %}">{{ issue.title }}</a>
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <p><em>Created by: </em>{{ issue.created_by }}</p>
+                            <p>Labels...</p>
+                        </div>
+                    </div> <br>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
