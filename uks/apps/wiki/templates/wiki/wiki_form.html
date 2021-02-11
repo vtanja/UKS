@@ -6,7 +6,7 @@
         <br>
         {% if 'edit' in request.path %}
             <h3 style="float: left">Edit page</h3>
-            <a class="btn btn-danger" style="width: 10%; color: white; float: right;" href="{% url 'wiki-delete' repository.id wiki.id %}">Delete</a> &nbsp;
+            <a class="btn btn-danger" style="width: 10%; color: white; float: right; cursor: pointer;" data-toggle="modal" data-target="#modal">Delete</a> &nbsp;
             <div style="float:right;">&nbsp; &nbsp;</div>
             <a class="btn btn-secondary" style="width: 10%; color: white; float:right;" href="{% url 'wiki-history' repository.id wiki.id %}">Show history</a> &nbsp; &nbsp;
         {% else %}
@@ -23,4 +23,28 @@
             <input type="hidden" name="next" value="{{ next }}">
         </form>
     </div>
+
+
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-success" id="exampleModalLabel">Delete</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h5>Are you sure that you want to delete wiki page {{ wiki.title }}? </h5>
+            </div>
+            <div class="modal-footer">
+                <form action="{% url 'wiki-delete' repository.id wiki.id %}" method="post" style="display: inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="branch_id" value="{{ wiki.id }}">
+                    <button type="submit" class="btn btn-success">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

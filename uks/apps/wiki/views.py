@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 # Create your views here.
 from django.urls import reverse_lazy, reverse
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from apps.repository.models import Repository
 from apps.user.models import UserHistoryItem
@@ -125,3 +125,11 @@ class WikiUpdateView(UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('wiki-details', kwargs={'id': self.kwargs['id'], 'pk': self.kwargs['pk']})
+
+
+class WikiDeleteView(DeleteView):
+    model = Wiki
+
+    def get_success_url(self):
+        logger.info('Routing to all wikis after deleting wiki!')
+        return reverse_lazy('wiki-overview', kwargs={'id': self.kwargs['id']})
