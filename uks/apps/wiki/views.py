@@ -24,7 +24,6 @@ class WikiListView(ListView):
         logger.info('Initializing context!')
         context['repository'] = self.repository
         context['wikis'] = wikis
-        # context['p_form'] = self.p_form
         context['show'] = False
         return context
 
