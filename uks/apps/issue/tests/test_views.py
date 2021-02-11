@@ -245,56 +245,58 @@ class IssueUpdateViewTest(TestCase):
     def setUpTestData(cls):
         fill_test_db()
 
-    def get_edit_existing_issue(self, repository_id=-1, issue_id=-1):
-        if repository_id == -1:
-            repository_id = Repository.objects.all()[0].id
-        if issue_id == -1:
-            issue_id = Issue.objects.filter(repository_id=repository_id)[0].id
+    def get_edit_issue_view(self, repository_id=0, issue_id=0):
+        """
+        Helper function that returns reponse for editingexisting issue.
+        If -1 is send for either repository_id or issue_id it returns id of non existent issue or repository.
+        """
+        repository_id, issue_id = get_issue_and_repository_id(repository=repository_id, issue=issue_id)
         response = self.client.get(reverse('issue-update', kwargs={'repository_id': repository_id, 'pk': issue_id}))
         return response, repository_id, issue_id
 
+    def logged_in_user_get_edit_view(self, repository_id=0, issue_id=0):
+        """
+        Helper function that logs in user and calls get_edit_issue_view and returns its result
+        """
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        return self.get_edit_issue_view(repository_id, issue_id)
+
     def test_redirect_id_user_not_logged_in(self):
-        response, repository_id, issue_id = self.get_edit_existing_issue()
+        response, repository_id, issue_id = self.get_edit_issue_view()
         self.assertRedirects(response,
                              '/welcome/login/?next=/repository/{}/issues/{}/edit/'.format(repository_id, issue_id))
 
     def test_logged_in_user_can_access(self):
-        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
-        response, repository_id, issue_id = self.get_edit_existing_issue()
+        response, _, _ = self.logged_in_user_get_edit_view()
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(str(response.wsgi_request.user), USER_USERNAME)
         self.assertTemplateUsed(response, ISSUE_FORM)
 
     def test_view_shows_correct_template(self):
-        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
-        response, repository_id, issue_id = self.get_edit_existing_issue()
+        response, _, _ = self.logged_in_user_get_edit_view()
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, ISSUE_FORM)
 
     def test_HTTP404_changing_issue_from_non_existent_repository(self):
-        self.client.login(username='testuser', password=USER_PASSWORD)
-        repositories = Repository.objects.all()
-        non_existant_repository = repositories[len(repositories) - 1].id + 1
-        response = self.client.get(reverse('issue-update', kwargs={'repository_id': non_existant_repository, 'pk': 1}))
+        response, repository_id, issue_id = self.logged_in_user_get_edit_view(-1)
 
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
 
     def test_HTTP404_changing_non_existing_issue(self):
-        self.client.login(username='testuser', password=USER_PASSWORD)
-        issues = Issue.objects.all()
-        non_existing_issue = issues[len(issues) - 1].id + 1
-        response, repository_id, issue_id = self.get_edit_existing_issue(issue_id=non_existing_issue)
+        response, repository_id, issue_id = self.logged_in_user_get_edit_view(issue_id=-1)
 
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
 
     def test_issue_change_created_for_every_change_and_redirect(self):
+        """
+        Test editing existing issue. Then it checks whether correct amount of IssueChange objects were created.
+        """
         start_of_the_test = timezone.now()
-        self.client.login(username='testuser', password=USER_PASSWORD)
-        _, repository_id, issue_id = self.get_edit_existing_issue()
+        _, repository_id, issue_id = self.logged_in_user_get_edit_view()
 
         response = self.client.post(reverse('issue-update', kwargs={'repository_id': repository_id, 'pk': issue_id}),
                                     {'title': 'Changed test title', 'description': 'test',
