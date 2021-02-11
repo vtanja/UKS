@@ -35,7 +35,7 @@ class WikiDetailPage(DetailView):
     model = Wiki
     template_name = 'wiki/wiki_detail.html'
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(WikiDetailPage, self).get_context_data(**kwargs)
         logger.info('Retrieving wiki that belong to repository with id: %s', self.kwargs['id'])
         context['wikis'] = Wiki.objects.filter(repository_id=self.kwargs['id'])
@@ -62,7 +62,7 @@ class CreateWikiView(CreateView):
 
         return super(CreateWikiView, self).form_valid(form)
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         logger.info('Initializing context')
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         context = super(CreateWikiView, self).get_context_data(**kwargs)
