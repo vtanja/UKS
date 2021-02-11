@@ -48,6 +48,25 @@ def fill_test_db():
     test_issue2.assignees.add(test_user)
 
 
+def get_issue_and_repository_id(issue=0, repository=0):
+    if issue != -1:
+        issue_id = Issue.objects.all()[issue].id
+    else:
+        issues = Issue.objects.all()
+        issue_id = issues[len(issues) - 1].id + 1
+    repository_id = get_repository_id(repository)
+    return repository_id, issue_id
+
+
+def get_repository_id(repository=0):
+    if repository != -1:
+        repository_id = Repository.objects.all()[repository].id
+    else:
+        repositories = Repository.objects.all()
+        repository_id = repositories[len(repositories) - 1].id + 1
+    return repository_id
+
+
 class IssueListViewTest(TestCase):
 
     @classmethod
