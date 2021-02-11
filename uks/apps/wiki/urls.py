@@ -1,6 +1,5 @@
 from django.urls import path
 
-from apps.wiki import views
 from apps.wiki.views import WikiListView, WikiDetailPage
 
 urlpatterns = [
