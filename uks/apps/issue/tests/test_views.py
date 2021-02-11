@@ -318,51 +318,46 @@ class CloseIssueTet(TestCase):
         fill_test_db()
 
     def test_redirect_user_if_not_logged_in(self):
-        repository_id = Repository.objects.all()[0].id
-        issue_id = Issue.objects.all()[0].id
+        repository_id, issue_id = get_issue_and_repository_id()
         response = self.client.get('/repository/{}/issues/{}/close/'.format(repository_id, issue_id))
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response,
                              '/welcome/login/?next=/repository/{}/issues/{}/close/'.format(repository_id, issue_id))
 
-    def test_close_issue_accessible_by_name(self):
-        self.client.login(username='testuser', password=USER_PASSWORD)
-        repository_id = Repository.objects.all()[0].id
-        issue_id = Issue.objects.all()[0].id
+    def get_response_for_close_issue(self, repository_id=0, issue_id=0):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        repository_id, issue_id = get_issue_and_repository_id(repository=repository_id, issue=issue_id)
         response = self.client.get(reverse('issue-close', kwargs={'repository_id': repository_id, 'pk': issue_id}))
+        return response, repository_id, issue_id
+
+    def test_close_issue_accessible_by_name(self):
+        response, repository_id, issue_id = self.get_response_for_close_issue()
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('issue-details', kwargs={'repository_id': repository_id, 'pk': issue_id}))
 
-    def test_HTTP404_if_issue_doesnt_exist(self):
-        self.client.login(username='testuser', password=USER_PASSWORD)
-        repositories = Repository.objects.all()
-        non_existing_repository_id = repositories[len(repositories) - 1].id + 1
-        issues = Issue.objects.all()
-        issue_id = issues[0].id
-        response = self.client.get(reverse('issue-close', kwargs={'repository_id': non_existing_repository_id, 'pk': issue_id}))
-        self.assertEqual(response.status_code, 404)
-        self.assertRaises(Http404)
-
     def test_HTTP404_if_repository_doesnt_exist(self):
-        self.client.login(username='testuser', password=USER_PASSWORD)
-        repositories = Repository.objects.all()
-        repository_id = repositories[0].id
-        issues = Issue.objects.all()
-        non_existing_issue_id = issues[len(issues) - 1].id + 1
-        response = self.client.get(reverse('issue-close', kwargs={'repository_id': repository_id, 'pk': non_existing_issue_id}))
+        response, _, _ = self.get_response_for_close_issue(repository_id=-1)
+        self.assert_404(response)
+
+    def test_HTTP404_if_issue_doesnt_exist(self):
+        response, _, _ = self.get_response_for_close_issue(issue_id=-1)
+        self.assert_404(response)
+
+    def assert_404(self, response):
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
 
     def test_close_opened_issue(self):
-        self.client.login(username='testuser', password=USER_PASSWORD)
-        issue = Issue.objects.filter(closed=False)[0]
-        self.client.get(reverse('issue-close', kwargs={'repository_id': issue.repository.id, 'pk': issue.pk}))
-        issue.refresh_from_db()
+        issue = self.get_close_issue_by_closed_attribute(False)
         self.assertTrue(issue.closed)
 
     def test_open_closed_issue(self):
-        self.client.login(username='testuser', password=USER_PASSWORD)
-        issue = Issue.objects.filter(closed=True)[0]
+        issue = self.get_close_issue_by_closed_attribute(True)
+        self.assertTrue(issue.closed is False)
+
+    def get_close_issue_by_closed_attribute(self, closed):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        issue = Issue.objects.filter(closed=closed)[0]
         self.client.get(reverse('issue-close', kwargs={'repository_id': issue.repository.id, 'pk': issue.pk}))
         issue.refresh_from_db()
-        self.assertTrue(issue.closed is False)
+        return issue
