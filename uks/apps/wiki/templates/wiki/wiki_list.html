@@ -1,0 +1,41 @@
+{% extends 'repository/repoDetail.html' %}
+
+{% block repo-content %}
+    {% if wikis %}
+        <br>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-9">
+                    {% block wiki-detail %}
+                    {% endblock wiki-detail %}
+                </div>
+                <div class="col-md-3">
+                <div style="margin-top: 20%; margin-left: 10%">
+                    <button class="btn btn-secondary" style="width: 40%">Edit</button> &nbsp; &nbsp;
+                    <button class="btn btn-success" style="width: 45%">New page</button>
+                </div>
+                <div class="card" style="width: 18rem; max-height: 50vh; margin-top: 10%">
+                  <div class="card-body">
+                    <h5 class="card-title">Pages &nbsp;&nbsp; <span class="badge badge-pill badge-success">{{ wikis|length }}</span></h5>
+                    <ul class="list-group list-group-flush" style="text-align: left">
+                        {% for wiki in wikis %}
+                            <a  style="font-size: large" href="{% url 'wiki-details' repository.id wiki.id %}">{{ wiki.title }}</a>
+                        {% endfor %}
+                    </ul>
+                  </div>
+                </div>
+                  <br>
+
+                </div>
+            </div>
+        <br><br>
+        </div>
+    {% else %}
+        <br>
+        <h5>There are no wiki pages yet!</h5>
+        <br>
+        <button class="btn btn-success">New page</button>
+        <p/>
+        <br><br>
+    {% endif %}
+{% endblock %}
