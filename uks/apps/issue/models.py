@@ -50,12 +50,11 @@ class Issue(models.Model):
         issue_change.issue = self
         issue_change.date = timezone.now()
         issue_change.save()
-        if status != 'CLOSED':
-            self.issue_status = status
-            self.closed = False
-        else:
+        self.issue_status = status
+        if status == 'DONE':
             self.closed = True
-
+        else:
+            self.closed = False
         self.save()
 
 
