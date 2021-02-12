@@ -16,7 +16,7 @@ from .forms import RepositoryForm
 from .models import Repository
 # Create your views here.
 from ..branch.models import Branch
-from ..user.models import UserHistoryItem
+from ..user.models import HistoryItem
 
 logger = logging.getLogger('django')
 
@@ -85,7 +85,7 @@ def add_repository(request):
             get_branches(repository)
             # repository.branch_set.set(branches)
 
-            change = UserHistoryItem()
+            change = HistoryItem()
             change.dateChanged = datetime.datetime.now()
             change.belongsTo = request.user
             change.message = 'added new repository'
