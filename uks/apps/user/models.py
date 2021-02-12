@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
-class UserHistoryItem(models.Model):
+class HistoryItem(models.Model):
     message = models.TextField()
     dateChanged = models.DateTimeField()
     belongsTo = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -1,0 +1,10 @@
+{% extends 'wiki/wiki_list.html' %}
+{% block wiki-detail %}
+    <br>
+    <div class="container" style="width: 100%; text-align: left">
+        <h3>{{ wiki.title }}</h3>
+        <p style="font-style: italic">This will be last update info</p>
+        <hr>
+        <div rows="10" >{{ wiki.content | safe }}</div>
+    </div>
+{%  endblock wiki-detail%}

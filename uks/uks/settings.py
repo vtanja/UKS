@@ -45,10 +45,12 @@ INSTALLED_APPS = [
     'apps.commit',
     'apps.label',
     'apps.project',
+    'apps.wiki',
     'security',
     'crispy_forms',
     'fontawesome-free',
     'colorfield',
+    'ckeditor',
 ]
 
 MIDDLEWARE = [
@@ -87,7 +89,7 @@ WSGI_APPLICATION = 'uks.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': os.getenv('POSTGRES_DB'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'HOST': 'localhost',
@@ -147,7 +149,6 @@ DATETIME_FORMAT = 'd. N Y, H:i:s'
 
 STATIC_URL = '/static/'
 STATIC_ROOT = './static'
-STATICFILES_DIRS = ('/apps/project/static',)
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 

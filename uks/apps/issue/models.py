@@ -32,14 +32,24 @@ class Issue(models.Model):
     def __str__(self):
         return self.title
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('issue-details', args=[str(self.repository_id), str(self.id)])
+
+    def toggle_issue_close(self):
+        if self.closed:
+            self.closed = False
+        else:
+            self.closed = True
+        self.save()
+
     def change_status(self, status):
         if status != 'CLOSED':
             self.issue_status = status
             self.closed = False
-            self.save()
         else:
             self.closed = True
-            self.save()
+        self.save()
 
 
 class IssueChange(models.Model):

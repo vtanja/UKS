@@ -9,8 +9,9 @@
         <!-- filter -->
         <div class="row">
             <table class="table table-hover">
-                <caption>Issues</caption>
+                <caption>Issues from all repositories</caption>
                 <thead>
+                <th scope="col">Repository</th>
                 <th scope="col">Status</th>
                 <th scope="col">Title</th>
                 <th scope="col">Created by</th>
@@ -18,9 +19,19 @@
                 <tbody>
                 {% for issue in object_list %}
                     <tr>
-                        <td>{{ issue.issue_status.title }}</td>
-                        <td><a href="{% url 'issue-details' issue.repository.id issue.id %}">{{ issue.title }}</a></td>
-                        <td>{{ user.username }}</td>
+                        <td style="vertical-align: center">{{ issue.repository.name }}</td>
+                        <td style="vertical-align: center">{{ issue.issue_status.title }}</td>
+                        <td style="text-align: start">
+                            <div>
+                            {% if issue.closed %}
+                                <span class="badge badge-pill badge-secondary">Closed</span>
+                            {% else %}
+                                <span style="font-size: small" class="badge badge-pill badge-success">Open</span>
+                            {% endif %}
+                            <a href="{{ issue.get_absolute_url }}">{{ issue.title }}</a>
+                            </div>
+                        </td>
+                        <td style="vertical-align: center">{{ user.username }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
