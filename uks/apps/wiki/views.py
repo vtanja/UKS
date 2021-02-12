@@ -14,12 +14,12 @@ from apps.wiki.models import Wiki
 logger = logging.getLogger('django')
 
 
-def add_hisotry_item(user, message):
+def add_history_item(user, message):
     change = HistoryItem()
     change.dateChanged = datetime.datetime.now()
     change.belongsTo = user
     change.message = message
-    change.save()
+    return change
 
 class WikiListView(ListView):
     model = Wiki
@@ -69,7 +69,8 @@ class CreateWikiView(CreateView):
         logger.info('Wiki page created!')
 
         logger.info('Added user history item!')
-        add_hisotry_item(self.request.user, 'created new wiki page')
+        self.change = add_history_item(self.request.user, 'created new wiki page')
+        self.change.save()
 
         return super(CreateWikiView, self).form_valid(form)
 
@@ -89,6 +90,9 @@ class CreateWikiView(CreateView):
         return kwargs
 
     def get_success_url(self):
+        wiki = get_object_or_404(Wiki, id=self.object.id)
+        self.change.changed_wiki_object = wiki
+        self.change.save()
         return reverse_lazy('wiki-overview', kwargs={'id': self.kwargs['id']})
 
 
@@ -102,7 +106,7 @@ class WikiUpdateView(UpdateView):
         response = super(WikiUpdateView, self).form_valid(form)
         logger.info('Creating wiki history item!')
 
-        add_hisotry_item(self.request.user, 'changed wiki page')
+        wiki = Wiki.objects.get(id=self.object.id)
 
         logger.info('Wiki page [%s] change done!', self.object.title)
         return response
@@ -121,6 +125,10 @@ class WikiUpdateView(UpdateView):
         return kwargs
 
     def get_success_url(self):
+        change = add_history_item(self.request.user, 'changed wiki page')
+        wiki = get_object_or_404(Wiki, id=self.object.id)
+        change.changed_wiki_object = wiki
+        change.save()
         return reverse_lazy('wiki-details', kwargs={'id': self.kwargs['id'], 'pk': self.kwargs['pk']})
 
 
@@ -128,7 +136,31 @@ class WikiDeleteView(DeleteView):
     model = Wiki
 
     def get_success_url(self):
-        add_hisotry_item(self.request.user, 'deleted wiki page')
+        change = add_history_item(self.request.user, 'deleted wiki page')
+        wiki = get_object_or_404(Wiki, self.model.pk)
+        change.changed_wiki_object = wiki
+        change.save()
         logger.info('Wiki [%s] has been deleted successfully!', self.kwargs['pk'])
         logger.info('Routing to all wikis after deleting wiki!')
         return reverse_lazy('wiki-overview', kwargs={'id': self.kwargs['id']})
+
+
+class HistoryListView(ListView):
+    model = HistoryItem
+    template_name = 'wiki/wiki_history.html'
+
+    def get_queryset(self):
+        logger.info('Getting current repository!')
+        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        self.wiki = get_object_or_404(Wiki, id=self.kwargs['pk'])
+
+    def get_context_data(self, **kwargs):
+        context = super(HistoryListView, self).get_context_data(**kwargs)
+        history = HistoryItem.objects.filter(changed_wiki_object_id=self.wiki.id)
+        logger.info('Initializing context!')
+        context['repository'] = self.repository
+        context['wikis'] = Wiki.objects.filter(repository=self.repository)
+        context['show'] = False
+        context['history'] = history
+        context['wiki'] = self.wiki
+        return context
