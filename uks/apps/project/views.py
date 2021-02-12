@@ -56,6 +56,12 @@ class ProjectDetailView(DetailView):
         self.project = get_object_or_404(Project, id=self.kwargs['pk'])
         context['repository'] = self.repository
         context['issues'] = Issue.objects.filter(project=self.project)
+        issue_dict = {
+            "TODO": context['issues'].filter(issue_status='TODO'),
+            "ONGOING": context['issues'].filter(issue_status='ONGOING'),
+            "DONE": context['issues'].filter(issue_status='DONE')
+        }
+        context['issue_dict'] = issue_dict
         return context
 
 
