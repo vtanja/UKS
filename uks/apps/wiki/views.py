@@ -1,7 +1,6 @@
 import datetime
 import logging
 
-from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 
 # Create your views here.
@@ -29,7 +28,7 @@ class WikiListView(ListView):
         logger.info('Getting current repository!')
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(WikiListView, self).get_context_data(**kwargs)
         wikis = Wiki.objects.filter(repository_id=self.repository.id)
         logger.info('Initializing context!')
@@ -43,11 +42,12 @@ class WikiDetailPage(DetailView):
     model = Wiki
     template_name = 'wiki/wiki_detail.html'
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(WikiDetailPage, self).get_context_data(**kwargs)
         logger.info('Retrieving wiki that belong to repository with id: %s', self.kwargs['id'])
         context['wikis'] = Wiki.objects.filter(repository_id=self.kwargs['id'])
         context['repository'] = Repository.objects.get(id=self.kwargs['id'])
+        context['show'] = False
         return context
 
 
@@ -70,11 +70,13 @@ class CreateWikiView(CreateView):
 
         return super(CreateWikiView, self).form_valid(form)
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         logger.info('Initializing context')
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         context = super(CreateWikiView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
+        context['wikis'] = Wiki.objects.filter(repository=self.repository)
+        context['show'] = False
         logger.info('Context initialized!')
         return context
 
@@ -104,10 +106,12 @@ class WikiUpdateView(UpdateView):
         logger.info('Wiki page [%s] change done!', self.object.title)
         return response
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         context = super(WikiUpdateView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
+        context['wikis'] = Wiki.objects.filter(repository=self.repository)
+        context['show'] = False
         return context
 
     def get_form_kwargs(self):
