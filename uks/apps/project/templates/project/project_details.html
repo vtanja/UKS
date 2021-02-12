@@ -50,8 +50,11 @@
                                 <div id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)"
                                     style="margin-left: 2mm; margin-right: 2mm; margin-top: 2mm; padding: 2mm; background-color: #f2ffed;">
                                     <a style="color: #408f2f" href="{% url 'issue-details' repository.id issue.id %}">{{ issue.title }}</a>
-                                <br>
-                                <br>
+                                    <div>
+                                        {% for label in issue.labels.all %}
+                                            <span class="badge badge-light" style="background-color: {{label.color}}!important;color:white">{{label.name}}</span>
+                                        {% endfor %}
+                                    </div>
                                 <p style="font-size: small">Assignee:
                                     {% for assignee in issue.assignees.all %} {{ assignee.username }}
                                         {% empty %} Not assigned
@@ -73,8 +76,11 @@
                                 <div id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)"
                                      style="margin-left: 2mm; margin-right: 2mm; margin-top: 2mm; padding: 2mm; background-color: #f2ffed;">
                                     <a style="color: #408f2f" href="{% url 'issue-details' repository.id issue.id %}">{{ issue.title }}</a>
-                                    <br>
-                                    <br>
+                                    <div>
+                                        {% for label in issue.labels.all %}
+                                            <span class="badge badge-light" style="background-color: {{label.color}}!important;color:white">{{label.name}}</span>
+                                        {% endfor %}
+                                    </div>
                                     <p style="font-size: small">Assignee:
                                         {% for assignee in issue.assignees.all %} {{ assignee.username }}
                                             {% empty %} Not assigned
@@ -96,8 +102,11 @@
                                 <div id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)"
                                      style="margin-left: 2mm; margin-right: 2mm; margin-top: 2mm; padding: 2mm; background-color: #f2ffed;">
                                     <a style="color: #408f2f" href="{% url 'issue-details' repository.id issue.id %}">{{ issue.title }}</a>
-                                    <br>
-                                    <br>
+                                    <div>
+                                        {% for label in issue.labels.all %}
+                                            <span class="badge badge-light" style="background-color: {{label.color}}!important;color:white">{{label.name}}</span>
+                                        {% endfor %}
+                                    </div>
                                     <p style="font-size: small">Assignee:
                                         {% for assignee in issue.assignees.all %} {{ assignee.username }}
                                             {% empty %} Not assigned
@@ -119,8 +128,11 @@
                                 <div id="{{ issue.id }}" class="card" draggable="true" ondragstart="drag(event)"
                                      style="margin-left: 2mm; margin-right: 2mm; margin-top: 2mm; padding: 2mm; background-color: #f2ffed;">
                                     <a style="color: #2b6020" href="{% url 'issue-details' repository.id issue.id %}">{{ issue.title }}</a>
-                                    <br>
-                                    <br>
+                                    <div>
+                                        {% for label in issue.labels.all %}
+                                            <span class="badge badge-light" style="background-color: {{label.color}}!important;color:white">{{label.name}}</span>
+                                        {% endfor %}
+                                    </div>
                                     <p style="font-size: small">Assignee:
                                         {% for assignee in issue.assignees.all %} {{ assignee.username }}
                                             {% empty %} Not assigned
