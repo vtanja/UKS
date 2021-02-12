@@ -11,8 +11,8 @@
                 </div>
                 <div class="col-md-3">
                 <div style="margin-top: 20%; margin-left: 10%">
-                    <button class="btn btn-secondary" style="width: 40%">Edit</button> &nbsp; &nbsp;
-                    <button class="btn btn-success" style="width: 45%">New page</button>
+                    <a class="btn btn-secondary" style="width: 40%; color: white">Edit</a> &nbsp; &nbsp;
+                    <a class="btn btn-success" style="width: 45%" href="{% url 'wiki-add' repository.id %}">New page</a>
                 </div>
                 <div class="card" style="width: 18rem; max-height: 50vh; margin-top: 10%">
                   <div class="card-body">
@@ -34,7 +34,7 @@
         <br>
         <h5>There are no wiki pages yet!</h5>
         <br>
-        <button class="btn btn-success">New page</button>
+        <a class="btn btn-success"  href="{% url 'wiki-add' repository.id %}">New page</a>
         <p/>
         <br><br>
     {% endif %}

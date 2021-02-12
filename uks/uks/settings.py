@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'fontawesome-free',
     'colorfield',
-
+    'ckeditor',
 ]
 
 MIDDLEWARE = [
