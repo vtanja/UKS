@@ -2,23 +2,22 @@ import datetime
 import json
 import logging
 import os
-from django.db.models import Q
-from django.shortcuts import render
 
+from django.contrib.auth.models import User
 import requests
 from django.contrib import messages
-from django.core import serializers
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import DetailView, View
 
-from .forms import RepositoryForm
+from .forms import RepositoryForm, CollaboratorsForm
 from .models import Repository
 # Create your views here.
 from ..branch.models import Branch
 from ..user.models import UserHistoryItem
 
 logger = logging.getLogger('django')
+repoId = 0
 
 
 class RepositoryDetailView(DetailView):
@@ -109,7 +108,36 @@ def RepositorySettings(request, id):
         Q(owner=request.user) | Q(collaborators__username__in=[str(request.user)])
     )
     repository = Repository.objects.get(id=id)
-    context = {'repository': repository}
+    global repo
+    repo = repository.id
+    users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
+    collabs = repository.collaborators.all()
+    context = {'repository': repository, 'users': users, 'collabs': collabs}
     return render(request, 'repository/repoSettings.html', context)
 
 
+def addCollaborators(request):
+    if request.method == 'POST':
+        form = CollaboratorsForm(request.POST)
+        if form.is_valid():
+            users = form.data.getlist('collaborators')
+            print(users)
+            global repo
+            repository = Repository.objects.get(id=repo)
+            print(repository.name)
+            for u in users:
+                user = User.objects.get(username=u)
+                Repository.objects.get(id=repo).collaborators.add(user)
+
+        else:
+            print('Forma nije validna')
+
+    else:
+        form = CollaboratorsForm()
+
+    repository = Repository.objects.get(id=repo)
+    users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
+    collabs = repository.collaborators.all()
+    print(collabs)
+    context = {'repository': repository, 'users': users, 'collabs': collabs}
+    return render(request, 'repository/repoSettings.html', context)

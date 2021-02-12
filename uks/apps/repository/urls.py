@@ -1,7 +1,7 @@
 from django.urls import path, include
 
-from apps.repository import views
-from apps.repository.views import RepositoryDetailView, RepositorySettings
+from ..repository import views
+from ..repository.views import RepositoryDetailView, RepositorySettings
 
 urlpatterns = [
     path('<int:pk>/', RepositoryDetailView.as_view(), name='detail'),
@@ -11,4 +11,5 @@ urlpatterns = [
     path('<int:id>/milestones/', include('apps.milestone.urls')),
     path('<int:id>/labels/', include('apps.label.urls')),
     path('<int:id>/settings/', RepositorySettings, name='repository_settings'),
+    path('addCollaborators/', views.addCollaborators, name='addCollaborators'),
 ]

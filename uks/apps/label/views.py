@@ -7,7 +7,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 from .forms import CreateLabelForm
 from .models import Label
-from apps.repository.models import Repository
+from ..repository.models import Repository
 
 
 class ListLabelView(ListView):
