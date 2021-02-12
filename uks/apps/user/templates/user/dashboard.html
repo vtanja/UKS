@@ -30,10 +30,13 @@
                     {% for item in history %}
                         <div class="card" >
                             <div class="card-body">
-                                <div class="card-text" >
-                                    <div style="float:left">{{ item.belongsTo.username }} &nbsp;{{ item.message }}</div>
-                                <em style="float: right">{{  item.get_time_of_change}}</em>
+                                {% if item.changed_wiki_object %}
+                                    <div class="card-text" >
+                                    <div style="float:left">{{ item.belongsTo.username }} &nbsp;{{ item.message }} <a href="{{ item.changed_wiki_object.get_absolute_url }}">wiki page</a> </div>
+                                    <em style="float: right">{{  item.get_time_of_change}}</em>
                                 </div>
+                                {% endif %}
+
                             </div>
                         </div> <br>
                     {% endfor %}

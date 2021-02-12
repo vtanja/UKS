@@ -11,7 +11,7 @@
                         <div class="card" >
                             <div class="card-body">
                                 <div class="card-text" >
-                                    <div style="float:left"><a href="{{ item.belongsTo.siteuser.get_absolute_url }}" >{{ item.belongsTo.username }}</a> &nbsp;{{ item.message }}</div>
+                                    <div style="float:left"><a href="{{ item.belongsTo.siteuser.get_absolute_url }}" >{{ item.belongsTo.username }}</a> &nbsp;{{ item.message }} wiki page</div>
                                 <em style="float: right">{{  item.get_time_of_change}}</em>
                                 </div>
                             </div>
@@ -19,7 +19,7 @@
                     {% endfor %}
         </div>
     {% else %}
-        <h6>There are no history for this wiki!</h6>
+        <h6>There are no history for this wiki page!</h6>
     {% endif %}
     </div>
 {% endblock %}

@@ -69,7 +69,7 @@ class CreateWikiView(CreateView):
         logger.info('Wiki page created!')
 
         logger.info('Added user history item!')
-        self.change = add_history_item(self.request.user, 'created new wiki page')
+        self.change = add_history_item(self.request.user, 'created new ')
         self.change.save()
 
         return super(CreateWikiView, self).form_valid(form)
@@ -125,7 +125,7 @@ class WikiUpdateView(UpdateView):
         return kwargs
 
     def get_success_url(self):
-        change = add_history_item(self.request.user, 'changed wiki page')
+        change = add_history_item(self.request.user, 'changed ')
         wiki = get_object_or_404(Wiki, id=self.object.id)
         change.changed_wiki_object = wiki
         change.save()
