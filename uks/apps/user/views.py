@@ -17,7 +17,7 @@ def dashboard(request):
     logger.info('Getting all repositories of user initialized!')
     repositories = all_users_repositories(request)
     logger.info('Getting user activity initialized!')
-    history = request.user.userhistoryitem_set.all().order_by('-dateChanged')
+    history = request.user.historyitem_set.all().order_by('-dateChanged')
     context = {'repositories': repositories, 'history': history}
     return render(request, 'user/dashboard.html', context)
 
