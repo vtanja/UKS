@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from apps.repository.models import Repository
@@ -44,11 +45,17 @@ class Issue(models.Model):
         self.save()
 
     def change_status(self, status):
+        issue_change = IssueChange()
+        issue_change.message = 'Issue changed status from {old} to {new}'.format(old=self.issue_status, new=status)
+        issue_change.issue = self
+        issue_change.date = timezone.now()
+        issue_change.save()
         if status != 'CLOSED':
             self.issue_status = status
             self.closed = False
         else:
             self.closed = True
+
         self.save()
 
 
