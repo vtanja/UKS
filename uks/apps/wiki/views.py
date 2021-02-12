@@ -14,6 +14,13 @@ from apps.wiki.models import Wiki
 logger = logging.getLogger('django')
 
 
+def add_hisotry_item(user, message):
+    change = HistoryItem()
+    change.dateChanged = datetime.datetime.now()
+    change.belongsTo = user
+    change.message = message
+    change.save()
+
 class WikiListView(ListView):
     model = Wiki
     template_name = 'wiki/wiki_list.html'
@@ -62,11 +69,7 @@ class CreateWikiView(CreateView):
         logger.info('Wiki page created!')
 
         logger.info('Added user history item!')
-        change = HistoryItem()
-        change.dateChanged = datetime.datetime.now()
-        change.belongsTo = self.request.user
-        change.message = 'created new wiki page'
-        change.save()
+        add_hisotry_item(self.request.user, 'created new wiki page')
 
         return super(CreateWikiView, self).form_valid(form)
 
@@ -98,11 +101,9 @@ class WikiUpdateView(UpdateView):
         logger.info('Wiki page [%s] change initializes!', self.object.title)
         response = super(WikiUpdateView, self).form_valid(form)
         logger.info('Creating wiki history item!')
-        change = HistoryItem()
-        change.belongsTo = self.request.user
-        change.message = 'changed wiki page'
-        change.dateChanged = datetime.datetime.now()
-        change.save()
+
+        add_hisotry_item(self.request.user, 'changed wiki page')
+
         logger.info('Wiki page [%s] change done!', self.object.title)
         return response
 
@@ -127,5 +128,7 @@ class WikiDeleteView(DeleteView):
     model = Wiki
 
     def get_success_url(self):
+        add_hisotry_item(self.request.user, 'deleted wiki page')
+        logger.info('Wiki [%s] has been deleted successfully!', self.kwargs['pk'])
         logger.info('Routing to all wikis after deleting wiki!')
         return reverse_lazy('wiki-overview', kwargs={'id': self.kwargs['id']})
