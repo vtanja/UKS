@@ -1,8 +1,7 @@
 import datetime
 import logging
 
-from django.shortcuts import get_object_or_404, redirect, render
-
+from django.shortcuts import get_object_or_404, redirect
 # Create your views here.
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -11,6 +10,7 @@ from apps.repository.models import Repository
 from apps.user.models import HistoryItem
 from apps.wiki.forms import CreateWikiForm
 from apps.wiki.models import Wiki
+
 logger = logging.getLogger('django')
 
 
@@ -105,8 +105,6 @@ class WikiUpdateView(UpdateView):
         logger.info('Wiki page [%s] change initializes!', self.object.title)
         response = super(WikiUpdateView, self).form_valid(form)
         logger.info('Creating wiki history item!')
-
-        wiki = Wiki.objects.get(id=self.object.id)
 
         logger.info('Wiki page [%s] change done!', self.object.title)
         return response
