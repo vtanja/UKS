@@ -58,7 +58,11 @@
                                 <td> {% if issue.milestone %} {{ issue.milestone.title }}
                                 {% else %} This issue isn't in any milestone {% endif %} </td>
                             </tr>
-                            <!-- Labels, Milestone, Project, Assignee -->
+                            <tr>
+                                <td><strong>Project</strong></td>
+                                <td> {% if issue.project %} {{ issue.project.name }}
+                                {% else %} This issue isn't in any project yet {% endif %} </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
