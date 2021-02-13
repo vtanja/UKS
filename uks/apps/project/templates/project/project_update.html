@@ -1,0 +1,13 @@
+{% extends 'repository/repoDetail.html' %}
+
+
+{% block repo-content %}
+    {% load crispy_forms_filters %}
+    <div class="container" style="width: 50%">
+        <form method="post">
+            {% csrf_token %}
+            {{ form | crispy }}
+            <input type="submit" value="Update">
+        </form>
+    </div>
+{% endblock %}

@@ -6,9 +6,11 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'dashboard' %}">Home</a>
           </li>
-          <li class="nav-item" >
-            <a class="nav-link" href="{% url 'profile' %}">My profile</a>
-          </li>
+            {% if request.user %}
+              <li class="nav-item" >
+                <a class="nav-link" href="{{request.user.siteuser.get_absolute_url}}">My profile</a>
+              </li>
+            {% endif %}
           <li class="nav-item" >
             <a class="nav-link" href="{% url 'all-user-issues' %}">Issues</a>
           </li>
