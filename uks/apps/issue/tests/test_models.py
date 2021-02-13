@@ -51,3 +51,18 @@ class IssueModelTest(TestCase):
         issue.toggle_issue_close()
         issue.refresh_from_db()
         self.assertTrue(issue.closed is False)
+
+    def test_change_status_to_todo(self):
+        self.change_issue_status('TODO', False)
+
+    def test_change_status_to_ongoing(self):
+        self.change_issue_status('ONGOING', False)
+
+    def test_change_status_to_done_closes_issue(self):
+        self.change_issue_status('DONE', True)
+
+    def change_issue_status(self, status, closed):
+        issue = Issue.objects.get(pk=4)
+        issue.change_status(status)
+        self.assertEqual(issue.issue_status, status)
+        self.assertTrue(issue.closed is closed)
