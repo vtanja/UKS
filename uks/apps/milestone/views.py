@@ -13,10 +13,6 @@ from apps.milestone.forms import CreateMilestoneForm
 from apps.issue.models import Issue
 
 
-def index(request):
-    return HttpResponse("Hello, world. You're at the milestones index page.")
-
-
 class MilestoneListView(ListView):
     model = Milestone
     template_name = 'milestone/milestone_list.html'
@@ -95,7 +91,7 @@ def close_milestone(request, repo_id, pk):
     milestone = get_object_or_404(Milestone, pk=pk)
     repository = get_object_or_404(Repository, pk=repo_id)
     milestone.toggle_milestone_close()
-    return redirect(reverse_lazy('repository_milestones', kwargs={'repo_id': repo_id}))
+    return redirect(reverse_lazy('milestone_details', kwargs={'repo_id': repo_id, 'pk': pk}))
 
 
 class MilestoneDeleteView(DeleteView):
