@@ -6,7 +6,7 @@ from apps.repository.models import Repository
 
 class Project(models.Model):
     name = models.CharField(max_length=30)
-    description = models.TextField()
+    description = models.TextField(null=True)
     repository = models.ForeignKey(Repository, on_delete=models.CASCADE, null=False)
 
     def __str__(self):
