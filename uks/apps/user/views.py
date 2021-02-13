@@ -9,6 +9,7 @@ from django.views.generic import ListView
 from apps.user.forms import ProfileImageUpdateForm
 from apps.repository.models import Repository
 from apps.issue.models import Issue
+from security.models import SiteUser
 
 logger = logging.getLogger('django')
 
@@ -29,9 +30,10 @@ def all_users_repositories(request):
     return repositories
 
 
-def profile(request):
+def profile(request, pk):
+    user = SiteUser.objects.get(user_id=pk)
     logger.info('User profile entered!')
-    context = get_profile_form(request)
+    context = get_profile_form(request, user)
 
     if (context == "redirect"):
         return redirect('profile')
@@ -45,11 +47,11 @@ def profile(request):
     return render(request, 'user/profile.html', context)
 
 
-def get_profile_form(request):
+def get_profile_form(request, user):
     if request.method == 'POST':
         p_form = ProfileImageUpdateForm(request.POST,
                                         request.FILES,
-                                        instance=request.user.siteuser)
+                                        instance=user)
         if p_form.is_valid():
             logger.info('User profile form is valid!')
             p_form.save()
@@ -57,7 +59,7 @@ def get_profile_form(request):
             messages.success(request, f'You have successfully updated your profile!')
             return "redirect"
     else:
-        p_form = ProfileImageUpdateForm(instance=request.user.siteuser)
+        p_form = ProfileImageUpdateForm(instance=user)
 
     context = {
         'p_form': p_form
