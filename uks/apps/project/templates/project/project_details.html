@@ -19,7 +19,7 @@
                 $.ajax({
                     url: '{% url "update_issue" repository.id %}',
                     data: {
-                        'id': ev.dataTransfer.getData("text"),
+                        'i_id': ev.dataTransfer.getData("text"),
                         'list_id': ev.target.id
                     },
                     dataType: 'json',

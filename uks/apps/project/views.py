@@ -17,7 +17,7 @@ class ProjectListView(ListView):
     template_name_suffix = '_list'
 
     def get_queryset(self):
-        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        self.repository = get_object_or_404(Repository, id=self.kwargs['repo_id'])
         return Project.objects.filter(repository=self.repository)
 
     def get_context_data(self, **kwargs):
@@ -32,7 +32,7 @@ class CreateProjectView(LoginRequiredMixin, CreateView):
     fields = ['name', 'description']
 
     def form_valid(self, form):
-        form.instance.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        form.instance.repository = get_object_or_404(Repository, id=self.kwargs['repo_id'])
         return super().form_valid(form)
 
     def get_form_kwargs(self):
@@ -41,12 +41,12 @@ class CreateProjectView(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(CreateProjectView, self).get_context_data(**kwargs)
-        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        self.repository = get_object_or_404(Repository, id=self.kwargs['repo_id'])
         context['repository'] = self.repository
         return context
 
     def get_success_url(self):
-        return reverse_lazy('repository_projects', kwargs={'id': self.kwargs['id']})
+        return reverse_lazy('repository_projects', kwargs={'repo_id': self.kwargs['repo_id']})
 
 
 class ProjectDetailView(DetailView):
@@ -55,7 +55,7 @@ class ProjectDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProjectDetailView, self).get_context_data(**kwargs)
-        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        self.repository = get_object_or_404(Repository, id=self.kwargs['repo_id'])
         self.project = get_object_or_404(Project, id=self.kwargs['pk'])
         context['repository'] = self.repository
         context['issues'] = Issue.objects.filter(project=self.project)
@@ -72,8 +72,8 @@ class ProjectDetailView(DetailView):
         return super().dispatch(request, *args, **kwargs)
 
 
-def update_issue(self, id):
-    issue_id = self.GET.get('id')
+def update_issue(self, repo_id):
+    issue_id = self.GET.get('i_id')
     list_id = self.GET.get('list_id')
     issue = Issue.objects.filter(id=issue_id).first()
     issue.change_status(list_id)
@@ -88,13 +88,13 @@ class ProjectUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(ProjectUpdateView, self).get_context_data(**kwargs)
-        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        self.repository = get_object_or_404(Repository, id=self.kwargs['repo_id'])
         self.project = get_object_or_404(Project, id=self.kwargs['pk'])
         context['repository'] = self.repository
         return context
 
     def get_success_url(self):
-        return reverse_lazy('repository_projects', kwargs={'id': self.kwargs['id']})
+        return reverse_lazy('repository_projects', kwargs={'repo_id': self.kwargs['repo_id']})
 
 
 class ProjectDeleteView(DeleteView):
@@ -103,10 +103,10 @@ class ProjectDeleteView(DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super(ProjectDeleteView, self).get_context_data(**kwargs)
-        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        self.repository = get_object_or_404(Repository, id=self.kwargs['repo_id'])
         self.project = get_object_or_404(Project, id=self.kwargs['pk'])
         context['repository'] = self.repository
         return context
 
     def get_success_url(self):
-        return reverse_lazy('repository_projects', kwargs={'id': self.kwargs['id']})
+        return reverse_lazy('repository_projects', kwargs={'repo_id': self.kwargs['repo_id']})
