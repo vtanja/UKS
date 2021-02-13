@@ -45,7 +45,8 @@
                         </div>
                         <div class="col" style="text-align: left">
                             <a href="{% url 'milestone_update' repository.id milestone.id %}">Edit</a>&nbsp;&nbsp;
-                            <a>Close</a>&nbsp;&nbsp;
+                            <a href="{% url 'milestone_close' repository.id milestone.id %}">
+                                {% if milestone.closed %}Reopen{% else %}Close{% endif %}</a>&nbsp;&nbsp;
                             <a style="color: red">Delete</a>
                         </div>
                     </div>
