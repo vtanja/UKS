@@ -1,3 +1,5 @@
+import json
+
 from apps.issue.models import Issue
 from apps.project.models import Project
 from apps.repository.models import Repository
@@ -6,6 +8,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 # Create your views here.
 from django.urls import reverse_lazy
+from django.views.decorators.cache import never_cache
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
 
@@ -64,13 +67,18 @@ class ProjectDetailView(DetailView):
         context['issue_dict'] = issue_dict
         return context
 
+    @never_cache
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
 
 def update_issue(self, id):
     issue_id = self.GET.get('id')
     list_id = self.GET.get('list_id')
     issue = Issue.objects.filter(id=issue_id).first()
     issue.change_status(list_id)
-    return HttpResponse()
+    payload = {'success': True}
+    return HttpResponse(json.dumps(payload), content_type='application/json')
 
 
 class ProjectUpdateView(UpdateView):

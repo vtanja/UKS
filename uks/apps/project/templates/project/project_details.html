@@ -13,7 +13,7 @@
         function drop(ev) {
             console.log("dropped");
             ev.preventDefault();
-            var data = ev.dataTransfer.getData("text")
+            let data = ev.dataTransfer.getData("text")
             if(ev.target.id === "TODO" || ev.target.id === "ONGOING" || ev.target.id === "DONE" || ev.target.id === "CLOSED") {
                 ev.target.appendChild(document.getElementById(data));
                 $.ajax({
@@ -22,7 +22,11 @@
                         'id': ev.dataTransfer.getData("text"),
                         'list_id': ev.target.id
                     },
-                    dataType: 'json'
+                    dataType: 'json',
+                    success: function(result){
+                        location.reload();
+                        console.log("reloaded")
+                    },
                 });
             }
         }
