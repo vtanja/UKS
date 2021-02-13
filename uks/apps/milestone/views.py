@@ -1,7 +1,8 @@
+from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView, CreateView, DetailView
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import ListView, CreateView, DetailView, UpdateView
 
 # Create your views here.
 from django.http import HttpResponse
@@ -66,3 +67,27 @@ class MilestoneDetailView(DetailView):
         context['repository'] = self.repository
         context['issues'] = Issue.objects.filter(milestone=self.milestone)
         return context
+
+
+class MilestoneUpdateView(UpdateView):
+    model = Milestone
+    form_class = CreateMilestoneForm
+    template_name_suffix = '_update'
+
+    def get_form_kwargs(self):
+        kwargs = super(MilestoneUpdateView, self).get_form_kwargs()
+        kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['id'])
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super(MilestoneUpdateView, self).get_context_data(**kwargs)
+        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        self.milestone = get_object_or_404(Milestone, id=self.kwargs['pk'])
+        context['repository'] = self.repository
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('repository_milestones', kwargs={'id': self.kwargs['id']})
+
+
+
