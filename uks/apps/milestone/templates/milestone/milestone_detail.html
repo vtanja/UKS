@@ -5,6 +5,9 @@
     <div class="row" style="border-bottom: darkgray; border-bottom-style: solid; border-bottom-width: thin; margin-bottom: 4mm">
         <div class="col">
             <h3 style="padding-top: 7mm">
+                <a style="color: forestgreen" href="{% url 'repository_milestones' repository.id %}">
+                    <em class="fas fa-angle-double-left"></em>
+                </a>&nbsp;
                 {{ milestone.title }}
             </h3>
         </div>
