@@ -135,7 +135,7 @@ class WikiDeleteView(DeleteView):
 
     def get_success_url(self):
         change = add_history_item(self.request.user, 'deleted wiki page')
-        wiki = get_object_or_404(Wiki, self.model.pk)
+        wiki = get_object_or_404(Wiki, id=self.object.id)
         change.changed_wiki_object = wiki
         change.save()
         logger.info('Wiki [%s] has been deleted successfully!', self.kwargs['pk'])
