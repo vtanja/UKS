@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, CreateView, DetailView, UpdateView
+from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
 # Create your views here.
 from django.http import HttpResponse
@@ -96,3 +96,18 @@ def close_milestone(request, repo_id, pk):
     repository = get_object_or_404(Repository, pk=repo_id)
     milestone.toggle_milestone_close()
     return redirect(reverse_lazy('repository_milestones', kwargs={'repo_id': repo_id}))
+
+
+class MilestoneDeleteView(DeleteView):
+    model = Milestone
+    template_name_suffix = '_delete'
+
+    def get_context_data(self, **kwargs):
+        context = super(MilestoneDeleteView, self).get_context_data(**kwargs)
+        self.repository = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        self.milestone = get_object_or_404(Milestone, id=self.kwargs['pk'])
+        context['repository'] = self.repository
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('repository_milestones', kwargs={'repo_id': self.kwargs['repo_id']})
