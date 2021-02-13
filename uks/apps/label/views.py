@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 from django.urls import reverse_lazy
@@ -89,11 +89,7 @@ class LabelDeleteView(LoginRequiredMixin, DeleteView):
     model = Label
     template_name = 'label/delete_label.html'
 
-    def form_valid(self):
-        label = get_object_or_404(Label, id=self.kwargs['pk'])
-        Label.objects.filter(id=label.id).delete()
-
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
             self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
             context = super(LabelDeleteView, self).get_context_data(**kwargs)
             context['repository'] = self.repository

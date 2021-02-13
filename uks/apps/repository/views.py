@@ -3,12 +3,14 @@ import json
 import logging
 import os
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 import requests
 from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import DetailView, View
+from django.urls import reverse_lazy
+from django.views.generic import DetailView, View, DeleteView
 
 from .forms import RepositoryForm, CollaboratorsForm
 from .models import Repository
@@ -121,10 +123,8 @@ def addCollaborators(request):
         form = CollaboratorsForm(request.POST)
         if form.is_valid():
             users = form.data.getlist('collaborators')
-            print(users)
             global repo
             repository = Repository.objects.get(id=repo)
-            print(repository.name)
             for u in users:
                 user = User.objects.get(username=u)
                 Repository.objects.get(id=repo).collaborators.add(user)
@@ -138,6 +138,33 @@ def addCollaborators(request):
     repository = Repository.objects.get(id=repo)
     users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
     collabs = repository.collaborators.all()
-    print(collabs)
     context = {'repository': repository, 'users': users, 'collabs': collabs}
     return render(request, 'repository/repoSettings.html', context)
+
+
+# Bug brise iz baze celog usera
+class CollaboratorsDeleteView(LoginRequiredMixin, DeleteView):
+    model = User
+    template_name = 'repository/deleteCollaborators.html'
+
+    def form_valid(self):
+        user = get_object_or_404(User, id=self.kwargs['pk'])
+        print('eeee')
+
+    def get_context_data(self, **kwargs):
+            print('abc')
+            self.repository = get_object_or_404(Repository, id=repo)
+            context = super(CollaboratorsDeleteView, self).get_context_data(**kwargs)
+            print(context)
+            context['repository'] = self.repository
+            print(context)
+            return context
+
+    def get_form_kwargs(self):
+            print('dfg')
+            kwargs = super(CollaboratorsDeleteView, self).get_form_kwargs()
+            kwargs['repository'] = get_object_or_404(Repository, id=repo)
+            return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy('repository_settings', kwargs={'id': repo})

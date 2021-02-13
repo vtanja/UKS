@@ -35,8 +35,17 @@
             <h3>You haven't invited any collaborators yet</h3>
         {% endif %}
         {% if collabs.count > 0 %}
-            {% for collab in collabs %}
-                <p>{{collab.username}}</p>
+            {% for collaborator in collabs %}
+                <div class="row">
+                        <div class="col" style="text-align: left">
+                            <p>{{collaborator.first_name}} {{collaborator.last_name}}</p>
+                        </div>
+                        <div class="col" style="text-align: left">{{collaborator.username}}</div>
+                        <div class="col" style="text-align: center">{{collaborator.email}}</div>
+                        <div class="col" style="text-align: right">
+                            <a class="btn btn-link" href="{% url 'collaborators-delete' collaborator.id %}">Delete</a>
+                        </div>
+                </div>
             {% endfor %}
         {% endif %}
 

@@ -1,7 +1,7 @@
 from django.urls import path, include
 
 from ..repository import views
-from ..repository.views import RepositoryDetailView, RepositorySettings
+from ..repository.views import RepositoryDetailView, RepositorySettings, CollaboratorsDeleteView
 
 urlpatterns = [
     path('<int:pk>/', RepositoryDetailView.as_view(), name='detail'),
@@ -12,4 +12,5 @@ urlpatterns = [
     path('<int:id>/labels/', include('apps.label.urls')),
     path('<int:id>/settings/', RepositorySettings, name='repository_settings'),
     path('addCollaborators/', views.addCollaborators, name='addCollaborators'),
+    path('delete/<int:pk>', CollaboratorsDeleteView.as_view(), name='collaborators-delete'),
 ]
