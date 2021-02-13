@@ -2,12 +2,9 @@ import datetime
 import json
 import logging
 import os
-from django.db.models import Q
-from django.shortcuts import render
 
 import requests
 from django.contrib import messages
-from django.core import serializers
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import DetailView
@@ -31,7 +28,7 @@ class RepositoryDetailView(DetailView):
     model = Repository
     template_name = 'repository/overview.html'
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         logger.info('Getting repository with id: %s', self.kwargs['pk'])
         self.repository = get_object_or_404(Repository, id=self.kwargs['pk'])
 
