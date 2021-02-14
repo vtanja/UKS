@@ -19,7 +19,7 @@ from ..branch.models import Branch
 from ..user.models import UserHistoryItem
 
 logger = logging.getLogger('django')
-repoId = 0
+repo = 0
 
 
 class RepositoryDetailView(DetailView):
@@ -144,21 +144,27 @@ def addCollaborators(request):
 
 # Bug brise iz baze celog usera
 class CollaboratorsDeleteView(LoginRequiredMixin, DeleteView):
-    model = User
-    template_name = 'repository/deleteCollaborators.html'
 
-    def form_valid(self):
-        user = get_object_or_404(User, id=self.kwargs['pk'])
-        print('eeee')
+    model = User
+    template_name = "repository/deleteCollaborators.html"
 
     def get_context_data(self, **kwargs):
-            print('abc')
-            self.repository = get_object_or_404(Repository, id=repo)
-            context = super(CollaboratorsDeleteView, self).get_context_data(**kwargs)
-            print(context)
-            context['repository'] = self.repository
-            print(context)
-            return context
+        print('abc')
+        self.repository = get_object_or_404(Repository, id=repo)
+        context = super(CollaboratorsDeleteView, self).get_context_data(**kwargs)
+        context['repository'] = self.repository
+        print(context)
+        return context
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        print(self.object)
+        user = User.objects.get(username=self.object.username)
+        print(user)
+        repository = Repository.objects.get(id=repo)
+        repository.collaborators.remove(user)
+        success_url = self.get_success_url()
+        return redirect(success_url)
 
     def get_form_kwargs(self):
             print('dfg')
