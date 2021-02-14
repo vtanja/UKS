@@ -1,6 +1,7 @@
 from apps.issue.models import Issue
-from apps.milestone.models import Milestone
 from apps.label.models import Label
+from apps.milestone.models import Milestone
+from apps.project.models import Project
 from django.forms import ModelForm
 
 
@@ -12,8 +13,9 @@ class CreateIssueForm(ModelForm):
         self.fields['assignees'].queryset = self.repository.collaborators
         self.fields['milestone'].queryset = Milestone.objects.filter(repository=self.repository)
         self.fields['labels'].queryset = Label.objects.filter(repository=self.repository)
+        self.fields['project'].queryset = Project.objects.filter(repository=self.repository)
 
     class Meta:
         model = Issue
-        fields = ['title', 'description', 'assignees', 'labels', 'milestone']
+        fields = ['title', 'description', 'assignees', 'labels', 'milestone', 'project']
 
