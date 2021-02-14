@@ -5,7 +5,6 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
-from apps.repository.models import Repository
 from .forms import CreateLabelForm
 from .models import Label
 from ..repository.models import Repository

@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import DetailView, View, DeleteView
+from django.views.generic import DetailView, DeleteView
 
 from .forms import RepositoryForm, CollaboratorsForm
 from .models import Repository
@@ -21,12 +21,14 @@ from ..user.models import HistoryItem
 logger = logging.getLogger('django')
 repo = 0
 
+
 def add_history_item(user, message):
     change = HistoryItem()
     change.dateChanged = datetime.datetime.now()
     change.belongsTo = user
     change.message = message
     return change
+
 
 class RepositoryDetailView(DetailView):
     model = Repository
@@ -110,9 +112,7 @@ def add_repository(request):
 
 
 def RepositorySettings(request, id):
-    repositories = Repository.objects.filter(
-        Q(owner=request.user) | Q(collaborators__username__in=[str(request.user)])
-    )
+
     repository = Repository.objects.get(id=id)
     global repo
     repo = repository.id
@@ -148,7 +148,6 @@ def addCollaborators(request):
 
 # Bug brise iz baze celog usera
 class CollaboratorsDeleteView(LoginRequiredMixin, DeleteView):
-
     model = User
     template_name = "repository/deleteCollaborators.html"
 
@@ -171,10 +170,10 @@ class CollaboratorsDeleteView(LoginRequiredMixin, DeleteView):
         return redirect(success_url)
 
     def get_form_kwargs(self):
-            print('dfg')
-            kwargs = super(CollaboratorsDeleteView, self).get_form_kwargs()
-            kwargs['repository'] = get_object_or_404(Repository, id=repo)
-            return kwargs
+        print('dfg')
+        kwargs = super(CollaboratorsDeleteView, self).get_form_kwargs()
+        kwargs['repository'] = get_object_or_404(Repository, id=repo)
+        return kwargs
 
     def get_success_url(self):
         return reverse_lazy('repository_settings', kwargs={'id': repo})
