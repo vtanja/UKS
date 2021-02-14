@@ -1,22 +1,24 @@
-from django.utils import timezone
-from django.urls import reverse_lazy
+from apps.repository.models import Repository
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
 from .forms import CreateIssueForm
 from .models import Issue, IssueChange
-from apps.repository.models import Repository
 
 
 class IssuesListView(ListView):
     model = Issue
 
     def get_queryset(self):
-        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        self.repository = get_object_or_404(Repository, id=self.kwargs['repository_id'])
         return Issue.objects.filter(repository=self.repository)
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(IssuesListView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
         context['show'] = False
@@ -26,8 +28,8 @@ class IssuesListView(ListView):
 class IssueDetailView(DetailView):
     model = Issue
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+    def get_context_data(self, **kwargs):
+        self.repository = get_object_or_404(Repository, id=self.kwargs['repository_id'])
         self.changes = IssueChange.objects.filter(issue=self.kwargs['pk'])
         context = super(IssueDetailView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
@@ -41,13 +43,13 @@ class CreateIssueView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
-        form.instance.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        form.instance.repository = get_object_or_404(Repository, id=self.kwargs['repository_id'])
         form.instance.issue_status = Issue.IssueStatus.TODO
         form.instance.closed = False
         return super(CreateIssueView, self).form_valid(form)
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+    def get_context_data(self, **kwargs):
+        self.repository = get_object_or_404(Repository, id=self.kwargs['repository_id'])
 
         context = super(CreateIssueView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
@@ -55,11 +57,11 @@ class CreateIssueView(LoginRequiredMixin, CreateView):
 
     def get_form_kwargs(self):
         kwargs = super(CreateIssueView, self).get_form_kwargs()
-        kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['id'])
+        kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['repository_id'])
         return kwargs
 
     def get_success_url(self):
-        return reverse_lazy('repository-issues', kwargs={'id': self.kwargs['id']})
+        return reverse_lazy('repository-issues', kwargs={'repository_id': self.kwargs['repository_id']})
 
 
 class IssueUpdateView(LoginRequiredMixin, UpdateView):
@@ -88,18 +90,26 @@ class IssueUpdateView(LoginRequiredMixin, UpdateView):
 
         return response
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+    def get_context_data(self, **kwargs):
+        self.repository = get_object_or_404(Repository, id=self.kwargs['repository_id'])
         context = super(IssueUpdateView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
         return context
 
     def get_form_kwargs(self):
         kwargs = super(IssueUpdateView, self).get_form_kwargs()
-        kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['id'])
+        kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['repository_id'])
         return kwargs
 
     def get_success_url(self):
         if self.request.path.find('edit') != -1:
-            return reverse_lazy('issue-details', kwargs={'id': self.kwargs['id'], 'pk': self.kwargs['pk']})
-        return reverse_lazy('repository-issues', kwargs={'id': self.kwargs['id']})
+            return reverse_lazy('issue-details', kwargs={'repository_id': self.kwargs['repository_id'], 'pk': self.kwargs['pk']})
+        return reverse_lazy('repository-issues', kwargs={'repository_id': self.kwargs['repository_id']})
+
+
+@login_required
+def close_issue(request, repository_id, pk):
+    issue = get_object_or_404(Issue, pk=pk)
+    get_object_or_404(Repository, pk=repository_id)
+    issue.toggle_issue_close()
+    return redirect(reverse_lazy('issue-details', kwargs={'repository_id': repository_id, 'pk': pk}))

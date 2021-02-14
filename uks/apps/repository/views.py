@@ -16,17 +16,23 @@ from .forms import RepositoryForm, CollaboratorsForm
 from .models import Repository
 # Create your views here.
 from ..branch.models import Branch
-from ..user.models import UserHistoryItem
+from ..user.models import HistoryItem
 
 logger = logging.getLogger('django')
 repo = 0
 
+def add_history_item(user, message):
+    change = HistoryItem()
+    change.dateChanged = datetime.datetime.now()
+    change.belongsTo = user
+    change.message = message
+    return change
 
 class RepositoryDetailView(DetailView):
     model = Repository
     template_name = 'repository/overview.html'
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         logger.info('Getting repository with id: %s', self.kwargs['pk'])
         self.repository = get_object_or_404(Repository, id=self.kwargs['pk'])
 
@@ -87,10 +93,8 @@ def add_repository(request):
             get_branches(repository)
             # repository.branch_set.set(branches)
 
-            change = UserHistoryItem()
-            change.dateChanged = datetime.datetime.now()
-            change.belongsTo = request.user
-            change.message = 'added new repository'
+            change = add_history_item(request.user, 'added new')
+            change.changed_repo_object = repository
             change.save()
 
             messages.success(request, 'Successfully added new repository!')

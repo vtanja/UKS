@@ -1,0 +1,25 @@
+{% extends 'repository/repoDetail.html' %}
+
+{% block repo-content %}
+    <br>
+    <div class="container" style="text-align: center; width: 60%">
+        <h4> {{ wiki.title }} history</h4>
+    <hr>
+    {% if history %}
+        <div style="text-align: start; margin-left: 5%">
+                    {% for item in history %}
+                        <div class="card" >
+                            <div class="card-body">
+                                <div class="card-text" >
+                                    <div style="float:left"><a href="{{ item.belongsTo.siteuser.get_absolute_url }}" >{{ item.belongsTo.username }}</a> &nbsp;{{ item.message }} wiki page</div>
+                                <em style="float: right">{{  item.get_time_of_change}}</em>
+                                </div>
+                            </div>
+                        </div> <br>
+                    {% endfor %}
+        </div>
+    {% else %}
+        <h6>There are no history for this wiki page!</h6>
+    {% endif %}
+    </div>
+{% endblock %}

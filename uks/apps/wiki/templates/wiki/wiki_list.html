@@ -1,0 +1,16 @@
+{% extends 'repository/repoDetail.html' %}
+
+{% block repo-content %}
+    {% if wikis %}
+        <br>
+        {% block wiki-detail %}
+        {% endblock %}
+    {% else %}
+        <br>
+        <h5>There are no wiki pages yet!</h5>
+        <br>
+        <a class="btn btn-success"  href="{% url 'wiki-add' repository.id %}">New page</a>
+        <p/>
+        <br><br>
+    {% endif %}
+{% endblock %}

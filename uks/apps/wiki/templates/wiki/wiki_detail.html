@@ -1,0 +1,33 @@
+{% extends 'wiki/wiki_list.html' %}
+{% block wiki-detail %}
+    <br>
+    <div class="container">
+            <div class="row">
+                <div class="col-md-9" style="text-align: left">
+                    <h3>{{ wiki.title }}</h3>
+                    <p style="font-style: italic">This will be last update info</p>
+                    <hr>
+                    <div>{{ wiki.content | safe }}</div>
+                </div>
+                <div class="col-md-3">
+                <div style="margin-top: 15%; margin-left: 10%">
+                    <a class="btn btn-secondary" style="width: 40%; color: white" href="{% url 'wiki-update' repository.id wiki.id %}">Edit</a> &nbsp; &nbsp;
+                    <a class="btn btn-success" style="width: 45%" href="{% url 'wiki-add' repository.id %}">New page</a>
+                </div>
+                <div class="card" style="width: 18rem; max-height: 50vh; margin-top: 10%">
+                  <div class="card-body">
+                    <h5 class="card-title">Pages &nbsp;&nbsp; <span class="badge badge-pill badge-success">{{ wikis|length }}</span></h5>
+                    <ul class="list-group list-group-flush" style="text-align: left">
+                        {% for wiki in wikis %}
+                            <a  style="font-size: large" href="{% url 'wiki-details' repository.id wiki.id %}">{{ wiki.title }}</a>
+                        {% endfor %}
+                    </ul>
+                  </div>
+                </div>
+                  <br>
+
+                </div>
+            </div>
+        <br><br>
+        </div>
+{%  endblock wiki-detail%}

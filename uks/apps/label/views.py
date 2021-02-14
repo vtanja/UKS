@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
+from apps.repository.models import Repository
 from .forms import CreateLabelForm
 from .models import Label
 from ..repository.models import Repository
@@ -18,7 +19,7 @@ class ListLabelView(ListView):
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         return Label.objects.filter(repository=self.repository)
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(ListLabelView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
         context['show'] = False
@@ -39,7 +40,7 @@ class CreateLabel(LoginRequiredMixin, CreateView):
         kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['id'])
         return kwargs
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(CreateLabel, self).get_context_data(**kwargs)
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         context['repository'] = self.repository
@@ -70,7 +71,7 @@ class LabelEdit(LoginRequiredMixin, UpdateView):
 
         return response
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, **kwargs):
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         context = super(LabelEdit, self).get_context_data(**kwargs)
         context['repository'] = self.repository
@@ -88,6 +89,11 @@ class LabelEdit(LoginRequiredMixin, UpdateView):
 class LabelDeleteView(LoginRequiredMixin, DeleteView):
     model = Label
     template_name = 'label/delete_label.html'
+
+    def form_valid(self):
+        label = get_object_or_404(Label, id=self.kwargs['pk'])
+        Label.objects.filter(id=label.id).delete()
+
 
     def get_context_data(self, **kwargs):
             self.repository = get_object_or_404(Repository, id=self.kwargs['id'])

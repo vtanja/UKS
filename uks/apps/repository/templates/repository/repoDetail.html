@@ -22,10 +22,12 @@
                         href="{% url 'repository_labels' repository.id %}">Labels</a>
                 </li>
                 <li class="nav-item" >
-                    <a  class="nav-link text-success">Projects</a>
+                    <a  class="nav-link text-success {%if 'projects' in request.path%}active{% endif %}"
+                        href="{% url 'repository_projects' repository.id %}">Projects</a>
                 </li>
                 <li class="nav-item" >
-                    <a  class="nav-link text-success">Wiki</a>
+                    <a  class="nav-link text-success {%if 'wiki' in request.path%}active{% endif %}" id="fifth-tab"
+                        href="{% url 'wiki-overview' repository.id %}">Wiki</a>
                 </li>
                 {% if repository.owner == request.user %}
                 <li class="nav-item" >
@@ -42,4 +44,14 @@
             {% endblock %}
         </div>
     </div>
+    </ul>
+  </div>
+  <div class="tab-content" id="myTabContent">
+    {% block repo-content %}
+        <h5 class="card-title">Repository {{repository.name}}</h5>
+        <h6>{{repository.description}}</h6>
+    {% endblock %}
+  </div>
+</div>
+
 {% endblock %}
