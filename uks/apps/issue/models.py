@@ -1,3 +1,4 @@
+from ckeditor.fields import RichTextField
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -16,7 +17,7 @@ class Issue(models.Model):
         DONE = 'DONE', _('Done')
 
     title = models.CharField(max_length=100)
-    description = models.CharField(max_length=200)
+    description = RichTextField(blank=True, null=True)
     issue_status = models.CharField(
         max_length=8,
         choices=IssueStatus.choices,
