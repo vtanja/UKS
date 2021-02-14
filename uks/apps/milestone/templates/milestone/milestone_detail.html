@@ -2,10 +2,24 @@
 
 {% block repo-content %}
     <div class="container" style="text-align: left; padding: 5mm;">
-        <h3 style="padding: 3mm">
-            {{ milestone.title }}
-        </h3>
-        <hr style=" border-bottom: darkgray; border-bottom-style: solid; border-bottom-width: thin">
+    <div class="row" style="border-bottom: darkgray; border-bottom-style: solid; border-bottom-width: thin; margin-bottom: 4mm">
+        <div class="col">
+            <h3 style="padding-top: 7mm">
+                <a style="color: forestgreen" href="{% url 'repository_milestones' repository.id %}">
+                    <em class="fas fa-angle-double-left"></em>
+                </a>&nbsp;
+                {{ milestone.title }}
+            </h3>
+        </div>
+        <div class="col" style="text-align: right">
+            <h3 style="padding: 3mm">
+                <a class="btn {% if milestone.closed %}btn-success{% else %}btn-danger{% endif %} m-2" style="color: ghostwhite"
+                   href="{% url 'milestone_close' repository.id milestone.id %}">
+                    {% if milestone.closed %}Reopen{% else %}Close{% endif %}
+                </a>
+            </h3>
+        </div>
+    </div>
         <div class="container row" style="text-align: left" >
             <div class="col-sm-5" >
                 <p>{{ milestone.dateCreated }} - {{ milestone.dueDate }}</p>
