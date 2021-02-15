@@ -1,13 +1,12 @@
+from apps.label.models import Label
+from apps.milestone.models import Milestone
+from apps.project.models import Project
+from apps.repository.models import Repository
 from ckeditor.fields import RichTextField
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-
-from apps.repository.models import Repository
-from apps.milestone.models import Milestone
-from apps.label.models import Label
-from apps.project.models import Project
 
 
 class Issue(models.Model):
@@ -45,11 +44,13 @@ class Issue(models.Model):
             self.closed = True
         self.save()
 
-    def change_status(self, status):
-        issue_change = IssueChange()
-        issue_change.message = 'Issue changed status from {old} to {new}'.format(old=self.issue_status, new=status)
-        issue_change.issue = self
-        issue_change.date = timezone.now()
+    def change_status(self, status, user):
+        from apps.user.models import HistoryItem
+        issue_change = HistoryItem()
+        issue_change.message = 'changed issue status from {old} to {new}'.format(old=self.issue_status, new=status)
+        issue_change.changed_issue = self
+        issue_change.date_changed = timezone.now()
+        issue_change.belongs_to = user
         issue_change.save()
         self.issue_status = status
         if status == 'DONE':
@@ -57,9 +58,3 @@ class Issue(models.Model):
         else:
             self.closed = False
         self.save()
-
-
-class IssueChange(models.Model):
-    message = models.CharField(max_length=100)
-    date = models.DateTimeField(auto_now_add=True)
-    issue = models.ForeignKey(Issue, on_delete=models.CASCADE)

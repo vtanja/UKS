@@ -8,7 +8,8 @@ from django.utils import timezone
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
 from .forms import CreateIssueForm
-from .models import Issue, IssueChange
+from .models import Issue
+from ..user.models import HistoryItem
 
 
 class IssuesListView(ListView):
@@ -30,7 +31,7 @@ class IssueDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         self.repository = get_object_or_404(Repository, id=self.kwargs['repository_id'])
-        self.changes = IssueChange.objects.filter(issue=self.kwargs['pk'])
+        self.changes = HistoryItem.objects.filter(changed_issue_id=self.kwargs['pk'])
         context = super(IssueDetailView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
         context['changes'] = self.changes

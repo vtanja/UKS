@@ -13,6 +13,7 @@ class HistoryItem(models.Model):
     belongs_to = models.ForeignKey(User, on_delete=models.CASCADE)
     changed_wiki_object = models.ForeignKey(Wiki, on_delete=models.CASCADE, null=True)
     changed_repo_object = models.ForeignKey(Repository, on_delete=models.CASCADE, null=True)
+    changed_issue = models.ForeignKey(Issue, on_delete=models.CASCADE, null=True)
 
     def get_time_of_change(self):
         if self.date_changed.date() == datetime.datetime.now().date():
