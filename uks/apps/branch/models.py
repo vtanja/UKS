@@ -1,8 +1,5 @@
-from django.db import models
-
-
-# Create your models here.
 from apps.repository.models import Repository
+from django.db import models
 
 
 class Branch(models.Model):
