@@ -1,22 +1,21 @@
-import datetime
 import logging
-
-from django.shortcuts import get_object_or_404, redirect
-# Create your views here.
-from django.urls import reverse_lazy, reverse
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from apps.repository.models import Repository
 from apps.user.models import HistoryItem
 from apps.wiki.forms import CreateWikiForm
 from apps.wiki.models import Wiki
+from django.shortcuts import get_object_or_404, redirect
+# Create your views here.
+from django.urls import reverse_lazy, reverse
+from django.utils import timezone
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 logger = logging.getLogger('django')
 
 
 def add_history_item(user, message):
     change = HistoryItem()
-    change.dateChanged = datetime.datetime.now()
+    change.dateChanged = timezone.now()
     change.belongsTo = user
     change.message = message
     return change
