@@ -91,6 +91,10 @@ def add_repository(request):
             print('Forma je validna')
             # form.save()
             form.instance.owner = request.user
+
+            if form.instance.repo_url == None:
+                form.instance.repo_url = 'https://github.com/vtanja/UKS'
+
             repository = form.save()
 
             start = timezone.now()
@@ -106,10 +110,6 @@ def add_repository(request):
             return redirect('dashboard')
         else:
             print('Forma nije validna')
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = RepositoryForm()
 
     return render(request, 'user/dashboard.html', {'form': form})
 

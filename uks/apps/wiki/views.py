@@ -1,10 +1,10 @@
 import logging
-
 from apps.repository.models import Repository
 from apps.user.models import HistoryItem
 from apps.wiki.forms import CreateWikiForm
 from apps.wiki.models import Wiki
 from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
 # Create your views here.
 from django.urls import reverse_lazy, reverse
 from django.utils import timezone
@@ -20,7 +20,7 @@ def add_history_item(user, message):
     change.message = message
     return change
 
-class WikiListView(ListView):
+class WikiListView(LoginRequiredMixin, ListView):
     model = Wiki
     template_name = 'wiki/wiki_list.html'
 
@@ -44,7 +44,7 @@ class WikiListView(ListView):
         return context
 
 
-class WikiDetailPage(DetailView):
+class WikiDetailPage(LoginRequiredMixin, DetailView):
     model = Wiki
     template_name = 'wiki/wiki_detail.html'
 
@@ -57,7 +57,7 @@ class WikiDetailPage(DetailView):
         return context
 
 
-class CreateWikiView(CreateView):
+class CreateWikiView(LoginRequiredMixin, CreateView):
     model = Wiki
     form_class = CreateWikiForm
     template_name = 'wiki/wiki_form.html'
@@ -95,7 +95,7 @@ class CreateWikiView(CreateView):
         return reverse_lazy('wiki-overview', kwargs={'id': self.kwargs['id']})
 
 
-class WikiUpdateView(UpdateView):
+class WikiUpdateView(LoginRequiredMixin, UpdateView):
     model = Wiki
     form_class = CreateWikiForm
 
@@ -129,7 +129,7 @@ class WikiUpdateView(UpdateView):
         return reverse_lazy('wiki-details', kwargs={'id': self.kwargs['id'], 'pk': self.kwargs['pk']})
 
 
-class WikiDeleteView(DeleteView):
+class WikiDeleteView(LoginRequiredMixin, DeleteView):
     model = Wiki
 
     def get_success_url(self):
@@ -142,7 +142,7 @@ class WikiDeleteView(DeleteView):
         return reverse_lazy('wiki-overview', kwargs={'id': self.kwargs['id']})
 
 
-class HistoryListView(ListView):
+class HistoryListView(LoginRequiredMixin, ListView):
     model = HistoryItem
     template_name = 'wiki/wiki_history.html'
 
