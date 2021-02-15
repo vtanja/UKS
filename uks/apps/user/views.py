@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.generic import ListView
 
+from apps.repository.forms import RepositoryForm
 from apps.user.forms import ProfileImageUpdateForm
 from apps.repository.models import Repository
 from apps.issue.models import Issue
@@ -14,12 +15,13 @@ from security.models import SiteUser
 logger = logging.getLogger('django')
 
 def dashboard(request):
+    form = RepositoryForm()
     logger.info('User dashboard entered!')
     logger.info('Getting all repositories of user initialized!')
     repositories = all_users_repositories(request)
     logger.info('Getting user activity initialized!')
     history = request.user.historyitem_set.all().order_by('-dateChanged')
-    context = {'repositories': repositories, 'history': history}
+    context = {'repositories': repositories, 'history': history, 'form': form}
     return render(request, 'user/dashboard.html', context)
 
 
