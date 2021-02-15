@@ -14,7 +14,6 @@ from ghapi.all import GhApi
 
 from .forms import RepositoryForm, CollaboratorsForm
 from .models import Repository
-# Create your views here.
 from ..branch.models import Branch
 from ..commit.models import Commit
 from ..user.models import HistoryItem
@@ -91,7 +90,7 @@ def add_repository(request):
             # form.save()
             form.instance.owner = request.user
 
-            if form.instance.repo_url == None:
+            if form.instance.repo_url is None:
                 form.instance.repo_url = 'https://github.com/vtanja/UKS'
 
             repository = form.save()
@@ -173,7 +172,6 @@ def get_github_api(repository):
 
 
 def RepositorySettings(request, key):
-
     repository = Repository.objects.get(id=key)
     global repo
     repo = repository.id
