@@ -43,13 +43,13 @@ class IssueModelTest(TestCase):
 
     def test_toggle_issue_close_with_opened_issue(self):
         issue = Issue.objects.filter(closed=False)[0]
-        issue.toggle_issue_close()
+        issue.toggle_issue_close(User.objects.all()[0])
         issue.refresh_from_db()
         self.assertTrue(issue.closed is True)
 
     def test_toggle_issue_close_with_closed_issue(self):
         issue = Issue.objects.filter(closed=True)[0]
-        issue.toggle_issue_close()
+        issue.toggle_issue_close(User.objects.all()[0])
         issue.refresh_from_db()
         self.assertTrue(issue.closed is False)
 

@@ -9,6 +9,16 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
+def create_history_item(issue, user, message):
+    from apps.user.models import HistoryItem
+    history_item = HistoryItem()
+    history_item.message = message
+    history_item.changed_issue = issue
+    history_item.date_changed = timezone.now()
+    history_item.belongs_to = user
+    history_item.save()
+
+
 class Issue(models.Model):
     class IssueStatus(models.TextChoices):
         TODO = 'TODO', _('To do')
@@ -37,21 +47,18 @@ class Issue(models.Model):
         from django.urls import reverse
         return reverse('issue-details', args=[str(self.repository_id), str(self.id)])
 
-    def toggle_issue_close(self):
+    def toggle_issue_close(self, user):
         if self.closed:
-            self.closed = False
+            message = 'opened'
         else:
-            self.closed = True
+            message = 'closed'
+        create_history_item(self, user, message)
+        self.closed = not self.closed
         self.save()
 
     def change_status(self, status, user):
-        from apps.user.models import HistoryItem
-        issue_change = HistoryItem()
-        issue_change.message = 'changed issue status from {old} to {new}'.format(old=self.issue_status, new=status)
-        issue_change.changed_issue = self
-        issue_change.date_changed = timezone.now()
-        issue_change.belongs_to = user
-        issue_change.save()
+        create_history_item(self, user, 'changed issue status from {old} to {new}'
+                            .format(old=self.issue_status, new=status))
         self.issue_status = status
         if status == 'DONE':
             self.closed = True
