@@ -1,3 +1,4 @@
+from apps.branch.models import Branch
 from django.db import models
 
 
@@ -8,6 +9,7 @@ class Commit(models.Model):
     date = models.DateTimeField()
     message = models.TextField()
     parents = models.ManyToManyField('self', symmetrical=False)
+    branches = models.ManyToManyField(Branch)
 
     def __str__(self):
         return '{author} committed {hash} at {date}'.format(author=self.author, hash=self.sha, date=self.date)

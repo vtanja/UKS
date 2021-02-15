@@ -117,6 +117,8 @@ def get_commits(api, br):
         for commit in reversed(commits):
             try:
                 ci = Commit.objects.get(sha=commit.sha)
+                ci.branches.add(br)
+                continue
             except Commit.DoesNotExist:
                 ci = Commit()
                 ci.url = commit.html_url
@@ -125,6 +127,7 @@ def get_commits(api, br):
                 ci.date = commit.commit.author.date
                 ci.message = commit.commit.message
                 ci.save()
+                ci.branches.add(br)
             for parent in commit.parents:
                 try:
                     par = Commit.objects.get(sha=parent.sha)
