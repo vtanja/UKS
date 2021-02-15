@@ -4,8 +4,9 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from ..models import Issue
 from ...repository.models import Repository
-from ..models import Issue, IssueChange
+from ...user.models import HistoryItem
 
 USER_USERNAME = 'testuser'
 USER1_USERNAME = 'testuser1'
@@ -304,8 +305,8 @@ class IssueUpdateViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/repository/{}/issues/{}/'.format(repository_id, issue_id))
         # Find all objects that have been changed since start of the test process
-        issue_change_objects = IssueChange.objects.filter(date__gt=start_of_the_test,
-                                                          message__contains=response.wsgi_request.user)
+        issue_change_objects = HistoryItem.objects.filter(date_changed__gt=start_of_the_test,
+                                                          belongs_to=response.wsgi_request.user)
         # Changed title and assignee list
         self.assertEqual(len(issue_change_objects), 2)
 
