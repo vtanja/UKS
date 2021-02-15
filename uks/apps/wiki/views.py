@@ -25,7 +25,7 @@ class WikiListView(LoginRequiredMixin, ListView):
     template_name = 'wiki/wiki_list.html'
 
     def get(self, request, *args, **kwargs):
-        repo = Repository.objects.get(id=self.kwargs['repo_id'])
+        repo = get_object_or_404(id=self.kwargs['repo_id'])
         if repo.wiki_set.count() > 0:
             return redirect(reverse('wiki-details', kwargs={'repo_id': repo.id, 'pk': repo.wiki_set.first().id}))
         return super().get(request, *args, **kwargs)
