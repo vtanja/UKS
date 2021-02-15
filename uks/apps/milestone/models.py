@@ -31,3 +31,7 @@ class Milestone(models.Model):
 
     def get_closed_issues_count(self):
         return self.issue_set.filter(closed=True).count()
+
+    def toggle_milestone_close(self):
+        self.closed = not self.closed
+        self.save()

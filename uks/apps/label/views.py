@@ -1,12 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
+
 # Create your views here.
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
-from apps.repository.models import Repository
 from .forms import CreateLabelForm
 from .models import Label
+from ..repository.models import Repository
 
 
 class ListLabelView(ListView):
@@ -91,6 +92,7 @@ class LabelDeleteView(LoginRequiredMixin, DeleteView):
     def form_valid(self):
         label = get_object_or_404(Label, id=self.kwargs['pk'])
         Label.objects.filter(id=label.id).delete()
+
 
     def get_context_data(self, **kwargs):
             self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
