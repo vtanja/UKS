@@ -65,10 +65,9 @@ def get_branches(repository):
         br = Branch()
         br.name = branch.name
         br.repository = repository
+        br.save()
         logger.info('Getting all commits for current branch')
         get_commits(api, br)
-        br.head = Commit.objects.get(sha=branch.commit.sha)
-        br.save()
 
 
 def get_repository_name_and_owner(repository):
