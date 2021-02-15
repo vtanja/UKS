@@ -3,19 +3,14 @@ import logging
 import os
 
 from django.contrib import messages
-from django.db.models import Q
-from django.shortcuts import render, redirect, get_object_or_404
-from django.utils import timezone
-from django.views.generic import DetailView
-from ghapi.all import GhApi
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-import requests
-from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views.generic import DetailView, DeleteView
+from ghapi.all import GhApi
 
 from .forms import RepositoryForm, CollaboratorsForm
 from .models import Repository
@@ -130,25 +125,38 @@ def get_commits(api, br):
                 ci.branches.add(br)
                 continue
             except Commit.DoesNotExist:
-                ci = Commit()
-                ci.url = commit.html_url
-                ci.sha = commit.sha
-                ci.author = commit.author.login
-                ci.date = commit.commit.author.date
-                ci.message = commit.commit.message
+                ci = create_commit_from_response(commit)
                 ci.save()
                 ci.branches.add(br)
-            for parent in commit.parents:
-                try:
-                    par = Commit.objects.get(sha=parent.sha)
-                    ci.parents.add(par)
-                except Commit.DoesNotExist:
-                    commits_with_missing_parents[ci] = parent.sha
-            else:
-                ci.save()
+                add_parents_to_commit(ci, commit, commits_with_missing_parents)
+
         logger.info('Getting next page of commits')
         commits = api.repos.list_commits(accept='application/vnd.github.v3+json', sha=br.name, per_page=100, page=page)
         page += 1
+
+    add_parents_that_were_missing_to_commits(commits_with_missing_parents)
+
+
+def create_commit_from_response(commit):
+    ci = Commit()
+    ci.url = commit.html_url
+    ci.sha = commit.sha
+    ci.author = commit.author.login
+    ci.date = commit.commit.author.date
+    ci.message = commit.commit.message
+    return ci
+
+
+def add_parents_to_commit(ci, commit, commits_with_missing_parents):
+    for parent in commit.parents:
+        try:
+            par = Commit.objects.get(sha=parent.sha)
+            ci.parents.add(par)
+        except Commit.DoesNotExist:
+            commits_with_missing_parents[ci] = parent.sha
+
+
+def add_parents_that_were_missing_to_commits(commits_with_missing_parents):
     logger.info('Connecting commits whose parents were not created at the time')
     for key in commits_with_missing_parents.keys():
         try:
