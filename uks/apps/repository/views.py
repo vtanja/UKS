@@ -171,7 +171,7 @@ def get_github_api(repository):
     return api
 
 
-def RepositorySettings(request, key):
+def repository_settings(request, key):
     repository = Repository.objects.get(id=key)
     global repo
     repo = repository.id
@@ -181,22 +181,18 @@ def RepositorySettings(request, key):
     return render(request, 'repository/repoSettings.html', context)
 
 
-def addCollaborators(request):
+def add_collaborators(request):
     if request.method == 'POST':
         form = CollaboratorsForm(request.POST)
         if form.is_valid():
             users = form.data.getlist('collaborators')
             global repo
-            repository = Repository.objects.get(id=repo)
             for u in users:
                 user = User.objects.get(username=u)
                 Repository.objects.get(id=repo).collaborators.add(user)
 
         else:
             print('Forma nije validna')
-
-    else:
-        form = CollaboratorsForm()
 
     repository = Repository.objects.get(id=repo)
     users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
