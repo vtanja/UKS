@@ -56,3 +56,7 @@ class ProjectModelTests(TestCase):
         project = Project.objects.get(pk=1)
         is_null = project._meta.get_field('repository').null
         self.assertFalse(is_null)
+
+    def test_object_name_is_name(self):
+        project = Project.objects.get(pk=1)
+        self.assertEqual(project.name, str(project))
