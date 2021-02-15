@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
@@ -63,6 +64,6 @@ class IssueModelTest(TestCase):
 
     def change_issue_status(self, status, closed):
         issue = Issue.objects.get(pk=4)
-        issue.change_status(status)
+        issue.change_status(status, User.objects.all()[0])
         self.assertEqual(issue.issue_status, status)
         self.assertTrue(issue.closed is closed)
