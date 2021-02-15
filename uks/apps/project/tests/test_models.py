@@ -36,3 +36,13 @@ class ProjectModelTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         fill_test_data()
+
+    def test_name_label(self):
+        project = Project.objects.get(id=1)
+        field_label = project._meta.get_field('name').verbose_name
+        self.assertEqual(field_label, 'name')
+
+    def test_description_label(self):
+        project = Project.objects.get(id=1)
+        field_label = project._meta.get_field('description').verbose_name
+        self.assertEqual(field_label, 'description')
