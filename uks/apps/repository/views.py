@@ -111,9 +111,9 @@ def add_repository(request):
     return render(request, 'user/dashboard.html', {'form': form})
 
 
-def RepositorySettings(request, id):
+def RepositorySettings(request, key):
 
-    repository = Repository.objects.get(id=id)
+    repository = Repository.objects.get(id=key)
     global repo
     repo = repository.id
     users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
@@ -175,4 +175,4 @@ class CollaboratorsDeleteView(LoginRequiredMixin, DeleteView):
         return kwargs
 
     def get_success_url(self):
-        return reverse_lazy('repository_settings', kwargs={'id': repo})
+        return reverse_lazy('repository_settings', kwargs={'key': repo})

@@ -10,7 +10,7 @@ urlpatterns = [
     path('<int:repository_id>/issues/', include('apps.issue.urls')),
     path('<int:repo_id>/milestones/', include('apps.milestone.urls')),
     path('<int:id>/labels/', include('apps.label.urls')),
-    path('<int:id>/settings/', RepositorySettings, name='repository_settings'),
+    path('<int:key>/settings/', RepositorySettings, name='repository_settings'),
     path('addCollaborators/', views.addCollaborators, name='addCollaborators'),
     path('delete/<int:pk>', CollaboratorsDeleteView.as_view(), name='collaborators-delete'),
     path('<int:repo_id>/projects/', include('apps.project.urls')),
