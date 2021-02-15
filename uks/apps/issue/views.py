@@ -80,9 +80,9 @@ class IssueUpdateView(LoginRequiredMixin, UpdateView):
             ch.belongs_to = self.request.user
             if changed_field == 'title':
                 ch.message = 'changed title from "{}" to "{}"'\
-                    .format(self.request.user.username, original_issue.title, form.cleaned_data[changed_field])
+                    .format(original_issue.title, form.cleaned_data[changed_field])
             elif changed_field == 'description':
-                ch.message = self.request.user.username + ' changed description'
+                ch.message = 'changed description'
             elif changed_field == 'assignees':
                 ch.message = 'changed assignees'
             elif changed_field == 'milestone':
