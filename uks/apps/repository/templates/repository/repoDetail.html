@@ -31,7 +31,16 @@
                     <a  class="nav-link text-success {%if 'wiki' in request.path%}active{% endif %}" id="fifth-tab"
                         href="{% url 'wiki-overview' repository.id %}">Wiki</a>
                 </li>
-            {% endif %}
+                {% if repository.owner == request.user %}
+                <li class="nav-item" >
+                    <a  class="nav-link text-success {%if 'settings' in request.path%}active{% endif %}" id="seven-tab"
+                        href="{% url 'repository_settings' repository.id %}">Settings</a>
+                </li>
+                {% endif %}
+                {% endif %}
+            </ul>
+        </div>
+    </div>
     </ul>
   </div>
   <div class="tab-content" id="myTabContent">
@@ -41,4 +50,5 @@
     {% endblock %}
   </div>
 </div>
+
 {% endblock %}
