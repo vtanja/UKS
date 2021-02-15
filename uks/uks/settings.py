@@ -44,10 +44,13 @@ INSTALLED_APPS = [
     'apps.branch',
     'apps.commit',
     'apps.label',
+    'apps.project',
+    'apps.wiki',
     'security',
     'crispy_forms',
     'fontawesome-free',
     'colorfield',
+    'ckeditor',
 ]
 
 MIDDLEWARE = [
@@ -86,7 +89,7 @@ WSGI_APPLICATION = 'uks.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': os.getenv('POSTGRES_DB'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'HOST': 'localhost',

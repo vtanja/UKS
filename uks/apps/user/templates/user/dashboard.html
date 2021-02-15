@@ -30,10 +30,19 @@
                     {% for item in history %}
                         <div class="card" >
                             <div class="card-body">
-                                <div class="card-text" >
-                                    <div style="float:left">{{ item.belongsTo.user.username }} &nbsp;{{ item.message }}</div>
-                                <em style="float: right">{{  item.get_time_of_change}}</em>
-                                </div>
+                                {% if item.changed_wiki_object %}
+                                    <div class="card-text" >
+                                        <div style="float:left">{{ item.belongsTo.username }} &nbsp;{{ item.message }} <a href="{{ item.changed_wiki_object.get_absolute_url }}">wiki page</a></div>
+                                        <em style="float: right">{{  item.get_time_of_change}}</em>
+                                    </div>
+                                {% endif %}
+                                {% if item.changed_repo_object %}
+                                    <div class="card-text" >
+                                        <div style="float:left">{{ item.belongsTo.username }} &nbsp;{{ item.message }} <a href="{{ item.changed_repo_object.get_absolute_url }}">repository</a></div>
+                                        <em style="float: right">{{  item.get_time_of_change}}</em>
+                                    </div>
+                                {% endif %}
+
                             </div>
                         </div> <br>
                     {% endfor %}
@@ -55,31 +64,13 @@
        <form method="post" action="{% url 'add' %}">
             <div class="modal-body">
                  {% csrf_token %}
-                    <div>
-                        <label for="name">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
-                    </div>
-                    <div>
-                        <label for="description">Description</label>
-                        <textarea class="form-control" id="description" rows="5" name="description" required></textarea>
-                    </div>
-                    <div>
-                        <label for="url">Repository url:</label>
-                        <input type="text" class="form-control" id="url" name="repo_url" required/>
-                    </div>
+                        {{ form | crispy }}
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-primary">Add</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
        </form>
-{#        <div class="modal-body">#}
-{#            <form method="post" action="{% url 'repository' %}">#}
-{#                {% csrf_token %}#}
-{#                {form|crispy}#}
-{#                <button type="submit" class="btn btn-success">Add</button>#}
-{#            </form>#}
-{#        </div>#}
     </div>
   </div>
 </div>
