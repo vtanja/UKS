@@ -102,9 +102,7 @@ class IssueUpdateView(LoginRequiredMixin, UpdateView):
         return kwargs
 
     def get_success_url(self):
-        if self.request.path.find('edit') != -1:
-            return reverse_lazy('issue-details', kwargs={'repository_id': self.kwargs['repository_id'], 'pk': self.kwargs['pk']})
-        return reverse_lazy('repository-issues', kwargs={'repository_id': self.kwargs['repository_id']})
+        return reverse_lazy('issue-details', kwargs={'repository_id': self.kwargs['repository_id'], 'pk': self.kwargs['pk']})
 
 
 @login_required
