@@ -293,7 +293,7 @@ class IssueUpdateViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
 
-    def test_issue_change_created_for_every_change_and_redirect(self):
+    def test_history_item_created_for_every_change_and_redirect(self):
         """Test editing existing issue. Then it checks whether correct amount of IssueChange objects were created."""
         start_of_the_test = timezone.now()
         _, repository_id, issue_id = self.logged_in_user_get_edit_view()
