@@ -57,25 +57,25 @@ def detail(request, id):
 
 
 def get_branches(repository):
+    api = get_github_api(repository)
+    logger.info('Sending request for getting all branches of repository')
+    branches = api.repos.list_branches(per_page=100)
+    for branch in branches:
+        logger.info('Creating new branch')
+        br = Branch()
+        br.name = branch.name
+        br.repository = repository
+        logger.info('Getting all commits for current branch')
+        get_commits(api, br)
+        br.head = Commit.objects.get(sha=branch.commit.sha)
+        br.save()
+
+
+def get_repository_name_and_owner(repository):
     parts = repository.repo_url.split('/')
     user = parts[3]
     repo_name = parts[4]
-    request = 'https://api.github.com/repos/' + user + '/' + repo_name + '/branches'
-
-    logger.info('Getting token for authorizing github api requests!')
-    api_token = os.getenv("GITHUB_TOKEN")
-    logger.info('Sending request for getting all branches of repository [%s]', repo_name)
-    response = requests.get(request, auth=('uks', api_token)).text
-
-    logger.info('Storing branches into db initialized!')
-    branches = []
-    for obj in json.loads(response):
-        branch = Branch()
-        branch.name = obj['name']
-        branch.repository = repository
-        branch.save()
-        branches.append(branch)
-    logger.info('Storing branches into db done!')
+    return repo_name, user
 
 
 def add_repository(request):
@@ -89,8 +89,10 @@ def add_repository(request):
             form.instance.owner = request.user
             repository = form.save()
 
+            start = timezone.now()
             get_branches(repository)
-            # repository.branch_set.set(branches)
+            print('Retrieving branches and commits took: {}'.format(timezone.now() - start))
+            logger.info('Retrieving branches and commits took: {}'.format(timezone.now() - start))
 
             change = add_history_item(request.user, 'added new')
             change.changed_repo_object = repository
