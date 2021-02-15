@@ -146,7 +146,6 @@ def addCollaborators(request):
     return render(request, 'repository/repoSettings.html', context)
 
 
-# Bug brise iz baze celog usera
 class CollaboratorsDeleteView(LoginRequiredMixin, DeleteView):
     model = User
     template_name = "repository/deleteCollaborators.html"
