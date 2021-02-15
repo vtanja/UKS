@@ -1,4 +1,3 @@
-import datetime
 import json
 import logging
 import os
@@ -7,6 +6,7 @@ import requests
 from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
 from django.views.generic import DetailView
 
 from .forms import RepositoryForm
@@ -17,12 +17,14 @@ from ..user.models import HistoryItem
 
 logger = logging.getLogger('django')
 
+
 def add_history_item(user, message):
     change = HistoryItem()
-    change.dateChanged = datetime.datetime.now()
+    change.dateChanged = timezone.now()
     change.belongsTo = user
     change.message = message
     return change
+
 
 class RepositoryDetailView(DetailView):
     model = Repository
