@@ -51,3 +51,8 @@ class ProjectModelTests(TestCase):
         project = Project.objects.get(pk=1)
         max_length = project._meta.get_field('name').max_length
         self.assertEquals(max_length, 30)
+
+    def test_repository_not_null(self):
+        project = Project.objects.get(pk=1)
+        is_null = project._meta.get_field('repository').null
+        self.assertFalse(is_null)
