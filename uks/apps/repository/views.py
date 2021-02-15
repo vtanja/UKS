@@ -23,11 +23,10 @@ logger = logging.getLogger('django')
 repo = 0
 
 
-
 def add_history_item(user, message):
     change = HistoryItem()
-    change.dateChanged = timezone.now()
-    change.belongsTo = user
+    change.date_changed = timezone.now()
+    change.belongs_to = user
     change.message = message
     return change
 
