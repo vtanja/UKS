@@ -46,3 +46,8 @@ class ProjectModelTests(TestCase):
         project = Project.objects.get(id=1)
         field_label = project._meta.get_field('description').verbose_name
         self.assertEqual(field_label, 'description')
+
+    def test_name_max_length(self):
+        project = Project.objects.get(pk=1)
+        max_length = project._meta.get_field('name').max_length
+        self.assertEquals(max_length, 30)
