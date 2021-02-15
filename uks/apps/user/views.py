@@ -18,7 +18,7 @@ from security.models import SiteUser
 logger = logging.getLogger('django')
 
 
-@login_required(login_url='/login')
+@login_required
 def dashboard(request):
     form = RepositoryForm()
     logger.info('User dashboard entered!')
@@ -30,7 +30,7 @@ def dashboard(request):
     return render(request, 'user/dashboard.html', context)
 
 
-@login_required(login_url='/login')
+@login_required
 def all_users_repositories(request):
     repositories = Repository.objects.filter(
         Q(owner=request.user) | Q(collaborators__username__in=[str(request.user)])
@@ -38,7 +38,7 @@ def all_users_repositories(request):
     return repositories
 
 
-@login_required(login_url='/login')
+@login_required
 def profile(request, pk):
     user = SiteUser.objects.get(user_id=pk)
     logger.info('User profile entered!')
@@ -60,7 +60,7 @@ def profile(request, pk):
     return render(request, 'user/profile.html', context)
 
 
-@login_required(login_url='/login')
+@login_required
 def get_profile_form(request, user):
     if request.method == 'POST':
         p_form = ProfileImageUpdateForm(request.POST,
