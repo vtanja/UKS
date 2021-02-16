@@ -12,7 +12,7 @@ from django.views.decorators.cache import never_cache
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
 
-class ProjectListView(ListView):
+class ProjectListView(LoginRequiredMixin, ListView):
     model = Project
     template_name_suffix = '_list'
 
@@ -49,7 +49,7 @@ class CreateProjectView(LoginRequiredMixin, CreateView):
         return reverse_lazy('repository_projects', kwargs={'repo_id': self.kwargs['repo_id']})
 
 
-class ProjectDetailView(DetailView):
+class ProjectDetailView(LoginRequiredMixin, DetailView):
     model = Project
     template_name_suffix = '_details'
 
@@ -81,7 +81,7 @@ def update_issue(self, repo_id):
     return HttpResponse(json.dumps(payload), content_type='application/json')
 
 
-class ProjectUpdateView(UpdateView):
+class ProjectUpdateView(LoginRequiredMixin, UpdateView):
     model = Project
     fields = ['name', 'description']
     template_name_suffix = '_update'
@@ -97,7 +97,7 @@ class ProjectUpdateView(UpdateView):
         return reverse_lazy('repository_projects', kwargs={'repo_id': self.kwargs['repo_id']})
 
 
-class ProjectDeleteView(DeleteView):
+class ProjectDeleteView(LoginRequiredMixin, DeleteView):
     model = Project
     template_name_suffix = '_delete'
 
@@ -106,6 +106,7 @@ class ProjectDeleteView(DeleteView):
         self.repository = get_object_or_404(Repository, id=self.kwargs['repo_id'])
         self.project = get_object_or_404(Project, id=self.kwargs['pk'])
         context['repository'] = self.repository
+        context['project'] = self.project
         return context
 
     def get_success_url(self):
