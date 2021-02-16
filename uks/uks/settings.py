@@ -181,9 +181,12 @@ LOGGING = {
     'disable_existing_loggers': False,
     'loggers': {
         'django': {
-            'handlers': ['console', 'file'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-            'propagate': False,
+            'handlers': ['logstash'],
+            'level': 'DEBUG',
+        },
+        'django.request': {
+            'handlers': ['logstash'],
+            'level': 'DEBUG',
         },
     },
     'handlers': {
@@ -198,11 +201,29 @@ LOGGING = {
             'filename': os.path.join(LOG_PATH, 'logs\debug.log'),
             'formatter': 'formatter'
         },
+        'logstash': {
+            'level': 'DEBUG',
+            'class': 'logstash.TCPLogstashHandler',
+            'host': 'logstash',
+            'port': 5959,  # Default port of logstash
+            'version': 1,
+            # Version of logstash event schema. Default value: 0 (for backward compatibility of the library)
+            'message_type': 'django',  # 'type' field in logstash message. Default value: 'logstash'.
+            'fqdn': False,  # Fully qualified domain name. Default value: false.
+            'tags': ['django.request'],  # list of tags. Default: None.
+        },
     },
     'formatters': {
         'formatter': {
             'format': '{levelname} {asctime} {message}',
             'style': '{',
-        }
+
+        },
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
     },
 }
