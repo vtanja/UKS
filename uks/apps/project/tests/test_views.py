@@ -122,7 +122,10 @@ class ProjectCreateViewTest(TestCase):
                                     {'name': 'test project', 'description': 'test description'})
         self.assertEqual(response.status_code, 404)
 
-    # da li je ucitan odg repository
+    def test_correct_repository_loaded(self):
+        response = self.get_create_project_response(0)
+        repository = Repository.objects.filter(id=get_repository_id(0)).first()
+        self.assertEqual(response.context['repository'], repository)
 
 
 class ProjectDetailViewTest(TestCase):
