@@ -62,6 +62,9 @@ class ProjectListViewTest(TestCase):
         response = self.get_repository_projects_response(1)
         self.assertEqual(len(response.context['project_list']), 0)
 
+    # da li su dobri projekti
+    # da li je ulogovan korisnik
+
 
 class ProjectCreateViewTest(TestCase):
     @classmethod
@@ -109,6 +112,8 @@ class ProjectCreateViewTest(TestCase):
         response = self.client.post(reverse('create_project', kwargs={'repo_id': repo_id}),
                                     {'name': 'test project', 'description': 'test description'})
         self.assertEqual(response.status_code, 404)
+
+    # da li je ucitan odg repository
 
 
 class ProjectDetailViewTest(TestCase):
@@ -234,3 +239,22 @@ class ProjectDeleteViewTest(TestCase):
     def test_deleting_non_existent(self):
         response = self.post_response(0, 10)
         self.assertEqual(response.status_code, 404)
+
+
+class ProjectUpdateViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        fill_test_data()
+
+    def get_project_update_response(self, repo_id=0, pk=0):
+        repo_id, pk = get_repository_and_project_id(repo_id, pk)
+        self.client.login(username='user1', password='aBcDeF1234')
+        response = self.client.get(reverse('project_update', kwargs={'repo_id': repo_id, 'pk': pk}))
+        return response
+
+    def post_response(self, repo_id=0, pk=0):
+        repo_id, pk = get_repository_and_project_id(repo_id, pk)
+        self.client.login(username='user1', password='aBcDeF1234')
+        response = self.client.post(reverse('project_update', kwargs={'repo_id': repo_id, 'pk': pk}),
+                                    {'name': 'edited test name', 'description': 'edited test description'})
+        return response
