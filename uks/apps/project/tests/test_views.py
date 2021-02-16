@@ -45,3 +45,11 @@ class ProjectListViewTest(TestCase):
     def test_repository_not_found(self):
         response = self.get_repository_projects_response(len(Repository.objects.all()) + 1)
         self.assertEqual(response.status_code, 404)
+
+    def test_project_count_in_repository(self):
+        response = self.get_repository_projects_response()
+        self.assertEqual(len(response.context['project_list']), 3)
+
+    def test_project_count_in_repository_with_no_projects(self):
+        response = self.get_repository_projects_response(1)
+        self.assertEqual(len(response.context['project_list']), 0)
