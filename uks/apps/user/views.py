@@ -13,6 +13,7 @@ from security.models import SiteUser
 
 logger = logging.getLogger('django')
 
+
 def dashboard(request):
     logger.info('User dashboard entered!')
     logger.info('Getting all repositories of user initialized!')
@@ -73,5 +74,5 @@ class AllIssuesListView(LoginRequiredMixin, ListView):
     template_name = 'user/issue_list.html'
 
     def get_queryset(self):
-        return Issue.objects.filter(Q(assignees__in=[self.request.user]) | Q(created_by=self.request.user))\
+        return Issue.objects.filter(Q(assignees__in=[self.request.user]) | Q(created_by=self.request.user)) \
             .filter(closed=False)

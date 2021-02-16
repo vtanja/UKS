@@ -1,4 +1,5 @@
 import datetime
+import http
 import json
 import logging
 import os
@@ -9,6 +10,7 @@ from django.contrib.auth.models import User
 import requests
 from django.contrib import messages
 from django.db.models import Q
+from django.http import HttpResponseNotFound
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, DeleteView, UpdateView
@@ -118,30 +120,39 @@ def add_repository(request):
 @login_required
 def RepositorySettings(request, key):
     repository = Repository.objects.get(id=key)
-    global repo
-    repo = repository.id
-    users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
-    collabs = repository.collaborators.all()
-    context = {'repository': repository, 'users': users, 'collabs': collabs}
-    return render(request, 'repository/manageAccess.html', context)
+    if not request.user == repository.owner:
+        return redirect('dashboard')
+    else:
+        global repo
+        repo = repository.id
+        users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
+        collabs = repository.collaborators.all()
+        context = {'repository': repository, 'users': users, 'collabs': collabs}
+        return render(request, 'repository/manageAccess.html', context)
 
 
 @login_required
 def ManageAccess(request, key):
     repository = Repository.objects.get(id=key)
-    global repo
-    repo = repository.id
-    users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
-    collabs = repository.collaborators.all()
-    context = {'repository': repository, 'users': users, 'collabs': collabs}
-    return render(request, 'repository/manageAccess.html', context)
+    if not request.user == repository.owner:
+        return redirect('dashboard')
+    else:
+        global repo
+        repo = repository.id
+        users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
+        collabs = repository.collaborators.all()
+        context = {'repository': repository, 'users': users, 'collabs': collabs}
+        return render(request, 'repository/manageAccess.html', context)
 
 
 @login_required
 def Options(request, key):
     repository = Repository.objects.get(id=key)
-    context = {'repository': repository}
-    return render(request, 'repository/options.html', context)
+    if not request.user == repository.owner:
+        return redirect('dashboard')
+    else:
+        context = {'repository': repository}
+        return render(request, 'repository/options.html', context)
 
 
 @login_required
@@ -217,3 +228,23 @@ class RepositoryUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('options', kwargs={'key': repo})
+
+
+class RepositoryDeleteView(LoginRequiredMixin, DeleteView):
+    model = Repository
+    template_name = "repository/repositoryDelete.html"
+
+    def get_context_data(self, **kwargs):
+        self.repository = get_object_or_404(Repository, id=self.kwargs['pk'])
+        context = super(RepositoryDeleteView, self).get_context_data(**kwargs)
+        context['repository'] = self.repository
+        print(context)
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super(RepositoryDeleteView, self).get_form_kwargs()
+        kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['pk'])
+        return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy('dashboard')
