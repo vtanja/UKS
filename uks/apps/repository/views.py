@@ -117,7 +117,7 @@ def add_repository(request):
     return render(request, 'user/dashboard.html', {'form': form})
 
 
-def RepositorySettings(request, key):
+def manage_access(request, key):
     repository = Repository.objects.get(id=key)
     if not request.user == repository.owner:
         return redirect('dashboard')
