@@ -37,3 +37,11 @@ class ProjectListViewTest(TestCase):
         response = self.get_repository_projects_response()
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'project/project_list.html')
+
+    def test_repository_in_context(self):
+        response = self.get_repository_projects_response()
+        self.assertEqual(response.context['repository'], Repository.objects.all()[0])
+
+    def test_repository_not_found(self):
+        response = self.get_repository_projects_response(len(Repository.objects.all()) + 1)
+        self.assertEqual(response.status_code, 404)
