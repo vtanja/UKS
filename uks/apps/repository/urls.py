@@ -1,18 +1,17 @@
 from django.urls import path, include
 
-from ..repository import views
-from ..repository.views import RepositoryDetailView, RepositorySettings, CollaboratorsDeleteView, ManageAccess, Options, \
-    RepositoryUpdateView, RepositoryDeleteView
+from uks.apps.repository.views import RepositoryDetailView, add_repository, repository_settings, add_collaborators, \
+    CollaboratorsDeleteView, ManageAccess, Options, RepositoryUpdateView, RepositoryDeleteView
 
 urlpatterns = [
     path('<int:pk>/', RepositoryDetailView.as_view(), name='detail'),
-    path('add/', views.add_repository, name='add'),
+    path('add/', add_repository, name='add'),
     path('<int:id>/branch/', include('apps.branch.urls')),
     path('<int:repository_id>/issues/', include('apps.issue.urls')),
     path('<int:repo_id>/milestones/', include('apps.milestone.urls')),
     path('<int:id>/labels/', include('apps.label.urls')),
-    path('<int:key>/settings/', RepositorySettings, name='repository_settings'),
-    path('addCollaborators/', views.addCollaborators, name='addCollaborators'),
+    path('<int:key>/settings/', repository_settings, name='repository_settings'),
+    path('addCollaborators/', add_collaborators, name='addCollaborators'),
     path('delete/<int:pk>', CollaboratorsDeleteView.as_view(), name='collaborators-delete'),
     path('<int:repo_id>/projects/', include('apps.project.urls')),
     path('<int:id>/wiki/', include('apps.wiki.urls')),

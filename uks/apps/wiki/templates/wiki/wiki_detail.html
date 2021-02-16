@@ -10,10 +10,12 @@
                     <div>{{ wiki.content | safe }}</div>
                 </div>
                 <div class="col-md-3">
+                {% if request.user.is_authenticated %}
                 <div style="margin-top: 15%; margin-left: 10%">
                     <a class="btn btn-secondary" style="width: 40%; color: white" href="{% url 'wiki-update' repository.id wiki.id %}">Edit</a> &nbsp; &nbsp;
                     <a class="btn btn-success" style="width: 45%" href="{% url 'wiki-add' repository.id %}">New page</a>
                 </div>
+                {% endif%}
                 <div class="card" style="width: 18rem; max-height: 50vh; margin-top: 10%">
                   <div class="card-body">
                     <h5 class="card-title">Pages &nbsp;&nbsp; <span class="badge badge-pill badge-success">{{ wikis|length }}</span></h5>
