@@ -5,6 +5,9 @@ from django.urls import reverse
 from django.utils import timezone
 
 from ..models import Issue
+from ...label.models import Label
+from ...milestone.models import Milestone
+from ...project.models import Project
 from ...repository.models import Repository
 from ...user.models import HistoryItem
 
@@ -35,6 +38,18 @@ def fill_test_db():
     test_repository1.save()
     test_repository2.save()
 
+    test_project = Project.objects.create(name='test project', description='des', repository=test_repository)
+    test_project1 = Project.objects.create(name='test project1', description='des', repository=test_repository)
+    test_project.save()
+    test_project1.save()
+
+    test_milestone = Milestone.objects.create(title='test milestone', description='test', repository=test_repository,
+                                              closed=False, dateCreated=timezone.now(), dueDate=timezone.now())
+    test_milestone.save()
+
+    test_label = Label.objects.create(name='functional', description='asdf', color='#3375FFFF', repository=test_repository)
+    test_label.save()
+
     # Create issues and add them to repositories
     test_issue1 = Issue.objects.create(title='test issue', description='test', repository=test_repository,
                                        created_by=test_user)
@@ -44,6 +59,9 @@ def fill_test_db():
                                        created_by=test_user1)
     test_issue4 = Issue.objects.create(title='test issue four', description='...', repository=test_repository1,
                                        created_by=test_user1, closed=True)
+    test_issue1.milestone = test_milestone
+    test_issue1.project = test_project
+    test_issue1.labels.add(test_label)
     test_issue1.save()
     test_issue2.save()
     test_issue3.save()
