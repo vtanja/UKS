@@ -6,17 +6,23 @@ from apps.project.models import Project
 from apps.issue.models import Issue
 
 
-def get_repository_id(repo_id):
+def get_repository_id(repo_id=0):
     if repo_id < len(Repository.objects.all()):
         repo_id = Repository.objects.all()[repo_id].id
+    else:
+        repo_id = Repository.objects.all()[len(Repository.objects.all()) - 1].id + 1
     return repo_id
 
 
 def get_repository_and_project_id(repo_id=0, pk=0):
     if repo_id < len(Repository.objects.all()):
         repo_id = Repository.objects.all()[repo_id].id
+    else:
+        repo_id = Repository.objects.all()[len(Repository.objects.all()) - 1].id + 1
     if pk < len(Project.objects.all()):
         pk = Project.objects.all()[pk].id
+    else:
+        pk = Project.objects.all()[len(Project.objects.all()) - 1].id + 1
     return repo_id, pk
 
 
@@ -116,7 +122,7 @@ class ProjectCreateViewTest(TestCase):
         self.assertRedirects(response, '/repository/{}/projects/'.format(repo_id))
 
     def test_add_to_non_existent_repository(self):
-        repo_id = get_repository_id(len(Repository.objects.all()) + 1)
+        repo_id = get_repository_id(10)
         self.client.login(username='user1', password='aBcDeF1234')
         response = self.client.post(reverse('create_project', kwargs={'repo_id': repo_id}),
                                     {'name': 'test project', 'description': 'test description'})
@@ -161,7 +167,7 @@ class ProjectDetailViewTest(TestCase):
         self.assertRedirects(response, '/welcome/login/?next=/repository/{}/projects/{}/'.format(repo_id, proj_id))
 
     def test_non_existent_repository(self):
-        response = self.get_project_details_response(10, 0)
+        response = self.get_project_details_response(50, 0)
         self.assertEqual(response.status_code, 404)
 
     def test_non_existent_project(self):
@@ -241,16 +247,17 @@ class ProjectDeleteViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_non_existent_project(self):
-        response = self.get_project_delete_response(0, 10)
+        response = self.get_project_delete_response(0, 50)
         self.assertEqual(response.status_code, 404)
 
     def test_successfully_deleted(self):
         response = self.post_response(0, 0)
+        repo_id = get_repository_id(0)
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '/repository/{}/projects/'.format(1))
+        self.assertRedirects(response, '/repository/{}/projects/'.format(repo_id))
 
     def test_deleting_non_existent(self):
-        response = self.post_response(0, 10)
+        response = self.post_response(0, 50)
         self.assertEqual(response.status_code, 404)
 
 
@@ -310,8 +317,9 @@ class ProjectUpdateViewTest(TestCase):
 
     def test_successfully_updated(self):
         response = self.post_response(0, 0)
+        repo_id = get_repository_id(0)
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '/repository/{}/projects/'.format(1))
+        self.assertRedirects(response, '/repository/{}/projects/'.format(repo_id))
 
     def test_updating_non_existent(self):
         response = self.post_response(0, 10)
