@@ -41,6 +41,12 @@ class ProjectListViewTest(TestCase):
         response = self.get_repository_projects_response()
         self.assertEqual(response.status_code, 200)
 
+    def test_user_not_logged_in(self):
+        repo_id = get_repository_id(0)
+        response = self.client.get(reverse('repository_projects', kwargs={'repo_id': repo_id}))
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/welcome/login/?next=/repository/{}/projects/'.format(repo_id))
+
     def test_view_uses_correct_template(self):
         response = self.get_repository_projects_response()
         self.assertEqual(response.status_code, 200)
@@ -67,7 +73,6 @@ class ProjectListViewTest(TestCase):
         repository = Repository.objects.filter(id=get_repository_id(0)).first()
         for proj in response.context['project_list']:
             self.assertEqual(proj.repository, repository)
-    # da li je ulogovan korisnik
 
 
 class ProjectCreateViewTest(TestCase):
