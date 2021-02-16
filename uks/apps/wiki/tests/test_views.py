@@ -114,10 +114,6 @@ class WikiDeleteViewTest(TestCase):
         response = self.client.get(reverse('wiki-delete', kwargs={'id': 1, 'pk': 1}))
         self.assertRedirects(response, f'/welcome/login/?next=/repository/1/wiki/1/delete/')
 
-    def test_redirects_to_wiki_list_on_success(self):
-        response = self.request(1,1)
-        self.assertEqual(response.status_code, 302)
-
     def test_deleting_non_existent_wiki(self):
         wiki_id = Wiki.objects.all().count()+1
         response = self.request(1, wiki_id)
