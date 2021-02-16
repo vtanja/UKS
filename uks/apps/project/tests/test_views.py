@@ -150,3 +150,9 @@ class ProjectDetailViewTest(TestCase):
     def test_non_existent_project(self):
         response = self.get_project_details_response(0, 10)
         self.assertEqual(response.status_code, 404)
+
+    def test_correct_project_details_loaded(self):
+        response = self.get_project_details_response(0, 0)
+        self.assertEqual(response.context['repository'], Repository.objects.all()[0])
+        self.assertEqual(response.context['project'], Project.objects.all()[0])
+        self.assertEqual(response.context['repository'], response.context['project'].repository)
