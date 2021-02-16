@@ -25,7 +25,7 @@ class WikiListView(LoginRequiredMixin, ListView):
     template_name = 'wiki/wiki_list.html'
 
     def get(self, request, *args, **kwargs):
-        repo = get_object_or_404(id=self.kwargs['repo_id'])
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
         if repo.wiki_set.count() > 0:
             return redirect(reverse('wiki-details', kwargs={'repo_id': repo.id, 'pk': repo.wiki_set.first().id}))
         return super().get(request, *args, **kwargs)
@@ -134,8 +134,6 @@ class WikiDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_success_url(self):
         change = add_history_item(self.request.user, 'deleted wiki page')
-        wiki = get_object_or_404(Wiki, id=self.object.id)
-        change.changed_wiki_object = wiki
         change.save()
         logger.info('Wiki [%s] has been deleted successfully!', self.kwargs['pk'])
         logger.info('Routing to all wikis after deleting wiki!')
