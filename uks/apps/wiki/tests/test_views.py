@@ -141,3 +141,92 @@ class WikiDetailViewTest(TestCase):
         login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         response = self.client.get(reverse('wiki-details', kwargs={'id': 1, 'pk': 1}))
         self.assertTrue(response.context['wiki'] is not None)
+
+
+class CreateWikiViewTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        fill_test_db()
+
+    def test_redirect_if_user_not_logged_in(self):
+        response = self.client.get('/repository/1/wiki/add/')
+        self.assertRedirects(response, '/welcome/login/?next=/repository/1/wiki/add/')
+
+    def test_view_shows_correct_template(self):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        response = self.client.get(reverse('wiki-add', kwargs={'id': 1}))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, WIKI_FORM)
+
+    def test_HTTP404_if_adding_to_non_existent_repository(self):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        repo_id = Repository.objects.all().count()+1
+        response = self.client.get(reverse('wiki-add', kwargs={'id': repo_id}))
+
+        self.assertEqual(response.status_code, 404)
+        self.assertRaises(Http404)
+
+    def test_redirects_to_wiki_list_on_success(self):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        response = self.client.post(reverse('wiki-add', kwargs={'id': 1}),
+                                    {'title': 'Test wiki', 'content': 'Test description'})
+        self.assertEqual(response.status_code, 302)
+
+    def test_logged_in_user_can_access(self):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        response = self.client.post(reverse('wiki-add', kwargs={'id': 1}))
+
+        self.assertEqual(str(response.wsgi_request.user), USER_USERNAME)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, WIKI_FORM)
+
+
+class WikiUpdateViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        fill_test_db()
+
+    def test_redirect_if_user_not_logged_in(self):
+        response = self.client.get('/repository/1/wiki/1/edit/')
+        self.assertRedirects(response, '/welcome/login/?next=/repository/1/wiki/1/edit/')
+
+    def test_view_url_exists_at_desired_locationt(self):
+        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        response = self.client.get('/repository/1/wiki/1/edit')
+        self.assertEqual(response.status_code, 301)
+
+    def test_view_url_accessible_by_name(self):
+        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        response = self.client.get(reverse('wiki-update', kwargs={'id': 1, 'pk': 1}))
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_shows_correct_template(self):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        response = self.client.get(reverse('wiki-update', kwargs={'id': 1, 'pk': 1}))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, WIKI_FORM)
+
+    def test_logged_in_user_can_access(self):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        response = self.client.get(reverse('wiki-update', kwargs={'id': 1, 'pk': 1}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(str(response.wsgi_request.user), USER_USERNAME)
+        self.assertTemplateUsed(response, WIKI_FORM)
+
+    def test_HTTP404_changing_wiki_from_non_existent_repository(self):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        repo_id = Repository.objects.all().count()+1
+        response = self.client.get(reverse('wiki-update', kwargs={'id': repo_id, 'pk': 1}))
+
+        self.assertEqual(response.status_code, 404)
+        self.assertRaises(Http404)
+
+    def test_HTTP404_changing_non_existing_wiki(self):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        wiki = Wiki.objects.all().count()+1
+        response = self.client.get(reverse('wiki-update', kwargs={'id': 1, 'pk': wiki}))
+
+        self.assertEqual(response.status_code, 404)
+        self.assertRaises(Http404)
