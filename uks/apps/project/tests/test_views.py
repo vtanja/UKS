@@ -280,3 +280,9 @@ class ProjectUpdateViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response,
                              '/welcome/login/?next=/repository/{}/projects/{}/update'.format(repo_id, proj_id))
+
+    def test_correct_repository_and_project_loaded(self):
+        response = self.get_project_update_response(0, 0)
+        self.assertEqual(response.context['repository'], Repository.objects.all()[0])
+        self.assertEqual(response.context['project'], Project.objects.all()[0])
+        self.assertEqual(response.context['repository'], response.context['project'].repository)
