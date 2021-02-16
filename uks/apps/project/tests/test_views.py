@@ -94,3 +94,10 @@ class ProjectCreateViewTest(TestCase):
                                     {'name': 'test project', 'description': 'test description'})
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/repository/{}/projects/'.format(repo_id))
+
+    def test_add_to_non_existent_repository(self):
+        repo_id = get_repository_id(len(Repository.objects.all()) + 1)
+        self.client.login(username='user1', password='aBcDeF1234')
+        response = self.client.post(reverse('create_project', kwargs={'repo_id': repo_id}),
+                                    {'name': 'test project', 'description': 'test description'})
+        self.assertEqual(response.status_code, 404)
