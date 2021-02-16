@@ -62,7 +62,11 @@ class ProjectListViewTest(TestCase):
         response = self.get_repository_projects_response(1)
         self.assertEqual(len(response.context['project_list']), 0)
 
-    # da li su dobri projekti
+    def test_correct_projects_loaded(self):
+        response = self.get_repository_projects_response(0)
+        repository = Repository.objects.filter(id=get_repository_id(0)).first()
+        for proj in response.context['project_list']:
+            self.assertEqual(proj.repository, repository)
     # da li je ulogovan korisnik
 
 
