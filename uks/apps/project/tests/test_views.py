@@ -171,3 +171,21 @@ class ProjectDetailViewTest(TestCase):
         issues = Issue.objects.filter(repository=Repository.objects.all()[0])
         for i in issues:
             self.assertIn(i, response.context['issue_dict'][i.issue_status])
+
+
+class ProjectDeleteViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        fill_test_data()
+
+    def get_project_delete_response(self, repo_id=0, pk=0):
+        repo_id, pk = get_repository_and_project_id(repo_id, pk)
+        self.client.login(username='user1', password='aBcDeF1234')
+        response = self.client.get(reverse('project_delete', kwargs={'repo_id': repo_id, 'pk': pk}))
+        return response
+
+    def post_response(self, repo_id=0, pk=0):
+        repo_id, pk = get_repository_and_project_id(repo_id, pk)
+        self.client.login(username='user1', password='aBcDeF1234')
+        response = self.client.post(reverse('project_delete', kwargs={'repo_id': repo_id, 'pk': pk}))
+        return response
