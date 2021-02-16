@@ -225,3 +225,8 @@ class ProjectDeleteViewTest(TestCase):
     def test_non_existent_project(self):
         response = self.get_project_delete_response(0, 10)
         self.assertEqual(response.status_code, 404)
+
+    def test_successfully_deleted(self):
+        response = self.post_response(0, 0)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/repository/{}/projects/'.format(1))
