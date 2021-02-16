@@ -12,6 +12,14 @@ def get_repository_id(repo_id):
     return repo_id
 
 
+def get_repository_and_project_id(repo_id=0, pk=0):
+    if repo_id < len(Repository.objects.all()):
+        repo_id = Repository.objects.all()[repo_id].id
+    if pk < len(Project.objects.all()):
+        pk = Project.objects.all()[pk].id
+    return repo_id, pk
+
+
 class ProjectListViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -101,3 +109,25 @@ class ProjectCreateViewTest(TestCase):
         response = self.client.post(reverse('create_project', kwargs={'repo_id': repo_id}),
                                     {'name': 'test project', 'description': 'test description'})
         self.assertEqual(response.status_code, 404)
+
+
+class ProjectDetailViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        fill_test_data()
+
+    def get_project_details_response(self, repo_id=0, pk=0):
+        repo_id, pk = get_repository_and_project_id(repo_id, pk)
+        self.client.login(username='user1', password='aBcDeF1234')
+        response = self.client.get(reverse('project_details', kwargs={'repo_id': repo_id, 'pk': pk}))
+        return response
+
+    def test_view_url_exists_at_desired_location(self):
+        repo_id, proj_id = get_repository_and_project_id()
+        self.client.login(username='user1', password='aBcDeF1234')
+        response = self.client.get('/repository/{}/projects/{}/'.format(repo_id, proj_id))
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_url_accessible_by_name(self):
+        response = self.get_project_details_response()
+        self.assertEqual(response.status_code, 200)
