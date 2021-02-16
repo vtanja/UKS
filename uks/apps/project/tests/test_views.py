@@ -258,3 +258,13 @@ class ProjectUpdateViewTest(TestCase):
         response = self.client.post(reverse('project_update', kwargs={'repo_id': repo_id, 'pk': pk}),
                                     {'name': 'edited test name', 'description': 'edited test description'})
         return response
+
+    def test_view_url_exists_at_desired_location(self):
+        repo_id, proj_id = get_repository_and_project_id()
+        self.client.login(username='user1', password='aBcDeF1234')
+        response = self.client.get('/repository/{}/projects/{}/update'.format(repo_id, proj_id))
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_url_accessible_by_name(self):
+        response = self.get_project_update_response()
+        self.assertEqual(response.status_code, 200)
