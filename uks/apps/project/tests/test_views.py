@@ -217,3 +217,11 @@ class ProjectDeleteViewTest(TestCase):
         self.assertEqual(response.context['repository'], Repository.objects.all()[0])
         self.assertEqual(response.context['project'], Project.objects.all()[0])
         self.assertEqual(response.context['repository'], response.context['project'].repository)
+
+    def test_non_existent_repository(self):
+        response = self.get_project_delete_response(10, 0)
+        self.assertEqual(response.status_code, 404)
+
+    def test_non_existent_project(self):
+        response = self.get_project_delete_response(0, 10)
+        self.assertEqual(response.status_code, 404)
