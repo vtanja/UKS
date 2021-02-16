@@ -71,7 +71,7 @@
                         <label for="collaborators">Select collaborators</label>
                          <select multiple class="form-control" id="collaborators" name="collaborators">
                              {% for user1 in users %}
-                                <option id="{{user1.username}}" value="{{user1.username}}" name="{{user1.username}}">{{user1.username}}</option>
+                                <option id="{{user1.username}}" value="{{user1.username}}">{{user1.username}}</option>
                              {% endfor %}
                          </select>
                     </div>

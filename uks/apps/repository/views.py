@@ -202,7 +202,7 @@ def repository_settings(request, key):
 
 
 @login_required
-def Options(request, key):
+def options(request, key):
     repository = Repository.objects.get(id=key)
     if not request.user == repository.owner:
         return redirect('dashboard')
