@@ -156,3 +156,12 @@ class ProjectDetailViewTest(TestCase):
         self.assertEqual(response.context['repository'], Repository.objects.all()[0])
         self.assertEqual(response.context['project'], Project.objects.all()[0])
         self.assertEqual(response.context['repository'], response.context['project'].repository)
+
+    def test_correct_issues_loaded(self):
+        response = self.get_project_details_response(0, 0)
+        issues = Issue.objects.filter(repository=Repository.objects.all()[0])
+        self.assertEqual(len(response.context['issues']), len(issues))
+        for i in issues:
+            self.assertIn(i, response.context['issues'])
+        for i in response.context['issues']:
+            self.assertEqual(i.repository, Repository.objects.all()[0])
