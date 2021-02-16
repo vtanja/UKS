@@ -142,3 +142,11 @@ class ProjectDetailViewTest(TestCase):
         response = self.client.get(reverse('project_details', kwargs={'repo_id': repo_id, 'pk': proj_id}))
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/welcome/login/?next=/repository/{}/projects/{}/'.format(repo_id, proj_id))
+
+    def test_non_existent_repository(self):
+        response = self.get_project_details_response(10, 0)
+        self.assertEqual(response.status_code, 404)
+
+    def test_non_existent_project(self):
+        response = self.get_project_details_response(0, 10)
+        self.assertEqual(response.status_code, 404)
