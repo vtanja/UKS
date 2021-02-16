@@ -8,7 +8,8 @@ from django.utils import timezone
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
 from .forms import CreateIssueForm
-from .models import Issue, IssueChange
+from .models import Issue
+from ..user.models import HistoryItem
 
 
 class IssuesListView(ListView):
@@ -30,7 +31,7 @@ class IssueDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         self.repository = get_object_or_404(Repository, id=self.kwargs['repository_id'])
-        self.changes = IssueChange.objects.filter(issue=self.kwargs['pk'])
+        self.changes = HistoryItem.objects.filter(changed_issue_id=self.kwargs['pk'])
         context = super(IssueDetailView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
         context['changes'] = self.changes
@@ -73,19 +74,25 @@ class IssueUpdateView(LoginRequiredMixin, UpdateView):
         original_issue = get_object_or_404(Issue, id=form.instance.id)
         response = super(IssueUpdateView, self).form_valid(form)
         for changed_field in form.changed_data:
-            ch = IssueChange()
-            ch.issue = original_issue
-            ch.date = timezone.now()
+            ch = HistoryItem()
+            ch.changed_issue = original_issue
+            ch.date_changed = timezone.now()
+            ch.belongs_to = self.request.user
             if changed_field == 'title':
-                ch.message = '{} changed title from "{}" to "{}"'.format(self.request.user.username, original_issue.title,
-                                                                     form.cleaned_data[changed_field])
+                ch.message = 'changed title from "{}" to "{}"'\
+                    .format(original_issue.title, form.cleaned_data[changed_field])
             elif changed_field == 'description':
-                ch.message = self.request.user.username + ' changed description'
+                ch.message = 'changed description'
             elif changed_field == 'assignees':
-                ch.message = '{} changed assignees'.format(self.request.user.username)
+                ch.message = 'changed assignees'
             elif changed_field == 'milestone':
-                ch.message = '{} changed milestone from {} to {}'\
-                    .format(self.request.user.username, original_issue.milestone.title, form.cleaned_data[changed_field])
+                ch.message = 'changed milestone from {} to {}'\
+                    .format(original_issue.milestone.title, form.cleaned_data[changed_field])
+            elif changed_field == 'project':
+                ch.message = 'changed project from {} to {}'\
+                    .format(original_issue.project.name, form.cleaned_data[changed_field])
+            elif changed_field == 'labels':
+                ch.message = 'changed labels'
             ch.save()
 
         return response
@@ -109,5 +116,5 @@ class IssueUpdateView(LoginRequiredMixin, UpdateView):
 def close_issue(request, repository_id, pk):
     issue = get_object_or_404(Issue, pk=pk)
     get_object_or_404(Repository, pk=repository_id)
-    issue.toggle_issue_close()
+    issue.toggle_issue_close(request.user)
     return redirect(reverse_lazy('issue-details', kwargs={'repository_id': repository_id, 'pk': pk}))

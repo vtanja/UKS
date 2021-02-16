@@ -1,11 +1,11 @@
 import logging
+
 from apps.repository.models import Repository
 from apps.user.models import HistoryItem
 from apps.wiki.forms import CreateWikiForm
 from apps.wiki.models import Wiki
-from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
-# Create your views here.
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.utils import timezone
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -15,8 +15,8 @@ logger = logging.getLogger('django')
 
 def add_history_item(user, message):
     change = HistoryItem()
-    change.dateChanged = timezone.now()
-    change.belongsTo = user
+    change.date_changed = timezone.now()
+    change.belongs_to = user
     change.message = message
     return change
 

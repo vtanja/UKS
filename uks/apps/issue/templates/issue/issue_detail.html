@@ -45,7 +45,7 @@
                             </tr>
                             <tr>
                                 <td><strong>Assignees</strong></td>
-                                <td> {% for assignee in issue.assignees.all %} {{ assignee.username }}
+                                <td> {% for assignee in issue.assignees.all %} <a href="{% url 'profile' assignee.id %}">{{ assignee.username }}</a>
                                 {% empty %} No one is assigned to this issue {% endfor %} </td>
                             </tr>
                             <tr>
@@ -55,12 +55,12 @@
                             </tr>
                             <tr>
                                 <td><strong>Milestone</strong></td>
-                                <td> {% if issue.milestone %} {{ issue.milestone.title }}
+                                <td> {% if issue.milestone %} <a href="{{ issue.milestone.get_absolute_url }}">{{ issue.milestone.title }}</a>
                                 {% else %} This issue isn't in any milestone {% endif %} </td>
                             </tr>
                             <tr>
                                 <td><strong>Project</strong></td>
-                                <td> {% if issue.project %} {{ issue.project.name }}
+                                <td> {% if issue.project %} <a href="{{ issue.project.get_absolute_url }}">{{ issue.project.name }}</a>
                                 {% else %} This issue isn't in any project yet {% endif %} </td>
                             </tr>
                         </tbody>
@@ -73,8 +73,8 @@
                 <br>
                 <div style="justify-content: flex-start">
                     {% for change in changes %}
-                        <small>{{ change.date }}</small>
-                        <p>{{ change.message }}</p>
+                        <small>{{ change.date_changed }}</small>
+                        <p><a href="{% url 'profile' change.belongs_to_id %}">{{ change.belongs_to }} </a> {{ change.message }}</p>
                     {% endfor %}
                 </div>
             </div>
