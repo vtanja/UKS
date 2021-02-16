@@ -20,11 +20,18 @@ def fill_test_data():
                                             owner=user1)
     repository3 = Repository.objects.create(name='test_repository3', description='test_repository_description',
                                             owner=user2)
+    repository1.save()
+    repository2.save()
+    repository3.save()
 
     project1 = Project.objects.create(name='test project 1', description='test description', repository=repository1)
     project2 = Project.objects.create(name='test project 2', description='test description', repository=repository1)
     project3 = Project.objects.create(name='test project 3', description='test description', repository=repository1)
     project4 = Project.objects.create(name='test project 4', description='test description', repository=repository3)
+    project1.save()
+    project2.save()
+    project3.save()
+    project4.save()
 
     test_issue1 = Issue.objects.create(title='test issue 1', description='test description', repository=repository1,
                                        created_by=user1, project=project1, issue_status='TODO')
@@ -36,6 +43,12 @@ def fill_test_data():
                                        created_by=user1, project=project1, issue_status='TODO')
     test_issue5 = Issue.objects.create(title='test issue 5', description='test description', repository=repository1,
                                        created_by=user1, project=project1, issue_status='DONE')
+
+    test_issue1.save()
+    test_issue2.save()
+    test_issue3.save()
+    test_issue4.save()
+    test_issue5.save()
 
 
 class ProjectModelTests(TestCase):
