@@ -20,8 +20,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('message', models.TextField()),
-                ('dateChanged', models.DateTimeField()),
-                ('belongsTo', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('date_changed', models.DateTimeField()),
+                ('belongs_to', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
                 ('changed_repo_object', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='repository.repository')),
                 ('changed_wiki_object', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='wiki.wiki')),
             ],

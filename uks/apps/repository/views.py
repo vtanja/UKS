@@ -14,7 +14,6 @@ from ghapi.all import GhApi
 
 from .forms import RepositoryForm, CollaboratorsForm
 from .models import Repository
-# Create your views here.
 from ..branch.models import Branch
 from ..commit.models import Commit
 from ..user.models import HistoryItem
@@ -23,11 +22,10 @@ logger = logging.getLogger('django')
 repo = 0
 
 
-
 def add_history_item(user, message):
     change = HistoryItem()
-    change.dateChanged = timezone.now()
-    change.belongsTo = user
+    change.date_changed = timezone.now()
+    change.belongs_to = user
     change.message = message
     return change
 
@@ -92,7 +90,7 @@ def add_repository(request):
             # form.save()
             form.instance.owner = request.user
 
-            if form.instance.repo_url == None:
+            if form.instance.repo_url is None:
                 form.instance.repo_url = 'https://github.com/vtanja/UKS'
 
             repository = form.save()
@@ -174,7 +172,6 @@ def get_github_api(repository):
 
 
 def repository_settings(request, key):
-
     repository = Repository.objects.get(id=key)
     global repo
     repo = repository.id

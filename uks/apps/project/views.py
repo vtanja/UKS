@@ -76,7 +76,7 @@ def update_issue(self, repo_id):
     issue_id = self.GET.get('i_id')
     list_id = self.GET.get('list_id')
     issue = Issue.objects.filter(id=issue_id).first()
-    issue.change_status(list_id)
+    issue.change_status(list_id, self.user)
     payload = {'success': True}
     return HttpResponse(json.dumps(payload), content_type='application/json')
 

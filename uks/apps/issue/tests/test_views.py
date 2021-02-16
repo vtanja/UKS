@@ -4,8 +4,12 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from ..models import Issue
+from ...label.models import Label
+from ...milestone.models import Milestone
+from ...project.models import Project
 from ...repository.models import Repository
-from ..models import Issue, IssueChange
+from ...user.models import HistoryItem
 
 USER_USERNAME = 'testuser'
 USER1_USERNAME = 'testuser1'
@@ -34,6 +38,18 @@ def fill_test_db():
     test_repository1.save()
     test_repository2.save()
 
+    test_project = Project.objects.create(name='test project', description='des', repository=test_repository)
+    test_project1 = Project.objects.create(name='test project1', description='des', repository=test_repository)
+    test_project.save()
+    test_project1.save()
+
+    test_milestone = Milestone.objects.create(title='test milestone', description='test', repository=test_repository,
+                                              closed=False, dateCreated=timezone.now(), dueDate=timezone.now())
+    test_milestone.save()
+
+    test_label = Label.objects.create(name='functional', description='asdf', color='#3375FFFF', repository=test_repository)
+    test_label.save()
+
     # Create issues and add them to repositories
     test_issue1 = Issue.objects.create(title='test issue', description='test', repository=test_repository,
                                        created_by=test_user)
@@ -43,6 +59,9 @@ def fill_test_db():
                                        created_by=test_user1)
     test_issue4 = Issue.objects.create(title='test issue four', description='...', repository=test_repository1,
                                        created_by=test_user1, closed=True)
+    test_issue1.milestone = test_milestone
+    test_issue1.project = test_project
+    test_issue1.labels.add(test_label)
     test_issue1.save()
     test_issue2.save()
     test_issue3.save()
@@ -292,22 +311,36 @@ class IssueUpdateViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
 
-    def test_issue_change_created_for_every_change_and_redirect(self):
+    def test_history_item_created_for_every_change_and_redirect(self):
         """Test editing existing issue. Then it checks whether correct amount of IssueChange objects were created."""
         start_of_the_test = timezone.now()
         _, repository_id, issue_id = self.logged_in_user_get_edit_view()
 
         response = self.client.post(reverse('issue-update', kwargs={'repository_id': repository_id, 'pk': issue_id}),
-                                    {'title': 'Changed test title', 'description': 'test',
-                                     'assignees': [], 'milestone': ''})
+                                    {'title': 'Changed test title', 'description': 'changed test desc',
+                                     'assignees': [], 'milestone': '', 'project': '', 'labels': []})
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/repository/{}/issues/{}/'.format(repository_id, issue_id))
         # Find all objects that have been changed since start of the test process
-        issue_change_objects = IssueChange.objects.filter(date__gt=start_of_the_test,
-                                                          message__contains=response.wsgi_request.user)
+        issue_change_objects = HistoryItem.objects.filter(date_changed__gt=start_of_the_test,
+                                                          belongs_to=response.wsgi_request.user)
         # Changed title and assignee list
-        self.assertEqual(len(issue_change_objects), 2)
+        self.assertEqual(len(issue_change_objects), 6)
+        for issue_change in issue_change_objects:
+            if issue_change.message.find('assignees') != -1:
+                self.assertEquals(issue_change.message, 'changed assignees')
+            elif issue_change.message.find('title') != -1:
+                self.assertEqual(issue_change.message, 'changed title from "test issue" to "Changed test title"')
+            elif issue_change.message.find('description') != -1:
+                self.assertEqual(issue_change.message, 'changed description')
+            elif issue_change.message.find('milestone') != -1:
+                self.assertEqual(issue_change.message, 'changed milestone from test milestone to None')
+            elif issue_change.message.find('project') != -1:
+                self.assertEqual(issue_change.message, 'changed project from test project to None')
+            elif issue_change.message.find('labels') != -1:
+                self.assertEqual(issue_change.message, 'changed labels')
+            self.assertEqual(issue_change.belongs_to, response.wsgi_request.user)
 
 
 class CloseIssueTet(TestCase):

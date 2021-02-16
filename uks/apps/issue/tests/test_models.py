@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
@@ -42,13 +43,13 @@ class IssueModelTest(TestCase):
 
     def test_toggle_issue_close_with_opened_issue(self):
         issue = Issue.objects.filter(closed=False)[0]
-        issue.toggle_issue_close()
+        issue.toggle_issue_close(User.objects.all()[0])
         issue.refresh_from_db()
         self.assertTrue(issue.closed is True)
 
     def test_toggle_issue_close_with_closed_issue(self):
         issue = Issue.objects.filter(closed=True)[0]
-        issue.toggle_issue_close()
+        issue.toggle_issue_close(User.objects.all()[0])
         issue.refresh_from_db()
         self.assertTrue(issue.closed is False)
 
@@ -63,6 +64,6 @@ class IssueModelTest(TestCase):
 
     def change_issue_status(self, status, closed):
         issue = Issue.objects.get(pk=4)
-        issue.change_status(status)
+        issue.change_status(status, User.objects.all()[0])
         self.assertEqual(issue.issue_status, status)
         self.assertTrue(issue.closed is closed)
