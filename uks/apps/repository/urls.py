@@ -1,7 +1,8 @@
 from django.urls import path, include
 
 from ..repository import views
-from ..repository.views import RepositoryDetailView, RepositorySettings, CollaboratorsDeleteView
+from ..repository.views import RepositoryDetailView, RepositorySettings, CollaboratorsDeleteView, ManageAccess, Options, \
+    RepositoryUpdateView
 
 urlpatterns = [
     path('<int:pk>/', RepositoryDetailView.as_view(), name='detail'),
@@ -15,5 +16,7 @@ urlpatterns = [
     path('delete/<int:pk>', CollaboratorsDeleteView.as_view(), name='collaborators-delete'),
     path('<int:repo_id>/projects/', include('apps.project.urls')),
     path('<int:id>/wiki/', include('apps.wiki.urls')),
-
+    path('<int:key>/manageAccess', ManageAccess, name='manage_access'),
+    path('<int:key>/options', Options, name='options'),
+    path('<int:pk>/edit', RepositoryUpdateView.as_view(), name='repository_update'),
 ]
