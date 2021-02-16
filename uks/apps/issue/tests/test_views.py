@@ -317,8 +317,8 @@ class IssueUpdateViewTest(TestCase):
         _, repository_id, issue_id = self.logged_in_user_get_edit_view()
 
         response = self.client.post(reverse('issue-update', kwargs={'repository_id': repository_id, 'pk': issue_id}),
-                                    {'title': 'Changed test title', 'description': 'test',
-                                     'assignees': [], 'milestone': ''})
+                                    {'title': 'Changed test title', 'description': 'changed test desc',
+                                     'assignees': [], 'milestone': '', 'project': '', 'labels': []})
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/repository/{}/issues/{}/'.format(repository_id, issue_id))
@@ -326,7 +326,21 @@ class IssueUpdateViewTest(TestCase):
         issue_change_objects = HistoryItem.objects.filter(date_changed__gt=start_of_the_test,
                                                           belongs_to=response.wsgi_request.user)
         # Changed title and assignee list
-        self.assertEqual(len(issue_change_objects), 2)
+        self.assertEqual(len(issue_change_objects), 6)
+        for issue_change in issue_change_objects:
+            if issue_change.message.find('assignees') != -1:
+                self.assertEquals(issue_change.message, 'changed assignees')
+            elif issue_change.message.find('title') != -1:
+                self.assertEqual(issue_change.message, 'changed title from "test issue" to "Changed test title"')
+            elif issue_change.message.find('description') != -1:
+                self.assertEqual(issue_change.message, 'changed description')
+            elif issue_change.message.find('milestone') != -1:
+                self.assertEqual(issue_change.message, 'changed milestone from test milestone to None')
+            elif issue_change.message.find('project') != -1:
+                self.assertEqual(issue_change.message, 'changed project from test project to None')
+            elif issue_change.message.find('labels') != -1:
+                self.assertEqual(issue_change.message, 'changed labels')
+            self.assertEqual(issue_change.belongs_to, response.wsgi_request.user)
 
 
 class CloseIssueTet(TestCase):
