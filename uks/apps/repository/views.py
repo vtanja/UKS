@@ -64,7 +64,6 @@ def detail(request, id):
     return render(request, 'repository/repoDetail.html', context)
 
 
-@login_required
 def get_branches(repository):
     api = get_github_api(repository)
     logger.info('Sending request for getting all branches of repository')
