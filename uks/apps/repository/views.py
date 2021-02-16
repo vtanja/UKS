@@ -1,5 +1,3 @@
-import datetime
-import http
 import json
 import logging
 import os
@@ -26,7 +24,6 @@ from ..user.models import HistoryItem
 
 logger = logging.getLogger('django')
 repo = 0
-
 
 
 def add_history_item(user, message):
@@ -194,7 +191,6 @@ def get_github_api(repository):
     return api
 
 
-
 @login_required
 def ManageAccess(request, key):
     repository = Repository.objects.get(id=key)
@@ -221,7 +217,6 @@ def Options(request, key):
 
 @login_required
 def add_collaborators(request):
-
     if request.method == 'POST':
         form = CollaboratorsForm(request.POST)
         if form.is_valid():

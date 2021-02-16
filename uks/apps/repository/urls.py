@@ -1,7 +1,7 @@
 from django.urls import path, include
 
-from uks.apps.repository.views import RepositoryDetailView, add_repository, repository_settings, add_collaborators, \
-    CollaboratorsDeleteView, ManageAccess, Options, RepositoryUpdateView, RepositoryDeleteView
+from ..repository.views import RepositoryDetailView, add_repository, add_collaborators, \
+    CollaboratorsDeleteView, ManageAccess, Options, RepositoryUpdateView, RepositoryDeleteView, RepositorySettings
 
 urlpatterns = [
     path('<int:pk>/', RepositoryDetailView.as_view(), name='detail'),
@@ -10,7 +10,7 @@ urlpatterns = [
     path('<int:repository_id>/issues/', include('apps.issue.urls')),
     path('<int:repo_id>/milestones/', include('apps.milestone.urls')),
     path('<int:id>/labels/', include('apps.label.urls')),
-    path('<int:key>/settings/', repository_settings, name='repository_settings'),
+    path('<int:key>/settings/', RepositorySettings, name='repository_settings'),
     path('addCollaborators/', add_collaborators, name='addCollaborators'),
     path('delete/<int:pk>', CollaboratorsDeleteView.as_view(), name='collaborators-delete'),
     path('<int:repo_id>/projects/', include('apps.project.urls')),
