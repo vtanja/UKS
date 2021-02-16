@@ -55,16 +55,16 @@ class WikiListViewTest(TestCase):
         fill_test_db()
 
     def request(self, repo_id):
-        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         return self.client.get(reverse('wiki-overview', kwargs={'id': repo_id}))
 
     def test_view_url_exists_at_desired_location_wiki_exist(self):
-        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         response = self.client.get('/repository/1/wiki/')
         self.assertEqual(response.status_code, 302)
 
     def test_view_url_exists_at_desired_location_wiki_not_exist(self):
-        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         response = self.client.get('/repository/4/wiki/')
         self.assertEqual(response.status_code, 200)
 
@@ -98,11 +98,11 @@ class WikiDeleteViewTest(TestCase):
         fill_test_db()
 
     def request(self, repo_id, wiki_id):
-        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         return  self.client.delete(reverse('wiki-delete', kwargs={'id': repo_id, 'pk': wiki_id}))
 
     def test_view_url_accessible_by_location(self):
-        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         response = self.client.delete('/repository/1/wiki/1/delete/')
         self.assertEqual(response.status_code, 302)
 
@@ -138,7 +138,7 @@ class WikiDetailViewTest(TestCase):
         fill_test_db()
 
     def request(self, repo_id, wiki_id):
-        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         return self.client.get(reverse('wiki-details', kwargs={'id': repo_id, 'pk': wiki_id}))
 
     def test_redirect_if_not_logged_in(self):
@@ -146,7 +146,7 @@ class WikiDetailViewTest(TestCase):
         self.assertRedirects(response, f'/welcome/login/?next=/repository/1/wiki/1/')
 
     def test_view_url_exists_at_desired_location(self):
-        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         response = self.client.get('/repository/1/wiki/1/')
         self.assertEqual(response.status_code, 200)
 
@@ -182,13 +182,13 @@ class CreateWikiViewTest(TestCase):
         fill_test_db()
 
     def request(self, repo_id):
-        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         return self.client.get(reverse('wiki-add', kwargs={'id': repo_id}))
 
     def request_post(self, repo_id):
-        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         return self.client.post(reverse('wiki-add', kwargs={'id': repo_id}),
-                                    {'title': 'Test wiki', 'content': 'Test description'})
+                                    {'title': 'Test wiki 4', 'content': 'Test description'})
 
     def test_redirect_if_user_not_logged_in(self):
         response = self.client.get('/repository/1/wiki/add/')
@@ -196,11 +196,11 @@ class CreateWikiViewTest(TestCase):
 
     def test_redirect_if_user_not_logged_in_creates_wiki(self):
         response = self.client.post(reverse('wiki-add', kwargs={'id': 1}),
-                                    {'title': 'Test wiki', 'content': 'Test description'})
+                                    {'title': 'Test wiki 3', 'content': 'Test description'})
         self.assertRedirects(response, '/welcome/login/?next=/repository/1/wiki/add/')
 
     def test_view_url_exists_at_desired_location(self):
-        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         response = self.client.get('/repository/1/wiki/add/')
         self.assertEqual(response.status_code, 200)
 
@@ -254,13 +254,13 @@ class WikiUpdateViewTest(TestCase):
         fill_test_db()
 
     def get_request(self, repo_id, wiki_id):
-        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         return self.client.get(reverse('wiki-update', kwargs={'id': repo_id, 'pk': wiki_id}))
 
     def post_request(self, repo_id, wiki_id):
-        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         return self.client.post(reverse('wiki-update', kwargs={'id': 1, 'pk': 1}),
-                                    {'title': 'Test wiki', 'content': 'Test description 2'})
+                                    {'title': 'Test wiki 1', 'content': 'Test description 2'})
 
     def test_redirect_if_user_not_logged_in(self):
         response = self.client.get('/repository/1/wiki/1/edit/')
@@ -268,11 +268,11 @@ class WikiUpdateViewTest(TestCase):
 
     def test_redirect_if_user_not_logged_in_updates_wiki(self):
         response = self.client.post(reverse('wiki-update', kwargs={'id': 1, 'pk': 1}),
-                                    {'title': 'Test wiki', 'content': 'Test description 2'})
+                                    {'title': 'Test wiki 2', 'content': 'Test description 2'})
         self.assertRedirects(response, '/welcome/login/?next=/repository/1/wiki/1/edit/')
 
     def test_view_url_exists_at_desired_location(self):
-        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         response = self.client.get('/repository/1/wiki/1/edit/')
         self.assertEqual(response.status_code, 200)
 
