@@ -165,3 +165,9 @@ class ProjectDetailViewTest(TestCase):
             self.assertIn(i, response.context['issues'])
         for i in response.context['issues']:
             self.assertEqual(i.repository, Repository.objects.all()[0])
+
+    def test_issue_dictionary(self):
+        response = self.get_project_details_response(0, 0)
+        issues = Issue.objects.filter(repository=Repository.objects.all()[0])
+        for i in issues:
+            self.assertIn(i, response.context['issue_dict'][i.issue_status])
