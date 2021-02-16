@@ -74,7 +74,7 @@ class WikiListViewTest(TestCase):
 
     def test_redirect_if_not_logged_in(self):
         response = self.client.get(reverse('wiki-overview', kwargs={'id': 1}))
-        self.assertRedirects(response, f'/welcome/login/?next=/repository/1/wiki/')
+        self.assertRedirects(response, '/welcome/login/?next=/repository/1/wiki/')
 
     def test_view_uses_correct_template(self):
         response = self.request(4)
@@ -112,7 +112,7 @@ class WikiDeleteViewTest(TestCase):
 
     def test_redirect_if_not_logged_in(self):
         response = self.client.get(reverse('wiki-delete', kwargs={'id': 1, 'pk': 1}))
-        self.assertRedirects(response, f'/welcome/login/?next=/repository/1/wiki/1/delete/')
+        self.assertRedirects(response, '/welcome/login/?next=/repository/1/wiki/1/delete/')
 
     def test_deleting_non_existent_wiki(self):
         wiki_id = Wiki.objects.all().count()+1
@@ -139,7 +139,7 @@ class WikiDetailViewTest(TestCase):
 
     def test_redirect_if_not_logged_in(self):
         response = self.client.get(reverse('wiki-details', kwargs={'id': 1, 'pk': 1}))
-        self.assertRedirects(response, f'/welcome/login/?next=/repository/1/wiki/1/')
+        self.assertRedirects(response, '/welcome/login/?next=/repository/1/wiki/1/')
 
     def test_view_url_exists_at_desired_location(self):
         self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
