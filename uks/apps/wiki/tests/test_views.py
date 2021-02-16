@@ -3,8 +3,10 @@ from django.contrib.auth.models import User
 from django.http import Http404
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.repository.models import Repository
+from apps.user.models import HistoryItem
 from apps.wiki.models import Wiki
 
 USER_USERNAME = 'testuser'
@@ -95,6 +97,17 @@ class WikiDeleteViewTest(TestCase):
     def setUpTestData(cls):
         fill_test_db()
 
+
+    def test_view_url_accessible_by_location(self):
+        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        response = self.client.delete('/repository/1/wiki/1/delete/')
+        self.assertEqual(response.status_code, 302)
+
+    def test_view_url_accessible_by_name(self):
+        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        response = self.client.delete(reverse('wiki-delete', kwargs={'id': 1, 'pk': 1}))
+        self.assertEqual(response.status_code, 302)
+
     def test_redirect_if_not_logged_in(self):
         response = self.client.get(reverse('wiki-delete', kwargs={'id': 1, 'pk': 1}))
         self.assertRedirects(response, f'/welcome/login/?next=/repository/1/wiki/1/delete/')
@@ -103,6 +116,21 @@ class WikiDeleteViewTest(TestCase):
         self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         response = self.client.delete(reverse('wiki-delete', kwargs={'id': 1, 'pk': 1}))
         self.assertEqual(response.status_code, 302)
+
+    def test_deleting_non_existent_wiki(self):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        wiki_id = Wiki.objects.all().count()+1
+        response = self.client.delete(reverse('wiki-delete', kwargs={'id': 1, 'pk': wiki_id}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_history_item_added_on_delete(self):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        start_of_the_test = timezone.now()
+        response = self.client.delete(reverse('wiki-delete', kwargs={'id': 1, 'pk': 1}))
+        self.assertEqual(response.status_code, 302)
+        change = HistoryItem.objects.filter(dateChanged__gt=start_of_the_test, belongsTo=response.wsgi_request.user,
+                                                )
+        self.assertEqual(len(change), 1)
 
 
 class WikiDetailViewTest(TestCase):
@@ -113,6 +141,11 @@ class WikiDetailViewTest(TestCase):
     def test_redirect_if_not_logged_in(self):
         response = self.client.get(reverse('wiki-details', kwargs={'id': 1, 'pk': 1}))
         self.assertRedirects(response, f'/welcome/login/?next=/repository/1/wiki/1/')
+
+    def test_view_url_exists_at_desired_location(self):
+        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        response = self.client.get('/repository/1/wiki/1/')
+        self.assertEqual(response.status_code, 200)
 
     def test_view_url_accessible_by_name(self):
         login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
@@ -141,6 +174,7 @@ class WikiDetailViewTest(TestCase):
         login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         response = self.client.get(reverse('wiki-details', kwargs={'id': 1, 'pk': 1}))
         self.assertTrue(response.context['wiki'] is not None)
+        self.assertEqual(response.context['wiki'], Wiki.objects.all()[0])
 
 
 class CreateWikiViewTest(TestCase):
@@ -152,6 +186,21 @@ class CreateWikiViewTest(TestCase):
     def test_redirect_if_user_not_logged_in(self):
         response = self.client.get('/repository/1/wiki/add/')
         self.assertRedirects(response, '/welcome/login/?next=/repository/1/wiki/add/')
+
+    def test_redirect_if_user_not_logged_in_creates_wiki(self):
+        response = self.client.post(reverse('wiki-add', kwargs={'id': 1}),
+                                    {'title': 'Test wiki', 'content': 'Test description'})
+        self.assertRedirects(response, '/welcome/login/?next=/repository/1/wiki/add/')
+
+    def test_view_url_exists_at_desired_location(self):
+        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        response = self.client.get('/repository/1/wiki/add/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_url_accessible_by_name(self):
+        login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        response = self.client.get(reverse('wiki-add', kwargs={'id': 1}))
+        self.assertEqual(response.status_code, 200)
 
     def test_view_shows_correct_template(self):
         self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
@@ -181,6 +230,26 @@ class CreateWikiViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, WIKI_FORM)
 
+    def test_if_correct_repo_is_loaded(self):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        response = self.client.get(reverse('wiki-add', kwargs={'id': 1}))
+
+        repository = Repository.objects.get(id=1)
+        self.assertEqual(response.context['repository'], repository )
+        self.assertEqual(len(response.context['wikis']), Wiki.objects.filter(repository=repository).count())
+        for wiki in response.context['wikis']:
+            self.assertEqual(wiki.repository, repository)
+
+    def test_history_item_added_on_create(self):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        start_of_the_test = timezone.now()
+        response = self.client.post(reverse('wiki-add', kwargs={'id': 1}),
+                                        {'title': 'Test wiki', 'content': 'Test description'})
+        self.assertEqual(response.status_code, 302)
+        change = HistoryItem.objects.filter(dateChanged__gt=start_of_the_test, belongsTo=response.wsgi_request.user,
+                                                message__contains='created')
+        self.assertEqual(len(change), 1)
+
 
 class WikiUpdateViewTest(TestCase):
     @classmethod
@@ -191,7 +260,12 @@ class WikiUpdateViewTest(TestCase):
         response = self.client.get('/repository/1/wiki/1/edit/')
         self.assertRedirects(response, '/welcome/login/?next=/repository/1/wiki/1/edit/')
 
-    def test_view_url_exists_at_desired_locationt(self):
+    def test_redirect_if_user_not_logged_in_updates_wiki(self):
+        response = self.client.post(reverse('wiki-update', kwargs={'id': 1, 'pk': 1}),
+                                    {'title': 'Test wiki', 'content': 'Test description 2'})
+        self.assertRedirects(response, '/welcome/login/?next=/repository/1/wiki/1/edit/')
+
+    def test_view_url_exists_at_desired_location(self):
         login = self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         response = self.client.get('/repository/1/wiki/1/edit')
         self.assertEqual(response.status_code, 301)
@@ -230,3 +304,15 @@ class WikiUpdateViewTest(TestCase):
 
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
+
+    def test_history_item_added_on_update(self):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        start_of_the_test = timezone.now()
+        response = self.client.post(reverse('wiki-update', kwargs={'id': 1, 'pk': 1}),
+                                    {'title': 'Test wiki', 'content': 'Test description 2'})
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/repository/1/wiki/1/')
+        change = HistoryItem.objects.filter(dateChanged__gt=start_of_the_test, belongsTo=response.wsgi_request.user,
+                                                          message__contains='changed')
+        # Changed title and assignee list
+        self.assertEqual(len(change), 1)
