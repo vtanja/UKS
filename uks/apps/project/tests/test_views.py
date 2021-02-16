@@ -53,3 +53,25 @@ class ProjectListViewTest(TestCase):
     def test_project_count_in_repository_with_no_projects(self):
         response = self.get_repository_projects_response(1)
         self.assertEqual(len(response.context['project_list']), 0)
+
+
+class ProjectCreateViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        fill_test_data()
+
+    def get_create_project_response(self, repo_id=0):
+        repo_id = get_repository_id(repo_id)
+        self.client.login(username='user1', password='aBcDeF1234')
+        response = self.client.get(reverse('create_project', kwargs={'repo_id': repo_id}))
+        return response
+
+    def test_view_url_exists_at_desired_location(self):
+        repo_id = get_repository_id(0)
+        self.client.login(username='user1', password='aBcDeF1234')
+        response = self.client.get('/repository/{}/projects/add/'.format(repo_id))
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_url_accessible_by_name(self):
+        response = self.get_create_project_response()
+        self.assertEqual(response.status_code, 200)
