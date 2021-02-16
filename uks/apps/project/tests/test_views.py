@@ -80,3 +80,9 @@ class ProjectCreateViewTest(TestCase):
         response = self.get_create_project_response()
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'project/project_create.html')
+
+    def test_user_not_logged_in(self):
+        repo_id = get_repository_id(0)
+        response = self.client.get(reverse('create_project', kwargs={'repo_id': repo_id}))
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/welcome/login/?next=/repository/{}/projects/add/'.format(repo_id))
