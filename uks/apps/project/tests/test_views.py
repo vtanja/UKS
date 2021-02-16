@@ -204,3 +204,10 @@ class ProjectDeleteViewTest(TestCase):
         response = self.get_project_delete_response()
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'project/project_delete.html')
+
+    def test_user_not_logged_in(self):
+        repo_id, proj_id = get_repository_and_project_id()
+        response = self.client.get(reverse('project_delete', kwargs={'repo_id': repo_id, 'pk': proj_id}))
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response,
+                             '/welcome/login/?next=/repository/{}/projects/{}/delete'.format(repo_id, proj_id))
