@@ -131,3 +131,8 @@ class ProjectDetailViewTest(TestCase):
     def test_view_url_accessible_by_name(self):
         response = self.get_project_details_response()
         self.assertEqual(response.status_code, 200)
+
+    def test_view_uses_correct_template(self):
+        response = self.get_project_details_response()
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'project/project_details.html')
