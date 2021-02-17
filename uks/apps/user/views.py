@@ -1,22 +1,21 @@
 import logging
 
+from apps.issue.models import Issue
+from apps.repository.forms import RepositoryForm
+from apps.repository.models import Repository
+from apps.user.forms import ProfileImageUpdateForm
+from apps.user.models import HistoryItem
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, \
     PasswordResetCompleteView
 from django.db.models import Q
 from django.shortcuts import render, redirect
-from django.contrib import messages
 from django.views.generic import ListView
-
-from apps.repository.forms import RepositoryForm
-from apps.user.forms import ProfileImageUpdateForm
-from apps.repository.models import Repository
-from apps.issue.models import Issue
 from security.models import SiteUser
 
 logger = logging.getLogger('django')
-
 
 @login_required
 def dashboard(request):
@@ -25,7 +24,7 @@ def dashboard(request):
     logger.info('Getting all repositories of user initialized!')
     repositories = all_users_repositories(request)
     logger.info('Getting user activity initialized!')
-    history = request.user.historyitem_set.all().order_by('-dateChanged')
+    history = HistoryItem.objects.filter(belongs_to=request.user, changed_issue__isnull=True).order_by('-date_changed')
     context = {'repositories': repositories, 'history': history, 'form': form}
     return render(request, 'user/dashboard.html', context)
 
@@ -52,8 +51,8 @@ def profile(request, pk):
     logger.info('Getting all issues of user initialized!')
     context['issues'] = Issue.objects.filter(created_by=request.user, closed=False)
 
-    if (ret_val == "redirect"):
-        return redirect('profile')
+    if ret_val == "redirect":
+        return redirect('profile', pk)
     else:
         context['p_form'] = ret_val
 
@@ -86,8 +85,10 @@ class AllIssuesListView(LoginRequiredMixin, ListView):
         return Issue.objects.filter(Q(assignees__in=[self.request.user]) | Q(created_by=self.request.user)) \
             .filter(closed=False)
 
+
 class MyPasswordResetView(LoginRequiredMixin, PasswordResetView):
     template_name = 'user/password_reset.html'
+
 
 class MyPasswordResetDoneView(LoginRequiredMixin, PasswordResetDoneView):
     template_name = 'user/password_reset_done.html'
