@@ -1,6 +1,11 @@
 {% extends 'repository/repoDetail.html' %}
 
 {% block repo-content %}
+    <style type="text/css">
+        .custom-card:hover {
+            box-shadow: 2px 2px 13px rgba(205, 205, 205, 0.64);
+        }
+    </style>
     <div class="container" style="padding: 7mm;">
         <div class="row">
             <div class="col">
@@ -10,7 +15,7 @@
     </div>
     <div class="container">
         {% for milestone in milestone_list %}
-            <div class="card" style="width: 100%" >
+            <div class="card custom-card" style="width: 100%; background-color: #f5f5f5" >
                 <div class="card-body">
                     <div style="display: flex; height: fit-content" class="row">
                         <div class="col" style="text-align: left;">
