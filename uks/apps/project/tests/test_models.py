@@ -8,9 +8,15 @@ from apps.project.models import Project
 from django.urls import reverse
 
 
+USER1_USERNAME = 'user1'
+USER2_USERNAME = 'user2'
+USER1_PASSWORD = 'aBcDeF1234'
+USER2_PASSWORD = 'GhIjKl1234'
+
+
 def fill_test_data():
-    user1 = User.objects.create_user(username='user1', password='aBcDeF1234')
-    user2 = User.objects.create_user(username='user2', password='GhIjKl1234')
+    user1 = User.objects.create_user(username=USER1_USERNAME, password=USER1_PASSWORD)
+    user2 = User.objects.create_user(username=USER2_USERNAME, password=USER2_PASSWORD)
     user1.save()
     user2.save()
 

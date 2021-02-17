@@ -6,6 +6,12 @@ from apps.project.models import Project
 from apps.issue.models import Issue
 
 
+USER1_USERNAME = 'user1'
+USER2_USERNAME = 'user2'
+USER1_PASSWORD = 'aBcDeF1234'
+USER2_PASSWORD = 'GhIjKl1234'
+
+
 def get_repository_id(repo_id=0):
     if repo_id < len(Repository.objects.all()):
         repo_id = Repository.objects.all()[repo_id].id
@@ -41,13 +47,13 @@ class ProjectListViewTest(TestCase):
 
     def get_repository_projects_response(self, repo_id=0):
         repo_id = get_repository_id(repo_id)
-        self.client.login(username='user1', password='aBcDeF1234')
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.get(reverse('repository_projects', kwargs={'repo_id': repo_id}))
         return response
 
     def test_view_url_exists_at_desired_location(self):
         repo_id = get_repository_id(0)
-        self.client.login(username='user1', password='aBcDeF1234')
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.get('/repository/{}/projects/'.format(repo_id))
         self.assertEqual(response.status_code, 200)
 
@@ -96,13 +102,13 @@ class ProjectCreateViewTest(TestCase):
 
     def get_create_project_response(self, repo_id=0):
         repo_id = get_repository_id(repo_id)
-        self.client.login(username='user1', password='aBcDeF1234')
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.get(reverse('create_project', kwargs={'repo_id': repo_id}))
         return response
 
     def test_view_url_exists_at_desired_location(self):
         repo_id = get_repository_id(0)
-        self.client.login(username='user1', password='aBcDeF1234')
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.get('/repository/{}/projects/add/'.format(repo_id))
         self.assertEqual(response.status_code, 200)
 
@@ -130,7 +136,7 @@ class ProjectCreateViewTest(TestCase):
 
     def test_successfully_added(self):
         repo_id = get_repository_id(0)
-        self.client.login(username='user1', password='aBcDeF1234')
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.post(reverse('create_project', kwargs={'repo_id': repo_id}),
                                     {'name': 'test project', 'description': 'test description'})
         self.assertEqual(response.status_code, 302)
@@ -138,7 +144,7 @@ class ProjectCreateViewTest(TestCase):
 
     def test_add_to_non_existent_repository(self):
         repo_id = get_repository_id(10)
-        self.client.login(username='user1', password='aBcDeF1234')
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.post(reverse('create_project', kwargs={'repo_id': repo_id}),
                                     {'name': 'test project', 'description': 'test description'})
         self.assertEqual(response.status_code, 404)
@@ -156,13 +162,13 @@ class ProjectDetailViewTest(TestCase):
 
     def get_project_details_response(self, repo_id=0, pk=0):
         repo_id, pk = get_repository_and_project_id(repo_id, pk)
-        self.client.login(username='user1', password='aBcDeF1234')
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.get(reverse('project_details', kwargs={'repo_id': repo_id, 'pk': pk}))
         return response
 
     def test_view_url_exists_at_desired_location(self):
         repo_id, proj_id = get_repository_and_project_id()
-        self.client.login(username='user1', password='aBcDeF1234')
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.get('/repository/{}/projects/{}/'.format(repo_id, proj_id))
         self.assertEqual(response.status_code, 200)
 
@@ -219,19 +225,19 @@ class ProjectDeleteViewTest(TestCase):
 
     def get_project_delete_response(self, repo_id=0, pk=0):
         repo_id, pk = get_repository_and_project_id(repo_id, pk)
-        self.client.login(username='user1', password='aBcDeF1234')
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.get(reverse('project_delete', kwargs={'repo_id': repo_id, 'pk': pk}))
         return response
 
     def post_response(self, repo_id=0, pk=0):
         repo_id, pk = get_repository_and_project_id(repo_id, pk)
-        self.client.login(username='user1', password='aBcDeF1234')
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.delete(reverse('project_delete', kwargs={'repo_id': repo_id, 'pk': pk}))
         return response
 
     def test_view_url_exists_at_desired_location(self):
         repo_id, proj_id = get_repository_and_project_id()
-        self.client.login(username='user1', password='aBcDeF1234')
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.get('/repository/{}/projects/{}/delete'.format(repo_id, proj_id))
         self.assertEqual(response.status_code, 200)
 
@@ -290,20 +296,20 @@ class ProjectUpdateViewTest(TestCase):
 
     def get_project_update_response(self, repo_id=0, pk=0):
         repo_id, pk = get_repository_and_project_id(repo_id, pk)
-        self.client.login(username='user1', password='aBcDeF1234')
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.get(reverse('project_update', kwargs={'repo_id': repo_id, 'pk': pk}))
         return response
 
     def post_response(self, repo_id=0, pk=0):
         repo_id, pk = get_repository_and_project_id(repo_id, pk)
-        self.client.login(username='user1', password='aBcDeF1234')
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.post(reverse('project_update', kwargs={'repo_id': repo_id, 'pk': pk}),
                                     {'name': 'edited test name', 'description': 'edited test description'})
         return response
 
     def test_view_url_exists_at_desired_location(self):
         repo_id, proj_id = get_repository_and_project_id()
-        self.client.login(username='user1', password='aBcDeF1234')
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.get('/repository/{}/projects/{}/update'.format(repo_id, proj_id))
         self.assertEqual(response.status_code, 200)
 
@@ -364,7 +370,7 @@ class ChangeIssueStatusTest(TestCase):
     def send_ajax_request(self, repo_id=0, issue_id=0, status='DONE'):
         repo_id = get_repository_id(repo_id)
         issue_id = get_issue_id(issue_id)
-        self.client.login(username='user1', password='aBcDeF1234')
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.get(reverse('update_issue', kwargs={'repo_id': repo_id}),
                                    {'i_id': issue_id, 'list_id': status}, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
         return response
@@ -382,7 +388,7 @@ class ChangeIssueStatusTest(TestCase):
     def test_view_url_exists_at_desired_location(self):
         repo_id = get_repository_id()
         issue_id = Issue.objects.all()[0].id
-        self.client.login(username='user1', password='aBcDeF1234')
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.get('/repository/{}/projects/ajax/update_issue/'.format(repo_id),
                                    {'i_id': issue_id, 'list_id': 'DONE'}, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
         self.assertEqual(response.status_code, 200)
