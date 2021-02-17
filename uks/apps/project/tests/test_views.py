@@ -134,7 +134,7 @@ class ProjectCreateViewTest(TestCase):
     def test_unauthenticated_user_adds_project(self):
         repo_id = get_repository_id(0)
         response = self.client.post(reverse('create_project', kwargs={'repo_id': repo_id}),
-                                    {'name': 'test project', 'description': 'test description'})
+                                    {'name': 'new test project', 'description': 'test'})
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/welcome/login/?next=/repository/{}/projects/add/'.format(repo_id))
 
@@ -142,7 +142,7 @@ class ProjectCreateViewTest(TestCase):
         repo_id = get_repository_id(0)
         self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.post(reverse('create_project', kwargs={'repo_id': repo_id}),
-                                    {'name': 'test project', 'description': 'test description'})
+                                    {'name': 'new project test', 'description': 'description'})
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, get_all_projects_url(0))
 
@@ -150,7 +150,7 @@ class ProjectCreateViewTest(TestCase):
         repo_id = get_repository_id(10)
         self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.post(reverse('create_project', kwargs={'repo_id': repo_id}),
-                                    {'name': 'test project', 'description': 'test description'})
+                                    {'name': 'test new project', 'description': 'test description'})
         self.assertEqual(response.status_code, 404)
 
     def test_correct_repository_loaded(self):
