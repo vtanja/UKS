@@ -368,3 +368,13 @@ class ChangeIssueStatusTest(TestCase):
         response = self.client.get(reverse('update_issue', kwargs={'repo_id': repo_id}),
                                    {'i_id': issue_id, 'list_id': status}, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
         return response
+
+    def test_user_not_logged_in(self):
+        repo_id = get_repository_id()
+        issue_id = Issue.objects.all()[0].id
+        response = self.client.get(reverse('update_issue', kwargs={'repo_id': repo_id}),
+                                   {'i_id': issue_id, 'list_id': 'DONE'}, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response,
+                             '/welcome/login/?next=/repository/{}/projects/ajax/update_issue/%3Fi_id%3D{}%26list_id%3DDONE'
+                             .format(repo_id, issue_id))
