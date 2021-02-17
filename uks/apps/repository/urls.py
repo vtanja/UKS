@@ -14,7 +14,6 @@ urlpatterns = [
     path('addCollaborators/', add_collaborators, name='addCollaborators'),
     path('delete/<int:pk>', CollaboratorsDeleteView.as_view(), name='collaborators-delete'),
     path('<int:repo_id>/projects/', include('apps.project.urls')),
-    path('<int:id>/wiki/', include('apps.wiki.urls')),
     path('<int:key>/manageAccess', manage_access, name='manage_access'),
     path('<int:key>/options', options, name='options'),
     path('<int:pk>/edit', RepositoryUpdateView.as_view(), name='repository_update'),

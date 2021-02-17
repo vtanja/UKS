@@ -92,7 +92,7 @@ class CreateWikiView(LoginRequiredMixin, CreateView):
         wiki = get_object_or_404(Wiki, id=self.object.id)
         self.change.changed_wiki_object = wiki
         self.change.save()
-        return reverse_lazy('wiki-overview', kwargs={'id': self.kwargs['repo_id']})
+        return reverse_lazy('wiki-overview', kwargs={'repo_id': self.kwargs['repo_id']})
 
 
 class WikiUpdateView(LoginRequiredMixin, UpdateView):
@@ -126,7 +126,7 @@ class WikiUpdateView(LoginRequiredMixin, UpdateView):
         wiki = get_object_or_404(Wiki, id=self.object.id)
         change.changed_wiki_object = wiki
         change.save()
-        return reverse_lazy('wiki-details', kwargs={'id': self.kwargs['repo_id'], 'pk': self.kwargs['pk']})
+        return reverse_lazy('wiki-details', kwargs={'repo_id': self.kwargs['repo_id'], 'pk': self.kwargs['pk']})
 
 
 class WikiDeleteView(LoginRequiredMixin, DeleteView):
@@ -137,7 +137,7 @@ class WikiDeleteView(LoginRequiredMixin, DeleteView):
         change.save()
         logger.info('Wiki [%s] has been deleted successfully!', self.kwargs['pk'])
         logger.info('Routing to all wikis after deleting wiki!')
-        return reverse_lazy('wiki-overview', kwargs={'id': self.kwargs['repo_id']})
+        return reverse_lazy('wiki-overview', kwargs={'repo_id': self.kwargs['repo_id']})
 
 
 class HistoryListView(LoginRequiredMixin, ListView):
