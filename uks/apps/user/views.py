@@ -52,8 +52,8 @@ def profile(request, pk):
     logger.info('Getting all issues of user initialized!')
     context['issues'] = Issue.objects.filter(created_by=request.user, closed=False)
 
-    if (ret_val == "redirect"):
-        return redirect('profile')
+    if ret_val == "redirect":
+        return redirect('profile', user.pk)
     else:
         context['p_form'] = ret_val
 
