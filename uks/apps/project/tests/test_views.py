@@ -1,10 +1,10 @@
+from apps.issue.models import Issue
+from apps.project.models import Project
+from apps.repository.models import Repository
 from django.test import TestCase
 from django.urls import reverse
-from .test_models import fill_test_data
-from apps.repository.models import Repository
-from apps.project.models import Project
-from apps.issue.models import Issue
 
+from .test_models import fill_test_data
 
 USER1_USERNAME = 'user1'
 USER2_USERNAME = 'user2'
@@ -284,7 +284,6 @@ class ProjectDeleteViewTest(TestCase):
 
     def test_successfully_deleted(self):
         response = self.post_response(0, 0)
-        repo_id = get_repository_id(0)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, get_all_projects_url(0))
 
@@ -357,7 +356,6 @@ class ProjectUpdateViewTest(TestCase):
 
     def test_successfully_updated(self):
         response = self.post_response(0, 0)
-        repo_id = get_repository_id(0)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, get_all_projects_url(0))
 
