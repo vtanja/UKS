@@ -34,8 +34,8 @@ class CreateTagView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.repository = get_object_or_404(Repository, id=self.kwargs['id'])
-        branchName = form.cleaned_data['branch']
-        branches = Branch.objects.filter(name=branchName)
+        branch_name = form.cleaned_data['branch']
+        branches = Branch.objects.filter(name=branch_name)
         branch = branches.get(repository=form.instance.repository)
         commits = Commit.objects.filter(branches__id=branch.id)
         commits = commits.extra(order_by=['-date'])
