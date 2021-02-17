@@ -14,6 +14,6 @@ urlpatterns = [
     path('addCollaborators/', views.add_collaborators, name='addCollaborators'),
     path('delete/<int:pk>', CollaboratorsDeleteView.as_view(), name='collaborators-delete'),
     path('<int:repo_id>/projects/', include('apps.project.urls')),
-    path('<int:id>/wiki/', include('apps.wiki.urls')),
+    path('<int:repo_id>/wiki/', include('apps.wiki.urls')),
 
 ]
