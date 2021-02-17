@@ -1,0 +1,16 @@
+{% extends 'repository/repoSettings.html' %}
+
+{% block repo-content %}
+  <div class="container" style="width: 50%">
+      <div class="card bg-light mb-3" style="max-width: 60rem;">
+          <div class="card-header"><h4>Delete repository: {{repository.name}}</h4></div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <h5 class="card-title">Are you sure you want to delete this repository?</h5>
+                    <button type="submit" class="btn btn-primary" value="DELETE">Yes</button>
+                </form>
+            </div>
+          </div>
+      </div>
+{% endblock %}

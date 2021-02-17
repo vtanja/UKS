@@ -2,6 +2,7 @@ import json
 import logging
 import os
 
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
@@ -9,10 +10,10 @@ from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import DetailView, DeleteView
+from django.views.generic import DetailView, DeleteView, UpdateView
 from ghapi.all import GhApi
 
-from .forms import RepositoryForm, CollaboratorsForm
+from .forms import RepositoryForm, CollaboratorsForm, RepositoryFormEdit
 from .models import Repository
 from ..branch.models import Branch
 from ..commit.models import Commit
@@ -20,6 +21,7 @@ from ..user.models import HistoryItem
 
 logger = logging.getLogger('django')
 repo = 0
+manageAccessUrl = 'repository/manageAccess.html'
 
 
 def add_history_item(user, message):
@@ -49,6 +51,7 @@ class RepositoryDetailView(DetailView):
         return context
 
 
+@login_required
 def detail(request, id):
     repositories = Repository.objects.filter(
         Q(owner=request.user) | Q(collaborators__username__in=[str(request.user)])
@@ -80,6 +83,7 @@ def get_repository_name_and_owner(repository):
     return repo_name, user
 
 
+@login_required
 def add_repository(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -110,6 +114,19 @@ def add_repository(request):
             print('Forma nije validna')
 
     return render(request, 'user/dashboard.html', {'form': form})
+
+
+def manage_access(request, key):
+    repository = Repository.objects.get(id=key)
+    if not request.user == repository.owner:
+        return redirect('dashboard')
+    else:
+        global repo
+        repo = repository.id
+        users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
+        collabs = repository.collaborators.all()
+        context = {'repository': repository, 'users': users, 'collabs': collabs}
+        return render(request, manageAccessUrl, context)
 
 
 def get_commits(api, br):
@@ -171,16 +188,31 @@ def get_github_api(repository):
     return api
 
 
+@login_required
 def repository_settings(request, key):
     repository = Repository.objects.get(id=key)
-    global repo
-    repo = repository.id
-    users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
-    collabs = repository.collaborators.all()
-    context = {'repository': repository, 'users': users, 'collabs': collabs}
-    return render(request, 'repository/repoSettings.html', context)
+    if not request.user == repository.owner:
+        return redirect('dashboard')
+    else:
+        global repo
+        repo = repository.id
+        users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
+        collabs = repository.collaborators.all()
+        context = {'repository': repository, 'users': users, 'collabs': collabs}
+        return render(request, manageAccessUrl, context)
 
 
+@login_required
+def options(request, key):
+    repository = Repository.objects.get(id=key)
+    if not request.user == repository.owner:
+        return redirect('dashboard')
+    else:
+        context = {'repository': repository}
+        return render(request, 'repository/options.html', context)
+
+
+@login_required
 def add_collaborators(request):
     if request.method == 'POST':
         form = CollaboratorsForm(request.POST)
@@ -198,7 +230,7 @@ def add_collaborators(request):
     users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
     collabs = repository.collaborators.all()
     context = {'repository': repository, 'users': users, 'collabs': collabs}
-    return render(request, 'repository/repoSettings.html', context)
+    return render(request, manageAccessUrl, context)
 
 
 class CollaboratorsDeleteView(LoginRequiredMixin, DeleteView):
@@ -206,7 +238,6 @@ class CollaboratorsDeleteView(LoginRequiredMixin, DeleteView):
     template_name = "repository/deleteCollaborators.html"
 
     def get_context_data(self, **kwargs):
-        print('abc')
         self.repository = get_object_or_404(Repository, id=repo)
         context = super(CollaboratorsDeleteView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
@@ -224,10 +255,49 @@ class CollaboratorsDeleteView(LoginRequiredMixin, DeleteView):
         return redirect(success_url)
 
     def get_form_kwargs(self):
-        print('dfg')
         kwargs = super(CollaboratorsDeleteView, self).get_form_kwargs()
         kwargs['repository'] = get_object_or_404(Repository, id=repo)
         return kwargs
 
     def get_success_url(self):
-        return reverse_lazy('repository_settings', kwargs={'key': repo})
+        return reverse_lazy('manage_access', kwargs={'key': repo})
+
+
+class RepositoryUpdateView(LoginRequiredMixin, UpdateView):
+    model = Repository
+    template_name = "repository/repoUpdate.html"
+    form_class = RepositoryFormEdit
+
+    def get_context_data(self, **kwargs):
+        self.repository = get_object_or_404(Repository, id=self.kwargs['pk'])
+        context = super(RepositoryUpdateView, self).get_context_data(**kwargs)
+        context['repository'] = self.repository
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super(RepositoryUpdateView, self).get_form_kwargs()
+        kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['pk'])
+        return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy('options', kwargs={'key': repo})
+
+
+class RepositoryDeleteView(LoginRequiredMixin, DeleteView):
+    model = Repository
+    template_name = "repository/repositoryDelete.html"
+
+    def get_context_data(self, **kwargs):
+        self.repository = get_object_or_404(Repository, id=self.kwargs['pk'])
+        context = super(RepositoryDeleteView, self).get_context_data(**kwargs)
+        context['repository'] = self.repository
+        print(context)
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super(RepositoryDeleteView, self).get_form_kwargs()
+        kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['pk'])
+        return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy('dashboard')
