@@ -370,8 +370,6 @@ class ChangeIssueStatusTest(TestCase):
         fill_test_data()
 
     def send_ajax_request(self, repo_id=0, issue_id=0, status='DONE'):
-        repo_id = get_repository_id(repo_id)
-        issue_id = get_issue_id(issue_id)
         self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.get(reverse('update_issue', kwargs={'repo_id': repo_id}),
                                    {'i_id': issue_id, 'list_id': status}, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
@@ -396,31 +394,45 @@ class ChangeIssueStatusTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_view_url_accessible_by_name(self):
-        response = self.send_ajax_request(0, 1, 'ONGOING')
+        repo_id = get_repository_id(0)
+        issue_id = Issue.objects.filter(title='test issue 1').first().id
+        response = self.send_ajax_request(repo_id, issue_id, 'ONGOING')
         self.assertEqual(response.status_code, 200)
 
     def test_status_successfully_changed(self):
-        response = self.send_ajax_request(0, 2, 'TODO')
+        status = 'TODO'
+        repo_id = get_repository_id(0)
+        issue_id = Issue.objects.filter(title='test issue 3').first().id
+        response = self.send_ajax_request(repo_id, issue_id, status)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Issue.objects.all()[2].issue_status, 'TODO')
-        self.assertFalse(Issue.objects.all()[2].closed)
+        issue = Issue.objects.filter(title='test issue 3').first()
+        self.assertEqual(issue.issue_status, status)
+        self.assertFalse(issue.closed)
 
     def test_status_successfully_changed_and_reopened(self):
-        response = self.send_ajax_request(0, 4, 'TODO')
+        status = 'TODO'
+        repo_id = get_repository_id(0)
+        issue_id = Issue.objects.filter(title='test issue 5').first().id
+        response = self.send_ajax_request(repo_id, issue_id, status)
+        issue = Issue.objects.filter(title='test issue 5').first()
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Issue.objects.all()[4].issue_status, 'TODO')
-        self.assertFalse(Issue.objects.all()[4].closed)
+        self.assertEqual(issue.issue_status, status)
+        self.assertFalse(issue.closed)
 
     def test_status_successfully_changed_to_done_and_closed(self):
-        response = self.send_ajax_request(0, 3, 'DONE')
+        status = 'DONE'
+        repo_id = get_repository_id(0)
+        issue_id = Issue.objects.filter(title='test issue 4').first().id
+        response = self.send_ajax_request(repo_id, issue_id, status)
+        issue = Issue.objects.filter(title='test issue 4').first()
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Issue.objects.all()[3].issue_status, 'DONE')
-        self.assertTrue(Issue.objects.all()[3].closed)
+        self.assertEqual(issue.issue_status, 'DONE')
+        self.assertTrue(issue.closed)
         
     def test_change_status_to_incorrect_value(self):
-        response = self.send_ajax_request(0, 4, 'SOME_STATUS')
+        response = self.send_ajax_request(1, 4, 'SOME_STATUS')
         self.assertEqual(response.status_code, 400)
 
     def test_change_status_of_non_existent_issue(self):
-        response = self.send_ajax_request(0, 44, 'TODO')
+        response = self.send_ajax_request(1, 44, 'TODO')
         self.assertEqual(response.status_code, 400)
