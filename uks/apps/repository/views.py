@@ -49,7 +49,7 @@ class RepositoryDetailView(DetailView):
 
         self.check_args()
 
-        commits = Commit.objects.filter(commit__branches=self.branch).order_by('-date')
+        commits = Commit.objects.filter(branches__in=[self.branch]).order_by('-date')
 
         context['commit_num'] = commits.count()
 
