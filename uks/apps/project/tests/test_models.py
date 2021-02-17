@@ -79,3 +79,8 @@ class ProjectModelTests(TestCase):
     def test_object_name_is_name(self):
         project = Project.objects.get(pk=1)
         self.assertEqual(project.name, str(project))
+
+    def test_get_absolute_url(self):
+        project = Project.objects.get(pk=1)
+        self.assertEqual(project.get_absolute_url(),
+                         reverse('project_details', args=[str(project.repository.id), str(project.id)]))
