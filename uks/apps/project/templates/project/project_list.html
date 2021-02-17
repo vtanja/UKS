@@ -1,17 +1,23 @@
 {% extends 'repository/repoDetail.html' %}
 
 {% block repo-content %}
-    <div class="container" style="padding: 7mm;">
+    <style type="text/css">
+        .custom-card:hover {
+            cursor: pointer;
+            box-shadow: 2px 2px 13px rgba(205, 205, 205, 0.64);
+        }
+    </style>
+    <div class="container" style="width: 70%; padding: 5mm; margin-top: 2mm">
         <div class="row">
             <div class="col">
                 <a style="float: right" class="btn btn-success" href="{% url 'create_project' repository.id %}">New project</a>
             </div>
         </div>
     </div>
-    <div class="container">
+    <div class="container" style="width: 70%; padding: 5mm">
         {% for project in project_list %}
-            <div class="card" style="width: 100%" >
-                <div class="card-body">
+            <div class="card custom-card" style="width: 100%; background-color: #f5f5f5" >
+                <div class="card-body" style="padding: 7mm">
                     <div style="display: flex; height: fit-content" class="row">
                         <div class="col" style="text-align: left;">
                             <h4>
@@ -20,8 +26,8 @@
                             </h4>
                         </div>
                         <div class="col" style="text-align: right">
-                            <a href="{% url 'project_update' repository.id project.id %}">Edit</a>&nbsp;&nbsp;
-                            <a style="color: red" href="{% url 'project_delete' repository.id project.id %}">Delete</a>
+                            <a class="btn btn-secondary" href="{% url 'project_update' repository.id project.id %}"><em class="far fa-edit"></em>&nbsp;Edit</a>&nbsp;&nbsp;
+                            <a class="btn btn-danger" href="{% url 'project_delete' repository.id project.id %}"><em class="far fa-trash-alt"></em>&nbsp;Delete</a>
                         </div>
                     </div>
                 </div>

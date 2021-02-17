@@ -32,13 +32,17 @@
                             <div class="card-body">
                                 {% if item.changed_wiki_object %}
                                     <div class="card-text" >
-                                        <div style="float:left">{{ item.belongsTo.username }} &nbsp;{{ item.message }} <a href="{{ item.changed_wiki_object.get_absolute_url }}">wiki page</a></div>
+                                        <div style="float:left"><a href="{% url 'profile' item.belongs_to_id %}">{{ item.belongs_to.username }}  </a> &nbsp;{{ item.message }} <a href="{{ item.changed_wiki_object.get_absolute_url }}">wiki page</a></div>
                                         <em style="float: right">{{  item.get_time_of_change}}</em>
                                     </div>
-                                {% endif %}
-                                {% if item.changed_repo_object %}
+                                {% elif item.changed_repo_object %}
                                     <div class="card-text" >
-                                        <div style="float:left">{{ item.belongsTo.username }} &nbsp;{{ item.message }} <a href="{{ item.changed_repo_object.get_absolute_url }}">repository</a></div>
+                                        <div style="float:left"><a href="{% url 'profile' item.belongs_to_id %}">{{ item.belongs_to.username }}  </a> {{ item.message }} <a href="{{ item.changed_repo_object.get_absolute_url }}">repository</a></div>
+                                        <em style="float: right">{{  item.get_time_of_change}}</em>
+                                    </div>
+                                {% else %}
+                                    <div class="card-text" >
+                                        <div style="float:left">{{ item.belongsTo.username }} &nbsp;{{ item.message }}</div>
                                         <em style="float: right">{{  item.get_time_of_change}}</em>
                                     </div>
                                 {% endif %}
