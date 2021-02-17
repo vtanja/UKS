@@ -390,3 +390,21 @@ class ChangeIssueStatusTest(TestCase):
     def test_view_url_accessible_by_name(self):
         response = self.send_ajax_request(0, 1, 'ONGOING')
         self.assertEqual(response.status_code, 200)
+
+    def test_status_successfully_changed(self):
+        response = self.send_ajax_request(0, 2, 'TODO')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Issue.objects.all()[2].issue_status, 'TODO')
+        self.assertFalse(Issue.objects.all()[2].closed)
+
+    def test_status_successfully_changed_and_reopened(self):
+        response = self.send_ajax_request(0, 4, 'TODO')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Issue.objects.all()[4].issue_status, 'TODO')
+        self.assertFalse(Issue.objects.all()[4].closed)
+
+    def test_status_successfully_changed_to_done_and_closed(self):
+        response = self.send_ajax_request(0, 4, 'DONE')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Issue.objects.all()[4].issue_status, 'DONE')
+        self.assertTrue(Issue.objects.all()[4].closed)
