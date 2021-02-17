@@ -3,6 +3,7 @@ import json
 from apps.issue.models import Issue
 from apps.project.models import Project
 from apps.repository.models import Repository
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -72,13 +73,21 @@ class ProjectDetailView(LoginRequiredMixin, DetailView):
         return super().dispatch(request, *args, **kwargs)
 
 
+@login_required
 def update_issue(self, repo_id):
+    content = 'application/json'
     issue_id = self.GET.get('i_id')
     list_id = self.GET.get('list_id')
+    if list_id != 'TODO' and list_id != 'ONGOING' and list_id != 'DONE':
+        payload = {'success': False}
+        return HttpResponse(json.dumps(payload), content_type=content, status=400)
     issue = Issue.objects.filter(id=issue_id).first()
+    if not issue:
+        payload = {'success': False, 'status': 404}
+        return HttpResponse(json.dumps(payload), content_type=content, status=400)
     issue.change_status(list_id, self.user)
     payload = {'success': True}
-    return HttpResponse(json.dumps(payload), content_type='application/json')
+    return HttpResponse(json.dumps(payload), content_type=content)
 
 
 class ProjectUpdateView(LoginRequiredMixin, UpdateView):
