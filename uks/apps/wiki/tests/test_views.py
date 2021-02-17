@@ -21,28 +21,28 @@ WIKI_FORM = 'wiki/wiki_form.html'
 
 def fill_test_db():
     # Create users
-    test_user = User.objects.create_user(username=USER_USERNAME, password=USER_PASSWORD)
-    test_user1 = User.objects.create_user(username=USER1_USERNAME, password=USER1_PASSWORD)
-    test_user2 = User.objects.create_user(username=USER2_USERNAME, password=USER2_PASSWORD)
-    test_user.save()
-    test_user1.save()
-    test_user2.save()
+    user_test = User.objects.create_user(username=USER_USERNAME, password=USER_PASSWORD)
+    user_test1 = User.objects.create_user(username=USER1_USERNAME, password=USER1_PASSWORD)
+    user_test2 = User.objects.create_user(username=USER2_USERNAME, password=USER2_PASSWORD)
+    user_test.save()
+    user_test1.save()
+    user_test2.save()
 
     # Create repositories
-    test_repository = Repository.objects.create(name='test_repository', description='test', owner=test_user)
-    test_repository1 = Repository.objects.create(name='test_repository1', description='test2', owner=test_user)
-    test_repository2 = Repository.objects.create(name='test_repository2', description='desc', owner=test_user1)
-    test_repository3 = Repository.objects.create(name='test_repository 3', description='test', owner=test_user)
-    test_repository.save()
-    test_repository1.save()
-    test_repository2.save()
-    test_repository3.save()
+    repository_test = Repository.objects.create(name='test_repository', description='test', owner=user_test)
+    repository_test1 = Repository.objects.create(name='test_repository1', description='test2', owner=user_test)
+    repository_test2 = Repository.objects.create(name='test_repository2', description='desc', owner=user_test1)
+    repository_test3 = Repository.objects.create(name='test_repository 3', description='test', owner=user_test)
+    repository_test.save()
+    repository_test1.save()
+    repository_test2.save()
+    repository_test3.save()
 
     # Create issues and add them to repositories
-    test_wiki1 = Wiki.objects.create(title='test wiki 1', content='test 1 desc', repository=test_repository)
-    test_wiki2 = Wiki.objects.create(title='test wiki 2', content='test 2 desc', repository=test_repository)
-    test_wiki3 = Wiki.objects.create(title='test wiki 3', content='test 3 desc', repository=test_repository1)
-    test_wiki4 = Wiki.objects.create(title='test wiki 4', content='test 3 desc', repository=test_repository1)
+    test_wiki1 = Wiki.objects.create(title='test wiki 1', content='test 1 desc', repository=repository_test)
+    test_wiki2 = Wiki.objects.create(title='test wiki 2', content='test 2 desc', repository=repository_test)
+    test_wiki3 = Wiki.objects.create(title='test wiki 3', content='test 3 desc', repository=repository_test1)
+    test_wiki4 = Wiki.objects.create(title='test wiki 4', content='test 3 desc', repository=repository_test1)
 
     test_wiki1.save()
     test_wiki2.save()
