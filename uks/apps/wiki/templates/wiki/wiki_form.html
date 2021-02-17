@@ -4,11 +4,11 @@
 {% block dashboard %}
     <div class="container" style="width: 60%; align-self: center ">
         <br>
-        {% if 'edit' in request.path %}
+        {% if 'edit' in request.path  and request.user.is_authenticated %}
             <h3 style="float: left">Edit page</h3>
-            <a class="btn btn-danger" style="width: 10%; color: white; float: right; cursor: pointer;" data-toggle="modal" data-target="#modal">Delete</a> &nbsp;
+            <a class="btn btn-danger" style="min-width: auto; color: white; float: right; cursor: pointer;" data-toggle="modal" data-target="#modal">Delete</a> &nbsp;
             <div style="float:right;">&nbsp; &nbsp;</div>
-            <a class="btn btn-secondary" style="width: 10%; color: white; float:right;" href="{% url 'wiki-history' repository.id wiki.id %}">Show history</a> &nbsp; &nbsp;
+            <a class="btn btn-secondary" style="min-width: auto; color: white; float:right;" href="{% url 'wiki-history' repository.id wiki.id %}">Show history</a> &nbsp; &nbsp;
         {% else %}
             <h3>{% if 'add' in request.path %}Create new{% else %}Edit{% endif %} page</h3>
         {% endif %}
@@ -24,7 +24,7 @@
         </form>
     </div>
 
-{% if wiki %}
+{% if wiki and request.user.is_authenticated %}
 <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">

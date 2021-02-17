@@ -4,6 +4,7 @@ from datetime import date
 
 # Create your models here.
 from apps.repository.models import Repository
+from django.urls import reverse
 
 
 class Milestone(models.Model):
@@ -35,3 +36,6 @@ class Milestone(models.Model):
     def toggle_milestone_close(self):
         self.closed = not self.closed
         self.save()
+
+    def get_absolute_url(self):
+        return reverse('milestone_details', args=[str(self.repository_id), str(self.pk)])

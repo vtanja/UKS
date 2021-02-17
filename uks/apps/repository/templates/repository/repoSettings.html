@@ -1,0 +1,89 @@
+{% extends 'repository/repoDetail.html' %}
+
+{% block repo-content %}
+<div style="margin-left: 300pt;">
+<br>
+  <h3 style="text-align: left">Who has access</h3>
+  <br>
+  <div class="card-deck">
+    <div class="card col-3">
+      <div class="card-body">
+        <h5>Public repository <em class="fas fa-eye"></em></h5>
+        <p></p>
+        <p>This repository is public and visible to anyone.</p>
+        <a href="#">Manage</a>
+      </div>
+    </div>
+    <div class="card col-3">
+      <div class="card-body">
+        <h5>Direct access <em class="fas fa-user-friends"></em></h5>
+        <p></p>
+        <p>{{collabs.count}} collaborators have access to this repository.</p>
+      </div>
+    </div>
+  </div>
+  <br>
+  <h3 style="text-align: left">Manage access
+     <img alt="collaborators" src="https://github.githubassets.com/images/icons/permissions.png" style="width: 40px; height: 40px;">
+    <button style="margin-left: 450pt;" type="button" class="btn btn-success" data-toggle="modal" data-target="#repoDialog">Invite a collaborator</button>
+  </h3>
+  <p></p>
+  <div class="card col-8">
+    <div style="text-align: center">
+        {% if collabs.count == 0 %}
+            <img alt="collaborators" src="https://github.githubassets.com/images/icons/permissions.png" class="mb-3" style="width: 65px; height: 65px; text-align: center;">
+            <h3>You haven't invited any collaborators yet</h3>
+        {% endif %}
+        {% if collabs.count > 0 %}
+            {% for collaborator in collabs %}
+                <div class="row">
+                        <div class="col" style="text-align: left">
+                            <p>{{collaborator.first_name}} {{collaborator.last_name}}</p>
+                        </div>
+                        <div class="col" style="text-align: left">{{collaborator.username}}</div>
+                        <div class="col" style="text-align: center">{{collaborator.email}}</div>
+                        <div class="col" style="text-align: right">
+                            <a class="btn btn-link" href="{% url 'collaborators-delete' collaborator.id %}">Delete</a>
+                        </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+    </div>
+    <br>
+  </div>
+  <br><br><br>
+</div>
+
+<div class="modal fade" id="repoDialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Add collaborators for repository {{repository.name}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+         {% load crispy_forms_filters %}
+       <form method="post" action="{% url 'addCollaborators' %}">
+            <div class="modal-body">
+                 {% csrf_token %}
+                    <div>
+                        <label for="collaborators">Select collaborators</label>
+                         <select multiple class="form-control" id="collaborators" name="collaborators">
+                             {% for user1 in users %}
+                                <option id="{{user1.username}}" value="{{user1.username}}" >{{user1.username}}</option>
+                             {% endfor %}
+                         </select>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Add</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+       </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
