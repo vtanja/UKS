@@ -40,6 +40,11 @@ def get_repository_and_project_id(repo_id=0, pk=0):
     return repo_id, pk
 
 
+def get_all_projects_url(repo_id=0):
+    repo_id = get_repository_id(repo_id)
+    return '/repository/{}/projects/'.format(repo_id)
+
+
 class ProjectListViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -52,9 +57,8 @@ class ProjectListViewTest(TestCase):
         return response
 
     def test_view_url_exists_at_desired_location(self):
-        repo_id = get_repository_id(0)
         self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
-        response = self.client.get('/repository/{}/projects/'.format(repo_id))
+        response = self.client.get(get_all_projects_url(0))
         self.assertEqual(response.status_code, 200)
 
     def test_view_url_accessible_by_name(self):
@@ -140,7 +144,7 @@ class ProjectCreateViewTest(TestCase):
         response = self.client.post(reverse('create_project', kwargs={'repo_id': repo_id}),
                                     {'name': 'test project', 'description': 'test description'})
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '/repository/{}/projects/'.format(repo_id))
+        self.assertRedirects(response, get_all_projects_url(0))
 
     def test_add_to_non_existent_repository(self):
         repo_id = get_repository_id(10)
@@ -282,7 +286,7 @@ class ProjectDeleteViewTest(TestCase):
         response = self.post_response(0, 0)
         repo_id = get_repository_id(0)
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '/repository/{}/projects/'.format(repo_id))
+        self.assertRedirects(response, get_all_projects_url(0))
 
     def test_deleting_non_existent(self):
         response = self.post_response(0, 50)
@@ -355,7 +359,7 @@ class ProjectUpdateViewTest(TestCase):
         response = self.post_response(0, 0)
         repo_id = get_repository_id(0)
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '/repository/{}/projects/'.format(repo_id))
+        self.assertRedirects(response, get_all_projects_url(0))
 
     def test_updating_non_existent(self):
         response = self.post_response(0, 10)
