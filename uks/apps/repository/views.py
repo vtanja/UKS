@@ -11,6 +11,7 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import DetailView, DeleteView
 from ghapi.all import GhApi
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 from .forms import RepositoryForm, CollaboratorsForm
 from .models import Repository
@@ -44,9 +45,45 @@ class RepositoryDetailView(DetailView):
 
         qs = Branch.objects.filter(repository=self.repository)
         context["qs_json"] = json.dumps([obj.as_dict() for obj in qs])
-        context['first'] = Branch.objects.filter(Q(repository_id=self.repository.id)).first()
         context['show'] = True
+
+        self.check_args()
+
+        commits = Commit.objects.filter(commit__branches=self.branch).order_by('-date')
+
+        context['commit_num'] = commits.count()
+
+        context['branch'] = self.branch
+
+        paginator = Paginator(commits, 15)  # Show 25 contacts per page.
+
+        page_number = self.request.GET.get('page')
+        if page_number is None:
+            page_number = 1
+
+        page_obj = paginator.get_page(page_number)
+
+        context['page_obj'] = page_obj
+
+        commits = paginator.page(page_number)
+
+        context['commits'] = commits
+
         return context
+
+    def check_args(self):
+        if self.kwargs.keys().__contains__('branch_id'):
+            if self.kwargs['branch_id'] is not None:
+                self.branch = get_object_or_404(Branch, id=self.kwargs['branch_id'])
+        else:
+            if self.repository.branch_set.filter(name='main').count() != 0:
+                self.branch = Branch.objects.filter(repository_id=self.repository.id, name='main').get()
+            elif self.repository.branch_set.filter(name='master').count() != 0:
+                self.branch = Branch.objects.filter(repository_id=self.repository.id, name='master').get()
+            elif self.repository.branch_set.filter(name='develop').count() != 0:
+                self.branch = Branch.objects.filter(repository_id=self.repository.id, name='develop').get()
+            else:
+                self.branch = self.repository.branch_set.first()
 
 
 def detail(request, id):
