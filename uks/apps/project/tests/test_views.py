@@ -408,3 +408,11 @@ class ChangeIssueStatusTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Issue.objects.all()[4].issue_status, 'DONE')
         self.assertTrue(Issue.objects.all()[4].closed)
+        
+    def test_change_status_to_incorrect_value(self):
+        response = self.send_ajax_request(0, 4, 'SOME_STATUS')
+        self.assertEqual(response.status_code, 400)
+
+    def test_change_status_of_non_existent_issue(self):
+        response = self.send_ajax_request(0, 44, 'TODO')
+        self.assertEqual(response.status_code, 400)
