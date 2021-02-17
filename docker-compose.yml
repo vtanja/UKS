@@ -89,3 +89,38 @@ services:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     ports:
       - "5959:5959"
+
+# redis as a Django cache store
+  redis:
+    image: redis
+    container_name: uks_redis
+    expose:
+      - '6379'
+
+# TICK stack for metrics and grafana for visualisation
+  influxdb:
+    container_name: uks_influxdb
+    image: influxdb:1.0.2
+    ports:
+      - "8083:8083"
+      - "8086:8086"
+    volumes:
+      - ./influxdb:/var/lib/influxdb
+    restart: always
+
+  grafana:
+    container_name: uks_grafana
+    image: grafana/grafana:4.3.2
+    ports:
+      - "3000:3000"
+    links:
+      - influxdb
+    restart: always
+
+  telegraf:
+    container_name: uks_telegraf
+    image: telegraf:1.3.3
+    volumes:
+      - ./config/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
