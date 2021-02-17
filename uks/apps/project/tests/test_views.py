@@ -419,7 +419,7 @@ class ChangeIssueStatusTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(issue.issue_status, 'DONE')
         self.assertTrue(issue.closed)
-        
+
     def test_change_status_to_incorrect_value(self):
         response = self.send_ajax_request(1, 4, 'SOME_STATUS')
         self.assertEqual(response.status_code, 400)
