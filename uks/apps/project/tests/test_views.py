@@ -14,6 +14,14 @@ def get_repository_id(repo_id=0):
     return repo_id
 
 
+def get_issue_id(issue_id=0):
+    if issue_id < len(Issue.objects.all()):
+        issue_id = Issue.objects.all()[issue_id].id
+    else:
+        issue_id = Issue.objects.all()[len(Issue.objects.all()) - 1].id + 1
+    return issue_id
+
+
 def get_repository_and_project_id(repo_id=0, pk=0):
     if repo_id < len(Repository.objects.all()):
         repo_id = Repository.objects.all()[repo_id].id
@@ -346,3 +354,17 @@ class ProjectUpdateViewTest(TestCase):
     def test_updating_non_existent(self):
         response = self.post_response(0, 10)
         self.assertEqual(response.status_code, 404)
+
+
+class ChangeIssueStatusTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        fill_test_data()
+
+    def send_ajax_request(self, repo_id=0, issue_id=0, status='DONE'):
+        repo_id = get_repository_id(repo_id)
+        issue_id = get_issue_id(issue_id)
+        self.client.login(username='user1', password='aBcDeF1234')
+        response = self.client.get(reverse('update_issue', kwargs={'repo_id': repo_id}),
+                                   {'i_id': issue_id, 'list_id': status}, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+        return response
