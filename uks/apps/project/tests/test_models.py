@@ -42,7 +42,7 @@ def fill_test_data():
     test_issue4 = Issue.objects.create(title='test issue 4', description='test description', repository=repository1,
                                        created_by=user1, project=project1, issue_status='TODO')
     test_issue5 = Issue.objects.create(title='test issue 5', description='test description', repository=repository1,
-                                       created_by=user1, project=project1, issue_status='DONE')
+                                       created_by=user1, closed=True, project=project1, issue_status='DONE')
 
     test_issue1.save()
     test_issue2.save()
