@@ -57,36 +57,40 @@ def fill_test_data():
     test_issue5.save()
 
 
+def get_project(index=0):
+    return Project.objects.all()[index]
+
+
 class ProjectModelTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         fill_test_data()
 
     def test_name_label(self):
-        project = Project.objects.get(id=1)
+        project = get_project()
         field_label = project._meta.get_field('name').verbose_name
         self.assertEqual(field_label, 'name')
 
     def test_description_label(self):
-        project = Project.objects.get(id=1)
+        project = get_project()
         field_label = project._meta.get_field('description').verbose_name
         self.assertEqual(field_label, 'description')
 
     def test_name_max_length(self):
-        project = Project.objects.get(pk=1)
+        project = get_project()
         max_length = project._meta.get_field('name').max_length
         self.assertEquals(max_length, 30)
 
     def test_repository_not_null(self):
-        project = Project.objects.get(pk=1)
+        project = get_project()
         is_null = project._meta.get_field('repository').null
         self.assertFalse(is_null)
 
     def test_object_name_is_name(self):
-        project = Project.objects.get(pk=1)
+        project = get_project()
         self.assertEqual(project.name, str(project))
 
     def test_get_absolute_url(self):
-        project = Project.objects.get(pk=1)
+        project = get_project()
         self.assertEqual(project.get_absolute_url(),
                          reverse('project_details', args=[str(project.repository.id), str(project.id)]))
