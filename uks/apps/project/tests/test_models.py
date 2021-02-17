@@ -20,34 +20,34 @@ def fill_test_data():
     user1.save()
     user2.save()
 
-    repository1 = Repository.objects.create(name='test_repository1', description='test_repository_description',
+    repository1 = Repository.objects.create(name='test_repository1', description='test_repository_description1',
                                             owner=user1)
-    repository2 = Repository.objects.create(name='test_repository2', description='test_repository_description',
+    repository2 = Repository.objects.create(name='test_repository2', description='test_repository_description2',
                                             owner=user1)
-    repository3 = Repository.objects.create(name='test_repository3', description='test_repository_description',
+    repository3 = Repository.objects.create(name='test_repository3', description='test_repository_description3',
                                             owner=user2)
     repository1.save()
     repository2.save()
     repository3.save()
 
-    project1 = Project.objects.create(name='test project 1', description='test description', repository=repository1)
-    project2 = Project.objects.create(name='test project 2', description='test description', repository=repository1)
-    project3 = Project.objects.create(name='test project 3', description='test description', repository=repository1)
-    project4 = Project.objects.create(name='test project 4', description='test description', repository=repository3)
+    project1 = Project.objects.create(name='test project 1', description='test description 1', repository=repository1)
+    project2 = Project.objects.create(name='test project 2', description='test description 2', repository=repository1)
+    project3 = Project.objects.create(name='test project 3', description='test description 3', repository=repository1)
+    project4 = Project.objects.create(name='test project 4', description='test description 4', repository=repository3)
     project1.save()
     project2.save()
     project3.save()
     project4.save()
 
-    test_issue1 = Issue.objects.create(title='test issue 1', description='test description', repository=repository1,
+    test_issue1 = Issue.objects.create(title='test issue 1', description='test description 1', repository=repository1,
                                        created_by=user1, project=project1, issue_status='TODO')
-    test_issue2 = Issue.objects.create(title='test issue 2', description='test description', repository=repository1,
+    test_issue2 = Issue.objects.create(title='test issue 2', description='test description 2', repository=repository1,
                                        created_by=user1, closed=True, project=project1, issue_status='DONE')
-    test_issue3 = Issue.objects.create(title='test issue 3', description='test description', repository=repository1,
+    test_issue3 = Issue.objects.create(title='test issue 3', description='test description 3', repository=repository1,
                                        created_by=user1, project=project1, issue_status='ONGOING')
-    test_issue4 = Issue.objects.create(title='test issue 4', description='test description', repository=repository1,
+    test_issue4 = Issue.objects.create(title='test issue 4', description='test description 4', repository=repository1,
                                        created_by=user1, project=project1, issue_status='TODO')
-    test_issue5 = Issue.objects.create(title='test issue 5', description='test description', repository=repository1,
+    test_issue5 = Issue.objects.create(title='test issue 5', description='test description 5', repository=repository1,
                                        created_by=user1, closed=True, project=project1, issue_status='DONE')
 
     test_issue1.save()
