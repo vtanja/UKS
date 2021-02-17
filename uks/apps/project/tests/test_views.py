@@ -378,3 +378,15 @@ class ChangeIssueStatusTest(TestCase):
         self.assertRedirects(response,
                              '/welcome/login/?next=/repository/{}/projects/ajax/update_issue/%3Fi_id%3D{}%26list_id%3DDONE'
                              .format(repo_id, issue_id))
+
+    def test_view_url_exists_at_desired_location(self):
+        repo_id = get_repository_id()
+        issue_id = Issue.objects.all()[0].id
+        self.client.login(username='user1', password='aBcDeF1234')
+        response = self.client.get('/repository/{}/projects/ajax/update_issue/'.format(repo_id),
+                                   {'i_id': issue_id, 'list_id': 'DONE'}, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_url_accessible_by_name(self):
+        response = self.send_ajax_request(0, 1, 'ONGOING')
+        self.assertEqual(response.status_code, 200)
