@@ -19,15 +19,6 @@ def get_repository_id(repo_id=0):
         repo_id = Repository.objects.all()[len(Repository.objects.all()) - 1].id + 1
     return repo_id
 
-
-def get_issue_id(issue_id=0):
-    if issue_id < len(Issue.objects.all()):
-        issue_id = Issue.objects.all()[issue_id].id
-    else:
-        issue_id = Issue.objects.all()[len(Issue.objects.all()) - 1].id + 1
-    return issue_id
-
-
 def get_repository_and_project_id(repo_id=0, pk=0):
     if repo_id < len(Repository.objects.all()):
         repo_id = Repository.objects.all()[repo_id].id
