@@ -20,4 +20,6 @@ urlpatterns = [
     path('<int:pk>/edit', RepositoryUpdateView.as_view(), name='repository_update'),
     path('<int:pk>/delete', RepositoryDeleteView.as_view(), name='repository_delete'),
     path('<int:id>/tag/', include('apps.tag.urls')),
+    path('<int:repo_id>/wiki/', include('apps.wiki.urls')),
+
 ]
