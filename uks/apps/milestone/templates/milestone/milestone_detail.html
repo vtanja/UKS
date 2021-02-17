@@ -15,7 +15,7 @@
             <h3 style="padding: 3mm">
                 <a class="btn {% if milestone.closed %}btn-success{% else %}btn-danger{% endif %} m-2" style="color: ghostwhite"
                    href="{% url 'milestone_close' repository.id milestone.id %}">
-                    {% if milestone.closed %}Reopen{% else %}Close{% endif %}
+                    {% if milestone.closed %}Reopen milestone{% else %}Close milestone{% endif %}
                 </a>
             </h3>
         </div>
