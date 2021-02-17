@@ -218,7 +218,7 @@ class ProjectDeleteViewTest(TestCase):
     def post_response(self, repo_id=0, pk=0):
         repo_id, pk = get_repository_and_project_id(repo_id, pk)
         self.client.login(username='user1', password='aBcDeF1234')
-        response = self.client.post(reverse('project_delete', kwargs={'repo_id': repo_id, 'pk': pk}))
+        response = self.client.delete(reverse('project_delete', kwargs={'repo_id': repo_id, 'pk': pk}))
         return response
 
     def test_view_url_exists_at_desired_location(self):
