@@ -33,6 +33,7 @@ services:
       - POSTGRES_USER=postgres
       - SECRET_KEY=some_secret_key
       - DEBUG_MODE=True
+      - GIT_TOKEN=0f49bb0eb914cc85700b9ba83c319e4a4bbb2a99
 
   nginx:
     image: nginx
