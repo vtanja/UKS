@@ -1,6 +1,7 @@
 
 from django.contrib.auth.models import User
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -229,7 +230,7 @@ class CreateWikiViewTest(TestCase):
     def test_if_correct_repo_is_loaded(self):
         response = self.request(1)
 
-        repository = Repository.objects.get(id=1)
+        repository = get_object_or_404(Repository, id=1)
         self.assertEqual(response.context['repository'], repository )
         self.assertEqual(len(response.context['wikis']), Wiki.objects.filter(repository=repository).count())
         for wiki in response.context['wikis']:
