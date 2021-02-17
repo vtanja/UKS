@@ -243,6 +243,13 @@ class ProjectDeleteViewTest(TestCase):
         self.assertRedirects(response,
                              '/welcome/login/?next=/repository/{}/projects/{}/delete'.format(repo_id, proj_id))
 
+    def test_unauthenticated_user_deletes_project(self):
+        repo_id, proj_id = get_repository_and_project_id()
+        response = self.client.delete(reverse('project_delete', kwargs={'repo_id': repo_id, 'pk': proj_id}))
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response,
+                             '/welcome/login/?next=/repository/{}/projects/{}/delete'.format(repo_id, proj_id))
+
     def test_correct_repository_and_project_loaded(self):
         response = self.get_project_delete_response(0, 0)
         self.assertEqual(response.context['repository'], Repository.objects.all()[0])
@@ -304,6 +311,14 @@ class ProjectUpdateViewTest(TestCase):
     def test_user_not_logged_in(self):
         repo_id, proj_id = get_repository_and_project_id()
         response = self.client.get(reverse('project_update', kwargs={'repo_id': repo_id, 'pk': proj_id}))
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response,
+                             '/welcome/login/?next=/repository/{}/projects/{}/update'.format(repo_id, proj_id))
+
+    def test_unauthenticated_user_updates_project(self):
+        repo_id, proj_id = get_repository_and_project_id()
+        response = self.client.post(reverse('project_update', kwargs={'repo_id': repo_id, 'pk': proj_id}),
+                                    {'name': 'edited test name', 'description': 'edited test description'})
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response,
                              '/welcome/login/?next=/repository/{}/projects/{}/update'.format(repo_id, proj_id))
