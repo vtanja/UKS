@@ -346,6 +346,29 @@ class IssueUpdateViewTest(TestCase):
                 self.assertEqual(issue_change.message, 'changed labels')
             self.assertEqual(issue_change.belongs_to, response.wsgi_request.user)
 
+    def test_add_milestone_and_project_to_issue_without_milestone_and_project(self):
+        start_of_the_test = timezone.now()
+        _, repository_id, issue_id = self.logged_in_user_get_edit_view(issue_id=3)
+
+        response = self.client.post(reverse('issue-update', kwargs={'repository_id': repository_id, 'pk': issue_id}),
+                                    {'title': 'test issue 2', 'description': 'test desc',
+                                     'assignees': [], 'milestone': '{}'.format(Milestone.objects.all()[0].id),
+                                     'project': '{}'.format(Project.objects.all()[0].id), 'labels': []})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/repository/{}/issues/{}/'.format(repository_id, issue_id))
+        # Find all objects that have been changed since start of the test process
+        issue_change_objects = HistoryItem.objects.filter(date_changed__gt=start_of_the_test,
+                                                          belongs_to=response.wsgi_request.user)
+        # Changed title and assignee list
+        self.assertEqual(len(issue_change_objects), 4)
+        for issue_change in issue_change_objects:
+            if issue_change.message.find('milestone') != -1:
+                self.assertEqual(issue_change.message, 'added this to "test milestone" milestone')
+            elif issue_change.message.find('project') != -1:
+                self.assertEqual(issue_change.message, 'added this to "test project" project')
+            self.assertEqual(issue_change.belongs_to, response.wsgi_request.user)
+
 
 class CloseIssueTet(TestCase):
 
