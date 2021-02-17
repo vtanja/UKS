@@ -30,7 +30,9 @@
          &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
                 <div class="col-md-6 align-text-bottom" style="text-align: left; height: 100%">
                      <a  class="text-success"  style="cursor: pointer; position:absolute; margin-top: 2%" href="{% url 'branch_list' repository.id %}">{{ branches|length}} branches</a>
+                     <a class="text-success" style="position:absolute; margin-top: 2%; margin-left: 100pt" href="{% url 'repository_tags' repository.id %}">{{tags|length}} tags</a>
                 </div>
+
         </div>
     <br>
         <div class="row">
