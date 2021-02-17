@@ -21,6 +21,7 @@ from ..user.models import HistoryItem
 
 logger = logging.getLogger('django')
 repo = 0
+manageAccessUrl = 'repository/manageAccess.html'
 
 
 def add_history_item(user, message):
@@ -125,7 +126,7 @@ def manage_access(request, key):
         users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
         collabs = repository.collaborators.all()
         context = {'repository': repository, 'users': users, 'collabs': collabs}
-        return render(request, 'repository/manageAccess.html', context)
+        return render(request, manageAccessUrl, context)
 
 
 def get_commits(api, br):
@@ -198,7 +199,7 @@ def repository_settings(request, key):
         users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
         collabs = repository.collaborators.all()
         context = {'repository': repository, 'users': users, 'collabs': collabs}
-        return render(request, 'repository/manageAccess.html', context)
+        return render(request, manageAccessUrl, context)
 
 
 @login_required
@@ -229,7 +230,7 @@ def add_collaborators(request):
     users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
     collabs = repository.collaborators.all()
     context = {'repository': repository, 'users': users, 'collabs': collabs}
-    return render(request, 'repository/manageAccess.html', context)
+    return render(request, manageAccessUrl, context)
 
 
 class CollaboratorsDeleteView(LoginRequiredMixin, DeleteView):
