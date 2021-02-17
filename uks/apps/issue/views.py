@@ -86,11 +86,17 @@ class IssueUpdateView(LoginRequiredMixin, UpdateView):
             elif changed_field == 'assignees':
                 ch.message = 'changed assignees'
             elif changed_field == 'milestone':
-                ch.message = 'changed milestone from {} to {}'\
-                    .format(original_issue.milestone.title, form.cleaned_data[changed_field])
+                if original_issue.milestone:
+                    ch.message = 'changed milestone from "{}" to "{}"'\
+                        .format(original_issue.milestone.title, form.cleaned_data[changed_field])
+                else:
+                    ch.message = 'added this to "{}" milestone'.format(form.cleaned_data[changed_field])
             elif changed_field == 'project':
-                ch.message = 'changed project from {} to {}'\
-                    .format(original_issue.project.name, form.cleaned_data[changed_field])
+                if original_issue.project:
+                    ch.message = 'changed project from "{}" to "{}"'\
+                        .format(original_issue.project.name, form.cleaned_data[changed_field])
+                else:
+                    ch.message = 'added this to "{}" project'.format(form.cleaned_data[changed_field])
             elif changed_field == 'labels':
                 ch.message = 'changed labels'
             ch.save()
