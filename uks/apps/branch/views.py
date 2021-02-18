@@ -1,18 +1,14 @@
-import json
+
 import logging
 
 from django.contrib import messages
-from django.db.models import Q
-
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
-
-from django.views.generic import DetailView, ListView, DeleteView
+from django.views.generic import ListView, DeleteView
 
 from apps.branch.forms import UpdateBranchForm
 from apps.branch.models import Branch
 from apps.repository.models import Repository
-from apps.repository.views import RepositoryDetailView
 
 logger = logging.getLogger('django')
 
