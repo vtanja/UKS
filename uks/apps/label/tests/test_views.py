@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.http import Http404
 from django.test import TestCase
 from django.urls import reverse
 
@@ -13,6 +14,7 @@ USER3_USERNAME = 'user3'
 USER3_PASSWORD = '73jzy5_*d'
 
 LABEL_FORM = 'label/create_label.html'
+DELETE_FROM = 'label/delete_label.html'
 
 
 def test_dataBase():
@@ -109,3 +111,108 @@ class LabelListViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
+class CreateLabelViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        test_dataBase()
+
+    def get_create_label_response(self, repository=0):
+        repository_id = get_repository_id(repository)
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
+        response = self.client.get(reverse('create_label', kwargs={'id': repository_id}))
+        return response
+
+    def test_logged_in_user_can_access(self):
+        response = self.get_create_label_response(0)
+        self.assertEqual(str(response.wsgi_request.user), USER1_USERNAME)
+        self.assertEqual(response.status_code, 200)
+
+    def test_correct_template_form(self):
+        response = self.get_create_label_response(0)
+        self.assertTemplateUsed(response, LABEL_FORM)
+
+    def test_bad_repository_for_form(self):
+        response = self.get_create_label_response(-1)
+        self.assertEqual(response.status_code, 404)
+
+    def test_successfully_added_new_label(self):
+        repository = get_repository_id(0)
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
+        response = self.client.post(reverse('create_label', kwargs={'id': repository}),
+                                    {'name': 'Label name123', 'description': 'Label description', 'color': '#3375FFFF'})
+        self.assertEqual(response.status_code, 302)
+
+    def test_successfully_redirect(self):
+        repository = get_repository_id(0)
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
+        response = self.client.post(reverse('create_label', kwargs={'id': repository}),
+                                    {'name': 'Label name123', 'description': 'Label description', 'color': '#3375FFFF'})
+        self.assertRedirects(response, '/repository/{}/labels/'.format(repository))
+
+    def test_added_new_label_with_bad_repository(self):
+        repository = get_repository_id(-1)
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
+        response = self.client.post(reverse('create_label', kwargs={'id': repository}),
+                                    {'name': 'Label name123', 'description': 'Label description', 'color': '#3375FFFF'})
+        self.assertEqual(response.status_code, 404)
+        self.assertRaises(Http404)
+
+
+class EditLabelViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        test_dataBase()
+
+    def get_label_edit_view(self, repository_id=0, label_id=0):
+        repository_id, label_id = get_label_and_repository_id(repository=repository_id, label=label_id)
+        response = self.client.get(reverse('label-edit', kwargs={'id': repository_id, 'pk': label_id}))
+        return response, repository_id, label_id
+
+    def logged_user_get_edit_view(self, repository_id=0, label_id=0):
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
+        return self.get_label_edit_view(repository_id, label_id)
+
+    def test_user_can_access(self):
+        response, _, _ = self.logged_user_get_edit_view()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(str(response.wsgi_request.user), USER1_USERNAME)
+
+    def test_check_form(self):
+        response, _, _ = self.logged_user_get_edit_view()
+        self.assertTemplateUsed(response, LABEL_FORM)
+
+    def test_check_non_existing_label(self):
+        response, _, _ = self.logged_user_get_edit_view(label_id=-1)
+        self.assertEqual(response.status_code, 404)
+        self.assertRaises(Http404)
+
+    def test_check_edit_function(self):
+        _, repository_id, label_id = self.logged_user_get_edit_view()
+        response = self.client.post(reverse('label-edit', kwargs={'id': repository_id, 'pk': label_id}),
+                                    {'name': 'Label name456', 'description': 'Label description456',
+                                     'color': '#3671FFFF'})
+        self.assertEqual(response.status_code, 302)
+
+
+class DeleteLabelViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        test_dataBase()
+
+    def get_label_delete_view(self, repository_id=0, label_id=0):
+        repository_id, label_id = get_label_and_repository_id(repository=repository_id, label=label_id)
+        response = self.client.get(reverse('label-delete', kwargs={'id': repository_id, 'pk': label_id}))
+        return response, repository_id, label_id
+
+    def logged_user_get_delete_view(self, repository_id=0, label_id=0):
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
+        return self.get_label_delete_view(repository_id, label_id)
+
+    def test_user_can_access(self):
+        response, _, _ = self.logged_user_get_delete_view()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(str(response.wsgi_request.user), USER1_USERNAME)
+
+    def test_check_form(self):
+        response, _, _ = self.logged_user_get_delete_view()
+        self.assertTemplateUsed(response, DELETE_FROM)
