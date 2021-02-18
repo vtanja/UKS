@@ -228,9 +228,8 @@ class CreateWikiViewTest(TestCase):
         self.assertTemplateUsed(response, WIKI_FORM)
 
     def test_if_correct_repo_is_loaded(self):
-        response = self.request(1)
-
-        repository = get_object_or_404(Repository, id=1)
+        repository = Repository.objects.all()[0]
+        response = self.request(repository.id)
         self.assertEqual(response.context['repository'], repository )
         self.assertEqual(len(response.context['wikis']), Wiki.objects.filter(repository=repository).count())
         for wiki in response.context['wikis']:
