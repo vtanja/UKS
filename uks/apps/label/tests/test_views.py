@@ -195,7 +195,7 @@ class EditLabelViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_check_edit_function_non_existing_label(self):
-        _, repository_id, label_id = self.logged_user_get_edit_view()
+        _, repository_id, _ = self.logged_user_get_edit_view()
         response = self.client.post(reverse('label-edit', kwargs={'id': repository_id, 'pk': 8}),
                                     {'name': 'Label name4568', 'description': 'This is label2',
                                      'color': '#3671FFFF'})
@@ -232,7 +232,7 @@ class DeleteLabelViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_check_delete_non_existing_label(self):
-        _, repository_id, label_id = self.logged_user_get_delete_view()
+        _, repository_id, _ = self.logged_user_get_delete_view()
         response = self.client.post(reverse('label-delete', kwargs={'id': repository_id, 'pk': 8}))
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
