@@ -167,9 +167,12 @@ class WikiDetailViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_view_for_wiki_that_exists(self):
-        response = self.request(1, 1)
-        self.assertTrue(response.context['wiki'] is not None)
-        self.assertEqual(response.context['wiki'], Wiki.objects.all()[0])
+        repository = Repository.objects.all()[0]
+        wiki = Wiki.objects.all()[0]
+        response = self.request(repository.id, wiki.id)
+        self.assertTrue(response.context_data['wiki'] is not None)
+        self.assertIn(response.context_data['wiki'], Wiki.objects.all())
+        self.assertEqual(response.context_data['wiki'].repository_id, repository.id)
 
 
 class CreateWikiViewTest(TestCase):
