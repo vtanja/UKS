@@ -1,3 +1,4 @@
+import logging
 from apps.issue.models import Issue
 from apps.milestone.forms import CreateMilestoneForm
 from apps.milestone.models import Milestone
@@ -9,7 +10,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
 
-# Create your views here.
+logger = logging.getLogger('django')
 
 
 class MilestoneListView(ListView):
@@ -24,6 +25,7 @@ class MilestoneListView(ListView):
         context = super(MilestoneListView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
         context['show'] = False
+        logger.info('Milestone list view context initialized')
         return context
 
 
@@ -45,9 +47,11 @@ class CreateMilestoneView(LoginRequiredMixin, CreateView):
         context = super(CreateMilestoneView, self).get_context_data(**kwargs)
         self.repository = get_object_or_404(Repository, id=self.kwargs['repo_id'])
         context['repository'] = self.repository
+        logger.info('Milestone create view context initialized')
         return context
 
     def get_success_url(self):
+        logger.info('Milestone successfully added to repository with id {}'.format(self.kwargs['repo_id']))
         return reverse_lazy('repository_milestones', kwargs={'repo_id': self.kwargs['repo_id']})
 
 
@@ -61,6 +65,7 @@ class MilestoneDetailView(DetailView):
         self.milestone = get_object_or_404(Milestone, id=self.kwargs['pk'])
         context['repository'] = self.repository
         context['issues'] = Issue.objects.filter(milestone=self.milestone)
+        logger.info('Milestone detail view context initialized')
         return context
 
 
@@ -79,9 +84,11 @@ class MilestoneUpdateView(UpdateView):
         self.repository = get_object_or_404(Repository, id=self.kwargs['repo_id'])
         self.milestone = get_object_or_404(Milestone, id=self.kwargs['pk'])
         context['repository'] = self.repository
+        logger.info('Milestone update view context initialized')
         return context
 
     def get_success_url(self):
+        logger.info('Milestone with id {} successfully updated'.format(self.kwargs['pk']))
         return reverse_lazy('repository_milestones', kwargs={'repo_id': self.kwargs['repo_id']})
 
 
@@ -89,6 +96,10 @@ class MilestoneUpdateView(UpdateView):
 def close_milestone(request, repo_id, pk):
     milestone = get_object_or_404(Milestone, pk=pk)
     milestone.toggle_milestone_close()
+    if milestone.closed:
+        logger.info('Milestone {} successfully closed'.format(milestone))
+    else:
+        logger.info('Milestone {} successfully reopened'.format(milestone))
     return redirect(reverse_lazy('milestone_details', kwargs={'repo_id': repo_id, 'pk': pk}))
 
 
@@ -101,7 +112,9 @@ class MilestoneDeleteView(DeleteView):
         self.repository = get_object_or_404(Repository, id=self.kwargs['repo_id'])
         self.milestone = get_object_or_404(Milestone, id=self.kwargs['pk'])
         context['repository'] = self.repository
+        logger.info('Milestone delete view context initialized')
         return context
 
     def get_success_url(self):
+        logger.info('Milestone with id {} succesfully deleted'.format(self.kwargs['pk']))
         return reverse_lazy('repository_milestones', kwargs={'repo_id': self.kwargs['repo_id']})
