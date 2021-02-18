@@ -11,5 +11,6 @@ class Branch(models.Model):
 
     def as_dict(self):
         return {
-            "name": self.name
+            "name": self.name,
+            "id": self.id
         }

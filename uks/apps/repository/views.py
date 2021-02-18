@@ -2,10 +2,11 @@ import json
 import logging
 import os
 
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -46,10 +47,46 @@ class RepositoryDetailView(DetailView):
 
         qs = Branch.objects.filter(repository=self.repository)
         context["qs_json"] = json.dumps([obj.as_dict() for obj in qs])
-        context['first'] = Branch.objects.filter(Q(repository_id=self.repository.id)).first()
         context['show'] = True
+
+        self.check_args()
+
+        commits = Commit.objects.filter(branches__in=[self.branch]).order_by('-date')
+
+        context['commit_num'] = commits.count()
+
+        context['branch'] = self.branch
+
+        paginator = Paginator(commits, 15)  # Show 25 contacts per page.
+
+        page_number = self.request.GET.get('page')
+        if page_number is None:
+            page_number = 1
+
+        page_obj = paginator.get_page(page_number)
+
+        context['page_obj'] = page_obj
+
+        commits = paginator.page(page_number)
+
+        context['commits'] = commits
+
         context['tags'] = Tag.objects.filter(repository=self.repository)
         return context
+
+    def check_args(self):
+        if self.kwargs.keys().__contains__('branch_id'):
+            if self.kwargs['branch_id'] is not None:
+                self.branch = get_object_or_404(Branch, id=self.kwargs['branch_id'])
+        else:
+            if self.repository.branch_set.filter(name='main').count() != 0:
+                self.branch = Branch.objects.filter(repository_id=self.repository.id, name='main').get()
+            elif self.repository.branch_set.filter(name='master').count() != 0:
+                self.branch = Branch.objects.filter(repository_id=self.repository.id, name='master').get()
+            elif self.repository.branch_set.filter(name='develop').count() != 0:
+                self.branch = Branch.objects.filter(repository_id=self.repository.id, name='develop').get()
+            else:
+                self.branch = self.repository.branch_set.first()
 
 
 @login_required
