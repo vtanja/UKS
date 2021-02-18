@@ -257,7 +257,7 @@ class CreateWikiViewTest(TestCase):
     def test_HTTP404_if_adding_to_non_existent_repository(self):
         repo_id = get_repository_id(-1)
         self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
-        return self.client.get(reverse('wiki-add', kwargs={'repo_id': repo_id}))
+        response = self.client.get(reverse('wiki-add', kwargs={'repo_id': repo_id}))
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
 
