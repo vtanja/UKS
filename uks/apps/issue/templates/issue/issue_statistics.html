@@ -1,0 +1,38 @@
+{% extends 'repository/repository_insights.html' %}
+
+{% block statistics %}
+    <h3>Issue statistics</h3>
+    <canvas id="opened-closed" width="180" height="60"></canvas>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        var ctx = document.getElementById('opened-closed').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['# open issues', '# closed issues'],
+                datasets: [{
+                    label: '# of Votes',
+                    data: [{{ opened_issues }}, {{ closed_issues }}],
+                    backgroundColor: [
+                        'rgba(49, 218, 51, 1)',
+                        'rgba(183, 183, 183, 1)',
+                    ],
+                    borderColor: [
+                        'rgba(42, 133, 43, 1)',
+                        'rgba(95, 95, 95, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Ratio of opened and closed issues',
+                    position: 'bottom',
+                }
+            }
+        });
+    </script>
+{% endblock %}
