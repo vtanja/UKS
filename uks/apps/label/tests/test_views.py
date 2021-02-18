@@ -15,6 +15,7 @@ USER3_PASSWORD = '73jzy5_*d'
 
 LABEL_FORM = 'label/create_label.html'
 DELETE_FROM = 'label/delete_label.html'
+LABEL_LIST_FORM = 'label/label_list.html'
 
 
 def test_dataBase():
@@ -92,7 +93,7 @@ class LabelListViewTest(TestCase):
     def test_view_url_accessible_by_name_and_test_template(self):
         response, _ = self.get_repository_labels()
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'label/label_list.html')
+        self.assertTemplateUsed(response, LABEL_LIST_FORM)
 
     def test_repository_with_labels(self):
         response, _ = self.get_repository_labels()
@@ -193,6 +194,14 @@ class EditLabelViewTest(TestCase):
                                      'color': '#3671FFFF'})
         self.assertEqual(response.status_code, 302)
 
+    def test_check_edit_function_non_existing_label(self):
+        _, repository_id, label_id = self.logged_user_get_edit_view()
+        response = self.client.post(reverse('label-edit', kwargs={'id': repository_id, 'pk': 8}),
+                                    {'name': 'Label name456', 'description': 'Label description456',
+                                     'color': '#3671FFFF'})
+        self.assertEqual(response.status_code, 404)
+        self.assertRaises(Http404)
+
 
 class DeleteLabelViewTest(TestCase):
     @classmethod
@@ -216,3 +225,14 @@ class DeleteLabelViewTest(TestCase):
     def test_check_form(self):
         response, _, _ = self.logged_user_get_delete_view()
         self.assertTemplateUsed(response, DELETE_FROM)
+
+    def test_check_delete_function(self):
+        _, repository_id, label_id = self.logged_user_get_delete_view()
+        response = self.client.post(reverse('label-delete', kwargs={'id': repository_id, 'pk': label_id}))
+        self.assertEqual(response.status_code, 302)
+
+    def test_check_delete_non_existing_label(self):
+        _, repository_id, label_id = self.logged_user_get_delete_view()
+        response = self.client.post(reverse('label-delete', kwargs={'id': repository_id, 'pk': 8}))
+        self.assertEqual(response.status_code, 404)
+        self.assertRaises(Http404)
