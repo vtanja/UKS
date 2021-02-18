@@ -56,7 +56,7 @@ jobs:
       run: |
         python ./uks/manage.py migrate
     - name: Run coverage
-      run: coverage run --source='uks' uks/manage.py test apps.issue apps.wiki; coverage xml -i -o coverage-reports/coverage.xml
+      run: coverage run --source='uks' uks/manage.py test apps.issue apps.wiki apps.project; coverage xml -i -o coverage-reports/coverage.xml
     - uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
