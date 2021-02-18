@@ -17,6 +17,7 @@ from .forms import RepositoryForm, CollaboratorsForm, RepositoryFormEdit
 from .models import Repository
 from ..branch.models import Branch
 from ..commit.models import Commit
+from ..tag.models import Tag
 from ..user.models import HistoryItem
 
 logger = logging.getLogger('django')
@@ -48,6 +49,7 @@ class RepositoryDetailView(DetailView):
         context["qs_json"] = json.dumps([obj.as_dict() for obj in qs])
         context['first'] = Branch.objects.filter(Q(repository_id=self.repository.id)).first()
         context['show'] = True
+        context['tags'] = Tag.objects.filter(repository=self.repository)
         return context
 
 
