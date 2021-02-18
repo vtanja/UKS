@@ -1,15 +1,14 @@
-from colorfield.fields import ColorField
 from django.test import TestCase
 
 from ..models import Label
-from .test_views import test_dataBase
+from .test_views import test_data_base
 
 
 class LabelModelTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        test_dataBase()
+        test_data_base()
 
     def test_label_name(self):
         label = Label.objects.get(id=5)

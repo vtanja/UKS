@@ -18,7 +18,7 @@ DELETE_FROM = 'label/delete_label.html'
 LABEL_LIST_FORM = 'label/label_list.html'
 
 
-def test_dataBase():
+def test_data_base():
     # Create users
     user1 = User.objects.create_user(username=USER1_USERNAME, password=USER1_PASSWORD)
     user2 = User.objects.create_user(username=USER2_USERNAME, password=USER2_PASSWORD)
@@ -140,21 +140,21 @@ class CreateLabelViewTest(TestCase):
         repository = get_repository_id(0)
         self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.post(reverse('create_label', kwargs={'id': repository}),
-                                    {'name': 'Label name123', 'description': 'Label description', 'color': '#3375FFFF'})
+                                    {'name': 'Label name123', 'description': 'Label description1', 'color': '#3375FFFF'})
         self.assertEqual(response.status_code, 302)
 
     def test_successfully_redirect(self):
         repository = get_repository_id(0)
         self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.post(reverse('create_label', kwargs={'id': repository}),
-                                    {'name': 'Label name123', 'description': 'Label description', 'color': '#3375FFFF'})
+                                    {'name': 'Label name456', 'description': 'Label description2', 'color': '#FBA9FFFF'})
         self.assertRedirects(response, '/repository/{}/labels/'.format(repository))
 
     def test_added_new_label_with_bad_repository(self):
         repository = get_repository_id(-1)
         self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.post(reverse('create_label', kwargs={'id': repository}),
-                                    {'name': 'Label name123', 'description': 'Label description', 'color': '#3375FFFF'})
+                                    {'name': 'Label name789', 'description': 'Label description3', 'color': '#FF90F5FF'})
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
 
