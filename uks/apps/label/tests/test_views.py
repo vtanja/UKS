@@ -79,7 +79,7 @@ def get_repository_id(repository=0):
 class LabelListViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        test_dataBase()
+        test_data_base()
 
     def get_repository_labels(self, repository_id=0):
         repository_id = get_repository_id(repository_id)
@@ -115,7 +115,7 @@ class LabelListViewTest(TestCase):
 class CreateLabelViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        test_dataBase()
+        test_data_base()
 
     def get_create_label_response(self, repository=0):
         repository_id = get_repository_id(repository)
@@ -162,7 +162,7 @@ class CreateLabelViewTest(TestCase):
 class EditLabelViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        test_dataBase()
+        test_data_base()
 
     def get_label_edit_view(self, repository_id=0, label_id=0):
         repository_id, label_id = get_label_and_repository_id(repository=repository_id, label=label_id)
@@ -206,7 +206,7 @@ class EditLabelViewTest(TestCase):
 class DeleteLabelViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        test_dataBase()
+        test_data_base()
 
     def get_label_delete_view(self, repository_id=0, label_id=0):
         repository_id, label_id = get_label_and_repository_id(repository=repository_id, label=label_id)
