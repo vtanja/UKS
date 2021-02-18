@@ -1,5 +1,4 @@
 {% extends 'repository/repoDetail.html' %}
-
 {% block repo-content %}
 {#    <h6>This is overview</h6>#}
 {#    {% for branch in branches %}#}
@@ -11,7 +10,7 @@
             <div class="col-md-3" style="text-align: left" >
                 <div class="btn-group">
                       <button id="button" type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" id="dropdownMenu2" aria-expanded="false">
-                          {{ first.name }}
+                          {{ branch.name }}
                       </button>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu2" >
                           <br>
@@ -19,9 +18,8 @@
                           <em class="fas fa-search text-success" style="position: fixed; margin-left: 80%; margin-top: -9%;"></em>
                           <br>
                           <div id="box" style="height: auto; max-height: 400px; width: 300px; overflow-x: hidden">
-                              {% for branch in branches %}
-{#                                  {%  first.name=branch['name'] %}#}
-                                  <a id="{{ branch.name }}"  style="cursor: pointer;" class="dropdown-item" onclick="update(id)">{{ branch }}</a>
+                              {% for item in branches %}
+                                  <a id="{{ item.name }}"  style="cursor: pointer;" class="dropdown-item" onclick="update(id)" href="{% url 'branch-detail' repository.id item.id %}" >{{ item }}</a>
                               {% endfor %}
                           </div>
                       </div>
@@ -30,11 +28,13 @@
          &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;
                 <div class="col-md-6 align-text-bottom" style="text-align: left; height: 100%">
                      <a  class="text-success"  style="cursor: pointer; position:absolute; margin-top: 2%" href="{% url 'branch_list' repository.id %}">{{ branches|length}} branches</a>
+                     <a class="text-success" style="position:absolute; margin-top: 2%; margin-left: 100pt" href="{% url 'repository_tags' repository.id %}">{{tags|length}} tags</a>
                 </div>
+
         </div>
     <br>
         <div class="row">
-            This is where commits will be displayed
+            {% include 'branch/branch_detail.html' with branch=branch commits=commits page_obj=page_obj%}
         </div>
     </div>
 {% endblock %}
@@ -62,7 +62,8 @@
         console.log(filteredArr)
         if (filteredArr.length > 0){
             filteredArr.map(info=>{
-                box.innerHTML += `<a id="${ info.name }"  style="margin-left: 5px; cursor: pointer;" class="dropdown-item;" onclick="update(id)" >${ info.name }</a><br>`
+                id = info.id
+                box.innerHTML += `<a id="${ info.name }"  style="margin-left: 5px; cursor: pointer;" class="dropdown-item;" onclick="update(id)" href="/repository/{{ repository.id }}/branch/${info.id}/"  >${ info.name }</a><br>`
             })
         } else {
             box.innerHTML = "<b>No results found...</b>"

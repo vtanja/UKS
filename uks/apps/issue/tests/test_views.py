@@ -45,9 +45,13 @@ def fill_test_db():
 
     test_milestone = Milestone.objects.create(title='test milestone', description='test', repository=test_repository,
                                               closed=False, dateCreated=timezone.now(), dueDate=timezone.now())
+    test_milestone1 = Milestone.objects.create(title='test milestone1', description='tes2t', repository=test_repository,
+                                               closed=False, dateCreated=timezone.now(), dueDate=timezone.now())
     test_milestone.save()
+    test_milestone1.save()
 
-    test_label = Label.objects.create(name='functional', description='asdf', color='#3375FFFF', repository=test_repository)
+    test_label = Label.objects.create(name='functional', description='asdf', color='#3375FFFF',
+                                      repository=test_repository)
     test_label.save()
 
     # Create issues and add them to repositories
@@ -335,11 +339,34 @@ class IssueUpdateViewTest(TestCase):
             elif issue_change.message.find('description') != -1:
                 self.assertEqual(issue_change.message, 'changed description')
             elif issue_change.message.find('milestone') != -1:
-                self.assertEqual(issue_change.message, 'changed milestone from test milestone to None')
+                self.assertEqual(issue_change.message, 'changed milestone from "test milestone" to "None"')
             elif issue_change.message.find('project') != -1:
-                self.assertEqual(issue_change.message, 'changed project from test project to None')
+                self.assertEqual(issue_change.message, 'changed project from "test project" to "None"')
             elif issue_change.message.find('labels') != -1:
                 self.assertEqual(issue_change.message, 'changed labels')
+            self.assertEqual(issue_change.belongs_to, response.wsgi_request.user)
+
+    def test_add_milestone_and_project_to_issue_without_milestone_and_project(self):
+        start_of_the_test = timezone.now()
+        _, repository_id, issue_id = self.logged_in_user_get_edit_view(issue_id=3)
+
+        response = self.client.post(reverse('issue-update', kwargs={'repository_id': repository_id, 'pk': issue_id}),
+                                    {'title': 'test issue 2', 'description': 'test desc',
+                                     'assignees': [], 'milestone': '{}'.format(Milestone.objects.all()[0].id),
+                                     'project': '{}'.format(Project.objects.all()[0].id), 'labels': []})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/repository/{}/issues/{}/'.format(repository_id, issue_id))
+        # Find all objects that have been changed since start of the test process
+        issue_change_objects = HistoryItem.objects.filter(date_changed__gt=start_of_the_test,
+                                                          belongs_to=response.wsgi_request.user)
+        # Changed title and assignee list
+        self.assertEqual(len(issue_change_objects), 4)
+        for issue_change in issue_change_objects:
+            if issue_change.message.find('milestone') != -1:
+                self.assertEqual(issue_change.message, 'added this to "test milestone" milestone')
+            elif issue_change.message.find('project') != -1:
+                self.assertEqual(issue_change.message, 'added this to "test project" project')
             self.assertEqual(issue_change.belongs_to, response.wsgi_request.user)
 
 
@@ -365,7 +392,8 @@ class CloseIssueTet(TestCase):
     def test_close_issue_accessible_by_name(self):
         response, repository_id, issue_id = self.get_response_for_close_issue()
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('issue-details', kwargs={'repository_id': repository_id, 'pk': issue_id}))
+        self.assertRedirects(response,
+                             reverse('issue-details', kwargs={'repository_id': repository_id, 'pk': issue_id}))
 
     def test_HTTP404_if_repository_doesnt_exist(self):
         response, _, _ = self.get_response_for_close_issue(repository_id=-1)

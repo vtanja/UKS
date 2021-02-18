@@ -1,0 +1,33 @@
+{% extends 'repository/repoDetail.html' %}
+
+{% block repo-content %}
+<div class="container" style="padding: 7mm;">
+        <div class="row">
+            <div class="col">
+               <a style="float: right; margin-right: 10pt" class="btn btn-success" href="{% url 'create_tag' repository.id %}">New tag</a>
+            </div>
+        </div>
+        <br>
+        <div class="container">
+         <div class="card-header" style="text-align: left"><i class="fa fa-tags" aria-hidden="true"></i> tags</div>
+            {% for tag in tag_list %}
+            <div class="card" style="width: 100%" >
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col" style="text-align: left">
+                             {{tag.version}}
+                        </div>
+                        <div class="col" style="text-align: left">{{tag.title}} </div>
+                        <div class="col" style="text-align: left">{{tag.branch}} </div>
+                        <div class="col" style="text-align: left; overflow: hidden; white-space: nowrap;">{{tag.commit.sha}} </div>
+                        <div class="col" style="text-align: right">
+                            <a class="btn btn-link" href="{% url 'edit_tag' repository.id tag.id %}">Edit</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+         <br>
+    </div>
+</div>
+{% endblock %}

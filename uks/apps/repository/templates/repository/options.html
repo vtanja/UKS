@@ -1,0 +1,26 @@
+{% extends 'repository/repoSettings.html' %}
+{% block options %}
+<div style="margin-left: 100pt;">
+    <br>
+        <h3 style="text-align: left">Settings</h3>
+        <br>
+        <div class="card col-3">
+            <div class="card-body">
+                <h5>Repository name {{repository.name}}.</h5>
+                <a href="{% url 'repository_update' repository.id %}">Rename</a>
+            </div>
+        </div>
+        <br>
+        <h3 style="text-align: left">Danger zone</h3>
+        <br>
+        <div class="card col-3" style="border-color: red;">
+            <div class="card-body">
+                <h5>Delete this repository</h5>
+                <p></p>
+                <p>Once you delete a repository, there is no going back. Please be certain.</p>
+                <a href="{% url 'repository_delete' repository.id %}">Delete</a>
+            </div>
+        </div>
+
+</div>
+{% endblock %}
