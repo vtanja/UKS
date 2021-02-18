@@ -3,7 +3,7 @@
 
 {% block repo-content %}
     {% load crispy_forms_filters %}
-    <div class="container" style="width: 50%">
+    <div class="container" style="width: 60%; padding: 10mm">
         <form method="post" action="{% url 'create_milestone' repository.id %}">
             {% csrf_token %}
             {{ form | crispy }}
