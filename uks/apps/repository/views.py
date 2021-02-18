@@ -18,6 +18,7 @@ from .forms import RepositoryForm, CollaboratorsForm, RepositoryFormEdit
 from .models import Repository
 from ..branch.models import Branch
 from ..commit.models import Commit
+from ..tag.models import Tag
 from ..user.models import HistoryItem
 
 logger = logging.getLogger('django')
@@ -71,6 +72,7 @@ class RepositoryDetailView(DetailView):
 
         context['commits'] = commits
 
+        context['tags'] = Tag.objects.filter(repository=self.repository)
         return context
 
     def check_args(self):

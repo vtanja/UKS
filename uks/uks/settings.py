@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'fontawesome-free',
     'colorfield',
     'ckeditor',
+    'apps.tag',
 ]
 
 MIDDLEWARE = [
