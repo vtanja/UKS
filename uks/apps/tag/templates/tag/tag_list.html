@@ -19,7 +19,7 @@
                         </div>
                         <div class="col" style="text-align: left">{{tag.title}} </div>
                         <div class="col" style="text-align: left">{{tag.branch}} </div>
-                        <div class="col" style="text-align: left; overflow: hidden; white-space: nowrap;">{{tag.commit.sha}} </div>
+                        <div class="col" style="text-align: left; overflow: hidden; white-space: nowrap;"><a href="{{tag.commit.get_absolute_url}}">{{tag.commit.sha}}</a></div>
                         <div class="col" style="text-align: right">
                             <a class="btn btn-link" href="{% url 'edit_tag' repository.id tag.id %}">Edit</a>
                         </div>
