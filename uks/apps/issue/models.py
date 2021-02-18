@@ -39,6 +39,7 @@ class Issue(models.Model):
     labels = models.ManyToManyField(Label, blank=True)
     milestone = models.ForeignKey(Milestone, on_delete=models.CASCADE, null=True, blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True)
+    date_created = models.DateTimeField(verbose_name='Date of creation')
 
     def __str__(self):
         return self.title

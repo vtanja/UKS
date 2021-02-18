@@ -47,6 +47,7 @@ class CreateIssueView(LoginRequiredMixin, CreateView):
         form.instance.repository = get_object_or_404(Repository, id=self.kwargs['repository_id'])
         form.instance.issue_status = Issue.IssueStatus.TODO
         form.instance.closed = False
+        form.instance.date_created = timezone.now()
         return super(CreateIssueView, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
