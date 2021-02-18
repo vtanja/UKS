@@ -5,6 +5,8 @@ from apps.repository.models import Repository
 from ckeditor.fields import RichTextField
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import signals
+from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -66,3 +68,17 @@ class Issue(models.Model):
         else:
             self.closed = False
         self.save()
+
+
+@receiver(signals.post_save, sender=Issue)
+def post_save_create_history_items(sender, instance, created,  *args, **kwargs):
+    if not created:
+        return
+    if instance.milestone:
+        create_history_item(instance, instance.created_by, 'added this to "{}"'.format(instance.milestone.title))
+    if instance.project:
+        create_history_item(instance, instance.created_by, 'added this to "{}"'.format(instance.project.name))
+    if instance.labels:
+        create_history_item(instance, instance.created_by, 'added labels to this instance')
+    if instance.assignees:
+        create_history_item(instance, instance.created_by, 'added assignees to this instance')
