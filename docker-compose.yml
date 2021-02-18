@@ -10,8 +10,8 @@ services:
     ports:
     - "8001:5432"
     environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
 
   web:
     container_name: uks_web
@@ -28,12 +28,12 @@ services:
       - es
       - kibana
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_USER=postgres
-      - SECRET_KEY=some_secret_key
-      - DEBUG_MODE=True
-      - GIT_TOKEN=0f49bb0eb914cc85700b9ba83c319e4a4bbb2a99
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG_MODE=${DEBUG_MODE}
+      - GIT_TOKEN=${GIT_TOKEN}
 
   nginx:
     image: nginx
