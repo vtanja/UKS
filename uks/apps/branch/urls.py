@@ -1,6 +1,6 @@
 from django.urls import path
 
-from apps.branch import view
+from apps.branch import views
 from apps.branch.views import BranchListView, BranchDeleteView
 from apps.repository.views import RepositoryDetailView
 
