@@ -190,14 +190,14 @@ class EditLabelViewTest(TestCase):
     def test_check_edit_function(self):
         _, repository_id, label_id = self.logged_user_get_edit_view()
         response = self.client.post(reverse('label-edit', kwargs={'id': repository_id, 'pk': label_id}),
-                                    {'name': 'Label name456', 'description': 'Label description456',
+                                    {'name': 'Label name4567', 'description': 'This is label1',
                                      'color': '#3671FFFF'})
         self.assertEqual(response.status_code, 302)
 
     def test_check_edit_function_non_existing_label(self):
         _, repository_id, label_id = self.logged_user_get_edit_view()
         response = self.client.post(reverse('label-edit', kwargs={'id': repository_id, 'pk': 8}),
-                                    {'name': 'Label name456', 'description': 'Label description456',
+                                    {'name': 'Label name4568', 'description': 'This is label2',
                                      'color': '#3671FFFF'})
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
