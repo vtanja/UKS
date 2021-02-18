@@ -65,6 +65,15 @@ class CreateIssueView(LoginRequiredMixin, CreateView):
         return reverse_lazy('repository-issues', kwargs={'repository_id': self.kwargs['repository_id']})
 
 
+def set_message(changed_field, form, original_issue, attribute):
+    if original_issue.project:
+        return 'changed {} from "{}" to "{}"' \
+            .format(attribute, original_issue.project.name if attribute == 'project'
+                    else original_issue.milestone.title, form.cleaned_data[changed_field])
+    else:
+        return 'added this to "{}" {}'.format(form.cleaned_data[changed_field], attribute)
+
+
 class IssueUpdateView(LoginRequiredMixin, UpdateView):
     model = Issue
     form_class = CreateIssueForm
@@ -86,11 +95,9 @@ class IssueUpdateView(LoginRequiredMixin, UpdateView):
             elif changed_field == 'assignees':
                 ch.message = 'changed assignees'
             elif changed_field == 'milestone':
-                ch.message = 'changed milestone from {} to {}'\
-                    .format(original_issue.milestone.title, form.cleaned_data[changed_field])
+                ch.message = set_message(changed_field, form, original_issue, 'milestone')
             elif changed_field == 'project':
-                ch.message = 'changed project from {} to {}'\
-                    .format(original_issue.project.name, form.cleaned_data[changed_field])
+                ch.message = set_message(changed_field, form, original_issue, 'project')
             elif changed_field == 'labels':
                 ch.message = 'changed labels'
             ch.save()

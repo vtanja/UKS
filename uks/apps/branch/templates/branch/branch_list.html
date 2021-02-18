@@ -9,7 +9,7 @@
                     <div class="card-body">
                         <div style="display: flex; height: fit-content" class="row">
                             <div class="col" style="text-align: left;">
-                                <a href="#" class="text-success">  {{ branch.name }} </a>
+                                <a href="{% url 'branch-detail' repository.id  branch.id%}" class="text-success">  {{ branch.name }} </a>
                             </div>
                             {% if request.user.is_authenticated %}
                             <div class="col" style="text-align: right">
