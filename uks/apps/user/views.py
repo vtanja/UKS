@@ -17,6 +17,7 @@ from security.models import SiteUser
 
 logger = logging.getLogger('django')
 
+
 @login_required
 def dashboard(request):
     form = RepositoryForm()

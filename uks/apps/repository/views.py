@@ -24,7 +24,6 @@ logger = logging.getLogger('django')
 repo = 0
 manageAccessUrl = 'repository/manageAccess.html'
 
-
 def add_history_item(user, message):
     change = HistoryItem()
     change.date_changed = timezone.now()
@@ -66,10 +65,13 @@ def detail(request, id):
 
 def get_branches(repository):
     api = get_github_api(repository)
+    if api is None:
+        return
     logger.info('Sending request for getting all branches of repository')
     branches = api.repos.list_branches(per_page=100)
-    for branch in branches:
+    for index, branch in enumerate(branches):
         logger.info('Creating new branch')
+        print('Adding branch {}/{}'.format(index + 1, len(branches)))
         br = Branch()
         br.name = branch.name
         br.repository = repository
@@ -100,6 +102,7 @@ def add_repository(request):
                 form.instance.repo_url = 'https://github.com/vtanja/UKS'
 
             repository = form.save()
+            repository.collaborators.add(request.user)
 
             start = timezone.now()
             get_branches(repository)
@@ -185,9 +188,13 @@ def add_parents_that_were_missing_to_commits(commits_with_missing_parents):
 
 
 def get_github_api(repository):
-    repository_name, owner = get_repository_name_and_owner(repository)
-    api = GhApi(owner=owner, repo=repository_name, token=os.getenv('GITHUB_TOKEN'))
-    return api
+    if os.getenv('GIT_TOKEN'):
+        repository_name, owner = get_repository_name_and_owner(repository)
+        api = GhApi(owner=owner, repo=repository_name, token=os.getenv('GIT_TOKEN'))
+        return api
+    else:
+        logger.error('GitHub api token does not exist')
+        return None
 
 
 @login_required
