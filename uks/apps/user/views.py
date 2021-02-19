@@ -1,19 +1,19 @@
 import logging
 
-from apps.issue.models import Issue
-from apps.repository.forms import RepositoryForm
-from apps.repository.models import Repository
-from apps.user.forms import ProfileImageUpdateForm
-from apps.user.models import HistoryItem
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import User
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, \
     PasswordResetCompleteView
 from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.views.generic import ListView
+
+from apps.issue.models import Issue
+from apps.repository.forms import RepositoryForm
+from apps.repository.models import Repository
+from apps.user.forms import ProfileImageUpdateForm
+from apps.user.models import HistoryItem
 from security.models import SiteUser
 
 logger = logging.getLogger('django')
