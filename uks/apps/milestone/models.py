@@ -35,6 +35,7 @@ class Milestone(models.Model):
 
     def toggle_milestone_close(self):
         self.closed = not self.closed
+        self.dateUpdated = date.today
         self.save()
 
     def get_absolute_url(self):
