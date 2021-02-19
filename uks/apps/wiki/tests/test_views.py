@@ -318,7 +318,7 @@ class WikiUpdateViewTest(TestCase):
     def post_request(self, repo_id, wiki_id):
         self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         return self.client.post(reverse('wiki-update', kwargs={'repo_id': repo_id, 'pk': wiki_id}),
-                                    {'title': 'Test wiki 1', 'content': 'Test description 2'})
+                                    {'title': 'Test wiki 1', 'content': 'Test description 2 x'})
 
     def test_redirect_if_user_not_logged_in(self):
         repo_id, wiki_id = get_wiki_and_repository_id()
@@ -328,7 +328,7 @@ class WikiUpdateViewTest(TestCase):
     def test_redirect_if_user_not_logged_in_updates_wiki(self):
         repo_id, wiki_id = get_wiki_and_repository_id()
         response = self.client.post(reverse('wiki-update', kwargs={'repo_id': repo_id, 'pk': wiki_id}),
-                                    {'title': 'Test wiki 2', 'content': 'Test description 2'})
+                                    {'title': 'Test wiki 2', 'content': 'Test description 2 xx'})
         self.assertRedirects(response, '/welcome/login/?next=/repository/{}/wiki/{}/edit/'.format(repo_id, wiki_id))
 
     def test_view_url_exists_at_desired_location(self):
@@ -388,5 +388,5 @@ class WikiUpdateViewTest(TestCase):
         self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         repo_id, wiki_id = get_wiki_and_repository_id(1, 2)
         response = self.client.post(reverse('wiki-update', kwargs={'repo_id': repo_id, 'pk': wiki_id}),
-                                    {'title': 'Test wiki 1', 'content': 'Test description 2'})
+                                    {'title': 'Test wiki 1', 'content': 'Test description 2 '})
         self.assertEqual(response.status_code, 403)
