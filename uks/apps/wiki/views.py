@@ -1,14 +1,15 @@
 import logging
 
-from apps.repository.models import Repository
-from apps.user.models import HistoryItem
-from apps.wiki.forms import CreateWikiForm
-from apps.wiki.models import Wiki
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.utils import timezone
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+
+from apps.repository.models import Repository
+from apps.user.models import HistoryItem
+from apps.wiki.forms import CreateWikiForm
+from apps.wiki.models import Wiki
 
 logger = logging.getLogger('django')
 
@@ -51,13 +52,17 @@ class WikiDetailPage(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(WikiDetailPage, self).get_context_data(**kwargs)
         logger.info('Retrieving wiki that belong to repository with id: %s', self.kwargs['repo_id'])
+        repository = get_object_or_404(Repository, id=self.kwargs['repo_id'])
         context['wikis'] = Wiki.objects.filter(repository_id=self.kwargs['repo_id'])
-        context['repository'] = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        context['repository'] = repository
         context['show'] = False
+        context['collab'] = repository.test_user(self.request.user)
+        context['last_update'] = HistoryItem.objects.filter(changed_wiki_object_id=self.object.id).order_by('-date_changed').first()
+
         return context
 
 
-class CreateWikiView(LoginRequiredMixin, CreateView):
+class CreateWikiView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Wiki
     form_class = CreateWikiForm
     template_name = 'wiki/wiki_form.html'
@@ -94,8 +99,13 @@ class CreateWikiView(LoginRequiredMixin, CreateView):
         self.change.save()
         return reverse_lazy('wiki-overview', kwargs={'repo_id': self.kwargs['repo_id']})
 
+    def test_func(self):
+        logger.info('Checking if user has permission to create new wiki page!')
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        return repo.test_user(self.request.user)
 
-class WikiUpdateView(LoginRequiredMixin, UpdateView):
+
+class WikiUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Wiki
     form_class = CreateWikiForm
 
@@ -128,8 +138,13 @@ class WikiUpdateView(LoginRequiredMixin, UpdateView):
         change.save()
         return reverse_lazy('wiki-details', kwargs={'repo_id': self.kwargs['repo_id'], 'pk': self.kwargs['pk']})
 
+    def test_func(self):
+        logger.info('Checking if user has permission to update wiki page!')
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        return repo.test_user(self.request.user)
 
-class WikiDeleteView(LoginRequiredMixin, DeleteView):
+
+class WikiDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Wiki
 
     def get_success_url(self):
@@ -139,8 +154,13 @@ class WikiDeleteView(LoginRequiredMixin, DeleteView):
         logger.info('Routing to all wikis after deleting wiki!')
         return reverse_lazy('wiki-overview', kwargs={'repo_id': self.kwargs['repo_id']})
 
+    def test_func(self):
+        logger.info('Checking if user has permission to delete wiki page!')
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        return repo.test_user(self.request.user)
 
-class HistoryListView(LoginRequiredMixin, ListView):
+
+class HistoryListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = HistoryItem
     template_name = 'wiki/wiki_history.html'
 
@@ -151,7 +171,7 @@ class HistoryListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(HistoryListView, self).get_context_data(**kwargs)
-        history = HistoryItem.objects.filter(changed_wiki_object_id=self.wiki.id)
+        history = HistoryItem.objects.filter(changed_wiki_object_id=self.wiki.id).order_by('-date_changed')
         logger.info('Initializing context!')
         context['repository'] = self.repository
         context['wikis'] = Wiki.objects.filter(repository=self.repository)
@@ -159,3 +179,9 @@ class HistoryListView(LoginRequiredMixin, ListView):
         context['history'] = history
         context['wiki'] = self.wiki
         return context
+
+    def test_func(self):
+        logger.info('Checking if user has permission to access wiki history page!')
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        return repo.test_user(self.request.user)
+
