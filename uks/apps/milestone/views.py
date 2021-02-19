@@ -174,6 +174,8 @@ def get_average_milestone_length(milestones):
         months = round(average/30)
         days = average - (months*30)
         response = '{} months and {} days'.format(str(months), str(days))
-    for leng in range(len(lens)):
+    i = 0
+    while i < len(lens):
         average_l.append(average)
+        i = i + 1
     return response, lens, labels, average_l
