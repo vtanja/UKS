@@ -4,13 +4,19 @@ from apps.milestone.forms import CreateMilestoneForm
 from apps.milestone.models import Milestone
 from apps.repository.models import Repository
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
 
 logger = logging.getLogger('django')
+
+
+def get_repo(repo_id):
+    logger.info('Checking if user has permission to create new wiki page!')
+    repo = get_object_or_404(Repository, id=repo_id)
+    return repo
 
 
 class MilestoneListView(ListView):
@@ -29,7 +35,7 @@ class MilestoneListView(ListView):
         return context
 
 
-class CreateMilestoneView(LoginRequiredMixin, CreateView):
+class CreateMilestoneView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Milestone
     template_name = 'milestone/milestone_create.html'
     form_class = CreateMilestoneForm
@@ -54,8 +60,12 @@ class CreateMilestoneView(LoginRequiredMixin, CreateView):
         logger.info('Milestone successfully added to repository with id {}'.format(self.kwargs['repo_id']))
         return reverse_lazy('repository_milestones', kwargs={'repo_id': self.kwargs['repo_id']})
 
+    def test_func(self):
+        repo = get_repo(self.kwargs['repo_id'])
+        return repo.test_user(self.request.user)
 
-class MilestoneDetailView(DetailView):
+
+class MilestoneDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Milestone
     template_name = 'milestone/milestone_detail.html'
 
@@ -68,8 +78,12 @@ class MilestoneDetailView(DetailView):
         logger.info('Milestone detail view context initialized')
         return context
 
+    def test_func(self):
+        repo = get_repo(self.kwargs['repo_id'])
+        return repo.test_user(self.request.user)
 
-class MilestoneUpdateView(UpdateView):
+
+class MilestoneUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Milestone
     form_class = CreateMilestoneForm
     template_name_suffix = '_update'
@@ -91,9 +105,18 @@ class MilestoneUpdateView(UpdateView):
         logger.info('Milestone with id {} successfully updated'.format(self.kwargs['pk']))
         return reverse_lazy('repository_milestones', kwargs={'repo_id': self.kwargs['repo_id']})
 
+    def test_func(self):
+        repo = get_repo(self.kwargs['repo_id'])
+        return repo.test_user(self.request.user)
+
 
 @login_required
 def close_milestone(request, repo_id, pk):
+    repository = get_object_or_404(Repository, id=repo_id)
+    if not repository.test_user(request.user):
+        logger.warning('User does not have permission.')
+        return redirect(reverse_lazy('repository_milestones', kwargs={'repo_id': repo_id}))
+
     milestone = get_object_or_404(Milestone, pk=pk)
     milestone.toggle_milestone_close()
     if milestone.closed:
@@ -103,7 +126,7 @@ def close_milestone(request, repo_id, pk):
     return redirect(reverse_lazy('milestone_details', kwargs={'repo_id': repo_id, 'pk': pk}))
 
 
-class MilestoneDeleteView(DeleteView):
+class MilestoneDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Milestone
     template_name_suffix = '_delete'
 
@@ -118,3 +141,7 @@ class MilestoneDeleteView(DeleteView):
     def get_success_url(self):
         logger.info('Milestone with id {} succesfully deleted'.format(self.kwargs['pk']))
         return reverse_lazy('repository_milestones', kwargs={'repo_id': self.kwargs['repo_id']})
+
+    def test_func(self):
+        repo = get_repo(self.kwargs['repo_id'])
+        return repo.test_user(self.request.user)
