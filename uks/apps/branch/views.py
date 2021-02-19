@@ -52,15 +52,20 @@ class BranchDeleteView(UserPassesTestMixin, DeleteView):
 def update_branch(request, repo_id, pk):
     logger.info('Getting branch that should be updates!')
     branch = get_object_or_404(Branch, id=pk)
-    if request.method == 'POST':
-        p_form = UpdateBranchForm(request.POST,
-                                  instance=branch)
-        if p_form.is_valid():
-            logger.info('Valid form for updating branch!')
-            p_form.save()
-            logger.info('Successfully updating branch[id: %s]', pk)
-            messages.success(request, 'You have successfully updated branch!')
 
-    messages.success(request, 'Successfully updated branch!')
-    logger.info('Routing to all branches after updating branch!')
-    return redirect('branch_list', id=repo_id)
+    is_collab = request.user in branch.repository.collaborators.all()
+    if is_collab or branch.repository.owner == request.user:
+        if request.method == 'POST':
+            p_form = UpdateBranchForm(request.POST,
+                                      instance=branch)
+            if p_form.is_valid():
+                logger.info('Valid form for updating branch!')
+                p_form.save()
+                logger.info('Successfully updating branch[id: %s]', pk)
+                messages.success(request, 'You have successfully updated branch!')
+
+        logger.info('Routing to all branches after updating branch!')
+        return redirect('branch_list', repo_id=repo_id)
+    else:
+        messages.error(request, 'User has no permissions for this action!')
+        return redirect('branch_list', repo_id=repo_id)
