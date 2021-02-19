@@ -1,6 +1,9 @@
+import logging
+
 from django.contrib.auth.models import User
 from django.db import models
 
+logger = logging.getLogger('django')
 
 class Repository(models.Model):
     name = models.CharField(max_length=30, unique=True, blank=False)
@@ -11,3 +14,8 @@ class Repository(models.Model):
 
     def get_absolute_url(self):
         return "/repository/" + str(self.id) + "/"
+
+    def test_user(self, user):
+        logger.info('Checking if user has permission for action!')
+        is_collab = user in self.collaborators.all()
+        return is_collab or self.owner == user
