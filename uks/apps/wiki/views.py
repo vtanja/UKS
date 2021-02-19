@@ -11,6 +11,8 @@ from apps.user.models import HistoryItem
 from apps.wiki.forms import CreateWikiForm
 from apps.wiki.models import Wiki
 
+MSG = 'Checking if user has permission to create new wiki page!'
+
 logger = logging.getLogger('django')
 
 
@@ -68,7 +70,7 @@ class WikiDetailPage(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         return context
 
     def test_func(self):
-        logger.info('Checking if user has permission to create new wiki page!')
+        logger.info(MSG)
         repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
         return repo.test_access(self.request.user)
 
@@ -111,7 +113,7 @@ class CreateWikiView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return reverse_lazy('wiki-overview', kwargs={'repo_id': self.kwargs['repo_id']})
 
     def test_func(self):
-        logger.info('Checking if user has permission to create new wiki page!')
+        logger.info(MSG)
         repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
         return repo.test_user(self.request.user)
 

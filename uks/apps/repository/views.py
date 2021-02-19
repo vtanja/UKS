@@ -21,6 +21,8 @@ from ..commit.models import Commit
 from ..tag.models import Tag
 from ..user.models import HistoryItem
 
+MSG = 'Checking if user has permission to create new wiki page!'
+
 logger = logging.getLogger('django')
 repo = 0
 manageAccessUrl = 'repository/manageAccess.html'
@@ -308,7 +310,7 @@ class CollaboratorsDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteVie
         return redirect(success_url)
 
     def test_func(self):
-        logger.info('Checking if user has permission to create new wiki page!')
+        logger.info(MSG)
         repository = get_object_or_404(Repository, id=repo)
         return repository.owner == self.request.user
 
@@ -341,7 +343,7 @@ class RepositoryUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return reverse_lazy('options', kwargs={'key': repo})
 
     def test_func(self):
-        logger.info('Checking if user has permission to create new wiki page!')
+        logger.info(MSG)
         repository = get_object_or_404(Repository, id=repo)
         return repository.owner == self.request.user
 
@@ -366,7 +368,7 @@ class RepositoryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return reverse_lazy('dashboard')
 
     def test_func(self):
-        logger.info('Checking if user has permission to create new wiki page!')
+        logger.info(MSG)
         repository = get_object_or_404(Repository, id=repo)
         return repository.owner == self.request.user
 
@@ -391,7 +393,7 @@ class RepositoryUpdateVisibilityView(LoginRequiredMixin, UserPassesTestMixin, Up
         return reverse_lazy('manage_access', kwargs={'key': repo})
 
     def test_func(self):
-        logger.info('Checking if user has permission to create new wiki page!')
+        logger.info(MSG)
         repository = get_object_or_404(Repository, id=repo)
         return repository.owner == self.request.user
 
@@ -406,6 +408,6 @@ class RepositoryInsightsView(LoginRequiredMixin, UserPassesTestMixin, TemplateVi
         return context
 
     def test_func(self):
-        logger.info('Checking if user has permission to create new wiki page!')
+        logger.info(MSG)
         repository = get_object_or_404(Repository, id=self.kwargs['repository_id'])
         return repository.test_user(self.request.user)

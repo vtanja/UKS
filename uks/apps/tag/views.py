@@ -1,12 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
-
-# Create your views here.
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView
 
 from .forms import CreateTagForm
-from ..branch.models import Branch
 from ..commit.models import Commit
 from ..repository.models import Repository
 from ..tag.models import Tag
