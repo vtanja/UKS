@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
 
 # Create your views here.
@@ -12,7 +12,7 @@ from ..repository.models import Repository
 from ..tag.models import Tag
 
 
-class ListTagView(ListView):
+class ListTagView(UserPassesTestMixin, ListView):
     model = Tag
     template_name = 'tag/tag_list.html'
 
@@ -26,8 +26,12 @@ class ListTagView(ListView):
         context['show'] = False
         return context
 
+    def test_func(self):
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        return repo.test_access(self.request.user)
 
-class CreateTagView(LoginRequiredMixin, CreateView):
+
+class CreateTagView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Tag
     template_name = 'tag/new_tag.html'
     form_class = CreateTagForm
@@ -54,8 +58,12 @@ class CreateTagView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse_lazy('repository_tags', kwargs={'id': self.kwargs['id']})
 
+    def test_func(self):
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        return repo.test_user(self.request.user)
 
-class TagUpdateView(LoginRequiredMixin, UpdateView):
+
+class TagUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Tag
     form_class = CreateTagForm
     template_name = 'tag/edit_tag.html'
@@ -82,3 +90,7 @@ class TagUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('repository_tags', kwargs={'id': self.kwargs['id']})
+
+    def test_func(self):
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        return repo.test_user(self.request.user)

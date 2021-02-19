@@ -25,7 +25,9 @@
                     dataType: 'json',
                     success: function(result){
                         location.reload();
-                        console.log("reloaded")
+                    },
+                    error: function(result){
+                        location.reload();
                     },
                 });
             }

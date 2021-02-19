@@ -5,6 +5,7 @@ from django.db import models
 
 logger = logging.getLogger('django')
 
+
 class Repository(models.Model):
     name = models.CharField(max_length=30, unique=True, blank=False)
     description = models.TextField(blank=True)
@@ -20,3 +21,10 @@ class Repository(models.Model):
         logger.info('Checking if user has permission for action!')
         is_collab = user in self.collaborators.all()
         return is_collab or self.owner == user
+
+    def test_access(self, user):
+        logger.info('Checking if user has access!')
+        if self.public:
+            return True
+        else:
+            return self.test_user(user)

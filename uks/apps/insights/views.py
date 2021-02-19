@@ -1,7 +1,7 @@
 # Create your views here.
 import datetime
 
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 from apps.repository.models import Repository
@@ -42,7 +42,7 @@ def get_commits_per_day(commits):
     return reversed(comms), reversed(labels)
 
 
-class CommitStatisticsView(LoginRequiredMixin, TemplateView):
+class CommitStatisticsView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'commit/commit_statistics.html'
 
     def get_context_data(self, **kwargs):
@@ -73,8 +73,12 @@ class CommitStatisticsView(LoginRequiredMixin, TemplateView):
         context['master_labels_pd'] = '*'.join([str(i) for i in master_labels_pd])
         return context
 
+    def test_func(self):
+        repo = get_object_or_404(Repository, id=self.kwargs['repository_id'])
+        return repo.test_user(self.request.user)
 
-class MilestoneStatisticsView(LoginRequiredMixin, TemplateView):
+
+class MilestoneStatisticsView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'milestone/milestone_statistics.html'
 
     def get_context_data(self, **kwargs):
@@ -91,6 +95,10 @@ class MilestoneStatisticsView(LoginRequiredMixin, TemplateView):
         context['labels'] = ','.join([str(i) for i in labels])
         context['average'] = ','.join([str(i) for i in average_l])
         return context
+
+    def test_func(self):
+        repo = get_object_or_404(Repository, id=self.kwargs['repository_id'])
+        return repo.test_user(self.request.user)
 
 
 def get_completed_percentage(milestones):
@@ -134,7 +142,7 @@ def get_average_milestone_length(milestones):
     return response, lens, labels, average_l
 
 
-class IssueStatisticsView(LoginRequiredMixin, TemplateView):
+class IssueStatisticsView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'issue/issue_statistics.html'
 
     def get_context_data(self, **kwargs):
@@ -149,6 +157,10 @@ class IssueStatisticsView(LoginRequiredMixin, TemplateView):
         context['labels'] = ','.join([str(i) for i in labels_l])
         context['average'] = ','.join([str(i) for i in average_l])
         return context
+
+    def test_func(self):
+        repo = get_object_or_404(Repository, id=self.kwargs['repository_id'])
+        return repo.test_user(self.request.user)
 
 
 def get_average_issue_length(issues):

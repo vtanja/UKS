@@ -21,7 +21,7 @@ def fill_test_data():
     user2.save()
 
     repository1 = Repository.objects.create(name='test_repository1', description='test_repository_description1',
-                                            owner=user1)
+                                            owner=user1, public=False)
     repository2 = Repository.objects.create(name='test_repository2', description='test_repository_description2',
                                             owner=user1)
     repository3 = Repository.objects.create(name='test_repository3', description='test_repository_description3',

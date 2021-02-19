@@ -20,6 +20,14 @@ def get_repository_id(repo_id=0):
     return repo_id
 
 
+def get_issue_id(i_id=0):
+    if i_id < len(Issue.objects.all()):
+        i_id = Issue.objects.all()[i_id].id
+    else:
+        i_id = Issue.objects.all()[len(Issue.objects.all()) - 1].id + 1
+    return i_id
+
+
 def get_repository_and_project_id(repo_id=0, pk=0):
     repo_id = get_repository_id(repo_id)
     if pk < len(Project.objects.all()):
@@ -87,6 +95,12 @@ class ProjectListViewTest(TestCase):
         for proj in response.context['project_list']:
             self.assertEqual(proj.repository, repository)
 
+    def test_user_without_permissions(self):
+        repo_id = get_repository_id(0)
+        self.client.login(username=USER2_USERNAME, password=USER2_PASSWORD)
+        response = self.client.get(reverse('repository_projects', kwargs={'repo_id': repo_id}))
+        self.assertEqual(response.status_code, 403)
+
 
 class ProjectCreateViewTest(TestCase):
     @classmethod
@@ -146,6 +160,13 @@ class ProjectCreateViewTest(TestCase):
         response = self.get_create_project_response(0)
         repository = Repository.objects.filter(id=get_repository_id(0)).first()
         self.assertEqual(response.context['repository'], repository)
+
+    def test_user_without_permissions(self):
+        repo_id = get_repository_id(0)
+        self.client.login(username=USER2_USERNAME, password=USER2_PASSWORD)
+        response = self.client.post(reverse('create_project', kwargs={'repo_id': repo_id}),
+                                    {'name': 'new project test', 'description': 'description'})
+        self.assertEqual(response.status_code, 403)
 
 
 class ProjectDetailViewTest(TestCase):
@@ -209,6 +230,12 @@ class ProjectDetailViewTest(TestCase):
         issues = Issue.objects.filter(repository=Repository.objects.all()[0])
         for i in issues:
             self.assertIn(i, response.context['issue_dict'][i.issue_status])
+
+    def test_user_without_permissions(self):
+        repo_id, pk = get_repository_and_project_id(0, 0)
+        self.client.login(username=USER2_USERNAME, password=USER2_PASSWORD)
+        response = self.client.get(reverse('project_details', kwargs={'repo_id': repo_id, 'pk': pk}))
+        self.assertEqual(response.status_code, 403)
 
 
 class ProjectDeleteViewTest(TestCase):
@@ -279,6 +306,12 @@ class ProjectDeleteViewTest(TestCase):
     def test_deleting_non_existent(self):
         response = self.post_response(0, 50)
         self.assertEqual(response.status_code, 404)
+
+    def test_user_without_permission(self):
+        repo_id, pk = get_repository_and_project_id(0, 0)
+        self.client.login(username=USER2_USERNAME, password=USER2_PASSWORD)
+        response = self.client.delete(reverse('project_delete', kwargs={'repo_id': repo_id, 'pk': pk}))
+        self.assertEqual(response.status_code, 403)
 
 
 class ProjectUpdateViewTest(TestCase):
@@ -352,6 +385,13 @@ class ProjectUpdateViewTest(TestCase):
         response = self.post_response(0, 10)
         self.assertEqual(response.status_code, 404)
 
+    def test_user_without_permission(self):
+        repo_id, pk = get_repository_and_project_id(0, 0)
+        self.client.login(username=USER2_USERNAME, password=USER2_PASSWORD)
+        response = self.client.post(reverse('project_update', kwargs={'repo_id': repo_id, 'pk': pk}),
+                                    {'name': 'edited test name', 'description': 'edited test description'})
+        self.assertEqual(response.status_code, 403)
+
 
 class ChangeIssueStatusTest(TestCase):
     @classmethod
@@ -419,9 +459,22 @@ class ChangeIssueStatusTest(TestCase):
         self.assertTrue(issue.closed)
 
     def test_change_status_to_incorrect_value(self):
-        response = self.send_ajax_request(1, 4, 'SOME_STATUS')
+        repo_id = get_repository_id(0)
+        i_id = get_issue_id(3)
+        response = self.send_ajax_request(repo_id, i_id, 'SOME_STATUS')
         self.assertEqual(response.status_code, 400)
 
     def test_change_status_of_non_existent_issue(self):
-        response = self.send_ajax_request(1, 44, 'TODO')
+        repo_id = get_repository_id(0)
+        i_id = get_issue_id(44)
+        response = self.send_ajax_request(repo_id, i_id, 'TODO')
         self.assertEqual(response.status_code, 400)
+
+    def test_user_without_permission(self):
+        status = 'TODO'
+        repo_id = get_repository_id(0)
+        issue_id = Issue.objects.filter(title='test issue 5').first().id
+        self.client.login(username=USER2_USERNAME, password=USER2_PASSWORD)
+        response = self.client.get(reverse('update_issue', kwargs={'repo_id': repo_id}),
+                                   {'i_id': issue_id, 'list_id': status}, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+        self.assertEqual(response.status_code, 403)

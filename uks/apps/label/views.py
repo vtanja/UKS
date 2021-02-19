@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
 
 # Create your views here.
@@ -10,7 +10,7 @@ from .models import Label
 from ..repository.models import Repository
 
 
-class ListLabelView(ListView):
+class ListLabelView(UserPassesTestMixin, ListView):
     model = Label
     template_name = 'label/label_list.html'
 
@@ -24,8 +24,12 @@ class ListLabelView(ListView):
         context['show'] = False
         return context
 
+    def test_func(self):
+        repo = get_object_or_404(Repository, id=self.kwargs['id'])
+        return repo.test_access(self.request.user)
 
-class CreateLabel(LoginRequiredMixin, CreateView):
+
+class CreateLabel(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Label
     template_name = 'label/create_label.html'
     form_class = CreateLabelForm
@@ -48,8 +52,12 @@ class CreateLabel(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse_lazy('repository_labels', kwargs={'id': self.kwargs['id']})
 
+    def test_func(self):
+        repo = get_object_or_404(Repository, id=self.kwargs['id'])
+        return repo.test_user(self.request.user)
 
-class LabelEdit(LoginRequiredMixin, UpdateView):
+
+class LabelEdit(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Label
     template_name = 'label/create_label.html'
     form_class = CreateLabelForm
@@ -84,8 +92,12 @@ class LabelEdit(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('repository_labels', kwargs={'id': self.kwargs['id']})
 
+    def test_func(self):
+        repo = get_object_or_404(Repository, id=self.kwargs['id'])
+        return repo.test_user(self.request.user)
 
-class LabelDeleteView(LoginRequiredMixin, DeleteView):
+
+class LabelDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Label
     template_name = 'label/delete_label.html'
 
@@ -93,17 +105,20 @@ class LabelDeleteView(LoginRequiredMixin, DeleteView):
         label = get_object_or_404(Label, id=self.kwargs['pk'])
         Label.objects.filter(id=label.id).delete()
 
-
     def get_context_data(self, **kwargs):
-            self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
-            context = super(LabelDeleteView, self).get_context_data(**kwargs)
-            context['repository'] = self.repository
-            return context
+        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        context = super(LabelDeleteView, self).get_context_data(**kwargs)
+        context['repository'] = self.repository
+        return context
 
     def get_form_kwargs(self):
-            kwargs = super(LabelDeleteView, self).get_form_kwargs()
-            kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['id'])
-            return kwargs
+        kwargs = super(LabelDeleteView, self).get_form_kwargs()
+        kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['id'])
+        return kwargs
 
     def get_success_url(self):
         return reverse_lazy('repository_labels', kwargs={'id': self.kwargs['id']})
+
+    def test_func(self):
+        repo = get_object_or_404(Repository, id=self.kwargs['id'])
+        return repo.test_user(self.request.user)

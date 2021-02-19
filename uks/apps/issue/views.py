@@ -1,6 +1,6 @@
 from apps.repository.models import Repository
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -12,7 +12,7 @@ from .models import Issue
 from ..user.models import HistoryItem
 
 
-class IssuesListView(ListView):
+class IssuesListView(UserPassesTestMixin, ListView):
     model = Issue
 
     def get_queryset(self):
@@ -24,6 +24,10 @@ class IssuesListView(ListView):
         context['repository'] = self.repository
         context['show'] = False
         return context
+
+    def test_func(self):
+        repo = get_object_or_404(Repository, id=self.kwargs['repository_id'])
+        return repo.test_access(self.request.user)
 
 
 class IssueDetailView(DetailView):
@@ -75,7 +79,7 @@ def set_message(changed_field, form, original_issue, attribute):
         return 'added this to "{}" {}'.format(form.cleaned_data[changed_field], attribute)
 
 
-class IssueUpdateView(LoginRequiredMixin, UpdateView):
+class IssueUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Issue
     form_class = CreateIssueForm
 
@@ -118,6 +122,10 @@ class IssueUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('issue-details', kwargs={'repository_id': self.kwargs['repository_id'], 'pk': self.kwargs['pk']})
+
+    def test_func(self):
+        repo = get_object_or_404(Repository, id=self.kwargs['repository_id'])
+        return repo.test_access(self.request.user)
 
 
 @login_required
