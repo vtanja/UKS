@@ -65,13 +65,13 @@ class Issue(models.Model):
 
         create_history_item(self, user, message)
 
-
     def change_status(self, status, user):
         create_history_item(self, user, 'changed issue status from {old} to {new}'
                             .format(old=self.issue_status, new=status))
         self.issue_status = status
         if status == 'DONE':
             self.closed = True
+            create_history_item(self, user, 'closed')
             milestone = getattr(self, 'milestone')
             self.save()
             if milestone:
