@@ -1,0 +1,13 @@
+{% extends 'repository/repoDetail.html' %}
+
+
+{% block repo-content %}
+    {% load crispy_forms_filters %}
+    <div class="container" style="width: 50%">
+        <form method="post" action="{% url 'edit_tag' repository.id tag.id %}">
+            {% csrf_token %}
+            {{ form | crispy }}
+            <button type="submit" class="btn btn-primary">Update</button>
+        </form>
+    </div>
+{% endblock %}

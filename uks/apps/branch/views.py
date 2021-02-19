@@ -1,11 +1,10 @@
+
 import logging
 
 from django.contrib import messages
-
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
-
-from django.views.generic import DetailView, ListView, DeleteView
+from django.views.generic import ListView, DeleteView
 
 from apps.branch.forms import UpdateBranchForm
 from apps.branch.models import Branch
@@ -14,20 +13,12 @@ from apps.repository.models import Repository
 logger = logging.getLogger('django')
 
 
-class BranchDetailView(DetailView):
-    model = Branch
-
-    def get_context_data(self, **kwargs):
-        context = super(BranchDetailView, self).get_context_data(**kwargs)
-        return context
-
-
 class BranchListView(ListView):
     model = Branch
 
     def get_queryset(self):
         logger.info('Getting current repository!')
-        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        self.repository = get_object_or_404(Repository, id=self.kwargs['pk'])
         logger.info('Creating form for updating branch!')
         self.p_form = UpdateBranchForm()
         logger.info('Getting all branches that belong to repository [name: %s]!', self.repository.name)
@@ -47,20 +38,20 @@ class BranchDeleteView(DeleteView):
 
     def get_success_url(self):
         logger.info('Routing to all branches after deleting branch!')
-        return reverse_lazy('branch_list', kwargs={'id': self.kwargs['id']})
+        return reverse_lazy('branch_list', kwargs={'repo_id': self.kwargs['repo_id']})
 
 
-def update_branch(request, id, pk):
+def update_branch(request, pk, branch_id):
     logger.info('Getting branch that should be updates!')
-    branch = get_object_or_404(Branch, id=pk)
+    branch = get_object_or_404(Branch, id=branch_id)
     if request.method == 'POST':
         p_form = UpdateBranchForm(request.POST,
                                         instance=branch)
         if p_form.is_valid():
             logger.info('Valid form for updating branch!')
             p_form.save()
-            logger.info('Successfully updating branch[id: %s]', pk)
+            logger.info('Successfully updating branch[id: %s]', branch_id)
             messages.success(request, 'You have successfully updated branch!')
 
     logger.info('Routing to all branches after updating branch!')
-    return redirect('branch_list', id=id)
+    return redirect('branch_list', id=pk)
