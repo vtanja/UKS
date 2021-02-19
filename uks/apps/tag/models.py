@@ -1,12 +1,9 @@
-from django.db import models
-
-
-# Create your models here.
 from datetime import date
+
+from django.db import models
 
 from ..branch.models import Branch
 from ..commit.models import Commit
-from ..repository.models import Repository
 
 
 class Tag(models.Model):
