@@ -26,7 +26,7 @@ class IssuesListView(UserPassesTestMixin, ListView):
         return context
 
     def test_func(self):
-        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        repo = get_object_or_404(Repository, id=self.kwargs['repository_id'])
         return repo.test_access(self.request.user)
 
 
@@ -124,7 +124,7 @@ class IssueUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return reverse_lazy('issue-details', kwargs={'repository_id': self.kwargs['repository_id'], 'pk': self.kwargs['pk']})
 
     def test_func(self):
-        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        repo = get_object_or_404(Repository, id=self.kwargs['repository_id'])
         return repo.test_access(self.request.user)
 
 
@@ -149,5 +149,5 @@ class IssueStatisticsView(LoginRequiredMixin, UserPassesTestMixin, TemplateView)
         return context
 
     def test_func(self):
-        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        repo = get_object_or_404(Repository, id=self.kwargs['repository_id'])
         return repo.test_access(self.request.user)

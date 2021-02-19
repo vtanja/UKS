@@ -25,7 +25,7 @@ class ListLabelView(UserPassesTestMixin, ListView):
         return context
 
     def test_func(self):
-        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        repo = get_object_or_404(Repository, id=self.kwargs['id'])
         return repo.test_access(self.request.user)
 
 
@@ -53,7 +53,7 @@ class CreateLabel(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return reverse_lazy('repository_labels', kwargs={'id': self.kwargs['id']})
 
     def test_func(self):
-        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        repo = get_object_or_404(Repository, id=self.kwargs['id'])
         return repo.test_user(self.request.user)
 
 
@@ -93,7 +93,7 @@ class LabelEdit(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return reverse_lazy('repository_labels', kwargs={'id': self.kwargs['id']})
 
     def test_func(self):
-        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        repo = get_object_or_404(Repository, id=self.kwargs['id'])
         return repo.test_user(self.request.user)
 
 
@@ -121,5 +121,5 @@ class LabelDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return reverse_lazy('repository_labels', kwargs={'id': self.kwargs['id']})
 
     def test_func(self):
-        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        repo = get_object_or_404(Repository, id=self.kwargs['id'])
         return repo.test_user(self.request.user)
