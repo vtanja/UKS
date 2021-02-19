@@ -1,6 +1,6 @@
 import django
 from django.db import models
-from datetime import date
+from datetime import date, datetime
 
 # Create your models here.
 from apps.repository.models import Repository
@@ -35,7 +35,11 @@ class Milestone(models.Model):
 
     def toggle_milestone_close(self):
         self.closed = not self.closed
-        self.dateUpdated = date.today
+        self.dateUpdated = datetime.now()
+        self.save()
+
+    def set_updated(self):
+        self.dateUpdated = datetime.now()
         self.save()
 
     def get_absolute_url(self):
