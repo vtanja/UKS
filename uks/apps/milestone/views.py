@@ -1,6 +1,4 @@
 import logging
-from datetime import timedelta
-
 from apps.issue.models import Issue
 from apps.milestone.forms import CreateMilestoneForm
 from apps.milestone.models import Milestone
@@ -131,49 +129,51 @@ class MilestoneStatisticsView(LoginRequiredMixin, TemplateView):
         context = super(MilestoneStatisticsView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
         repository_milestones = Milestone.objects.filter(repository=self.repository)
-        context['closed_milestones_percent'] = self.get_completed_percentage(repository_milestones)
+        context['closed_milestones_percent'] = get_completed_percentage(repository_milestones)
         context['closed_milestones'] = repository_milestones.filter(closed=True).count()
         context['open_milestones'] = repository_milestones.filter(closed=False).count()
         context['all_milestones'] = repository_milestones.count()
-        context['average_lasting'], lens, labels, average_l = self.get_average_milestone_length(milestones=repository_milestones)
+        context['average_lasting'], lens, labels, average_l = get_average_milestone_length(milestones=repository_milestones)
         context['lens'] = ','.join([str(i) for i in lens])
         context['labels'] = ','.join([str(i) for i in labels])
         context['average'] = ','.join([str(i) for i in average_l])
         return context
 
-    def get_completed_percentage(self, milestones):
-        all_count = milestones.count()
-        if all_count == 0:
-            return 100
-        closed_count = milestones.filter(closed=True).count()
-        res = (100*closed_count)/all_count
-        return round(res)
 
-    def get_average_milestone_length(self, milestones):
-        count = 0
-        length = 0
-        response = ''
-        lens = []
-        labels = []
-        average_l = []
-        for milestone in milestones:
-            if milestone.is_finished():
-                diff = milestone.dateClosed - milestone.dateCreated
-                diff = diff.days
-                lens.append(diff)
-                labels.append(milestone.title)
-                count = count + 1
-                length += diff
-        if count == 0:
-            response = 'no data', lens, labels, average_l
-            return response
-        average = round(length/count)
-        if average < 30:
-            response = str(average) + ' days'
-        elif 30 < average < 365:
-            months = round(average/30)
-            days = average - (months*30)
-            response = '{} months and {} days'.format(str(months), str(days))
-        for len in lens:
-            average_l.append(average)
-        return response, lens, labels, average_l
+def get_completed_percentage(milestones):
+    all_count = milestones.count()
+    if all_count == 0:
+        return 100
+    closed_count = milestones.filter(closed=True).count()
+    res = (100*closed_count)/all_count
+    return round(res)
+
+
+def get_average_milestone_length(milestones):
+    count = 0
+    length = 0
+    response = ''
+    lens = []
+    labels = []
+    average_l = []
+    for milestone in milestones:
+        if milestone.is_finished():
+            diff = milestone.dateClosed - milestone.dateCreated
+            diff = diff.days
+            lens.append(diff)
+            labels.append(milestone.title)
+            count = count + 1
+            length += diff
+    if count == 0:
+        response = 'no data', lens, labels, average_l
+        return response
+    average = round(length/count)
+    if average < 30:
+        response = str(average) + ' days'
+    elif 30 < average < 365:
+        months = round(average/30)
+        days = average - (months*30)
+        response = '{} months and {} days'.format(str(months), str(days))
+    for leng in range(len(lens)):
+        average_l.append(average)
+    return response, lens, labels, average_l
