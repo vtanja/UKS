@@ -11,7 +11,7 @@ from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import DetailView, DeleteView, UpdateView
+from django.views.generic import DetailView, DeleteView, UpdateView, TemplateView
 from ghapi.all import GhApi
 
 from .forms import RepositoryForm, CollaboratorsForm, RepositoryFormEdit
@@ -347,3 +347,13 @@ class RepositoryDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('dashboard')
+
+
+class RepositoryInsightsView(LoginRequiredMixin, TemplateView):
+    template_name = 'repository/repository_insights.html'
+
+    def get_context_data(self, **kwargs):
+        self.repository = get_object_or_404(Repository, id=self.kwargs['repository_id'])
+        context = super(RepositoryInsightsView, self).get_context_data(**kwargs)
+        context['repository'] = self.repository
+        return context

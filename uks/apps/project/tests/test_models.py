@@ -6,7 +6,7 @@ from apps.repository.models import Repository
 from apps.issue.models import Issue
 from apps.project.models import Project
 from django.urls import reverse
-
+from django.utils import timezone
 
 USER1_USERNAME = 'user1'
 USER2_USERNAME = 'user2'
@@ -40,15 +40,20 @@ def fill_test_data():
     project4.save()
 
     test_issue1 = Issue.objects.create(title='test issue 1', description='test description 1', repository=repository1,
-                                       created_by=user1, project=project1, issue_status='TODO')
+                                       created_by=user1, project=project1, issue_status='TODO',
+                                       date_created=timezone.now())
     test_issue2 = Issue.objects.create(title='test issue 2', description='test description 2', repository=repository1,
-                                       created_by=user1, closed=True, project=project1, issue_status='DONE')
+                                       created_by=user1, closed=True, project=project1, issue_status='DONE',
+                                       date_created=timezone.now())
     test_issue3 = Issue.objects.create(title='test issue 3', description='test description 3', repository=repository1,
-                                       created_by=user1, project=project1, issue_status='ONGOING')
+                                       created_by=user1, project=project1, issue_status='ONGOING',
+                                       date_created=timezone.now())
     test_issue4 = Issue.objects.create(title='test issue 4', description='test description 4', repository=repository1,
-                                       created_by=user1, project=project1, issue_status='TODO')
+                                       created_by=user1, project=project1, issue_status='TODO',
+                                       date_created=timezone.now())
     test_issue5 = Issue.objects.create(title='test issue 5', description='test description 5', repository=repository1,
-                                       created_by=user1, closed=True, project=project1, issue_status='DONE')
+                                       created_by=user1, closed=True, project=project1, issue_status='DONE',
+                                       date_created=timezone.now())
 
     test_issue1.save()
     test_issue2.save()
