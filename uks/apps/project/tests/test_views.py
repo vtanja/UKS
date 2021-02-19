@@ -11,6 +11,9 @@ USER2_USERNAME = 'user2'
 USER1_PASSWORD = 'aBcDeF1234'
 USER2_PASSWORD = 'GhIjKl1234'
 
+TEST_ISSUE = 'test issue 5'
+TEST_DESCRIPTION = 'edited test description'
+TEST_NAME = 'edited test name'
 
 def get_repository_id(repo_id=0):
     if repo_id < len(Repository.objects.all()):
@@ -329,7 +332,7 @@ class ProjectUpdateViewTest(TestCase):
         repo_id, pk = get_repository_and_project_id(repo_id, pk)
         self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
         response = self.client.post(reverse('project_update', kwargs={'repo_id': repo_id, 'pk': pk}),
-                                    {'name': 'edited test name', 'description': 'edited test description'})
+                                    {'name': TEST_NAME, 'description': TEST_DESCRIPTION})
         return response
 
     def test_view_url_exists_at_desired_location(self):
@@ -357,7 +360,7 @@ class ProjectUpdateViewTest(TestCase):
     def test_unauthenticated_user_updates_project(self):
         repo_id, proj_id = get_repository_and_project_id()
         response = self.client.post(reverse('project_update', kwargs={'repo_id': repo_id, 'pk': proj_id}),
-                                    {'name': 'edited test name', 'description': 'edited test description'})
+                                    {'name': TEST_NAME, 'description': TEST_DESCRIPTION})
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response,
                              '/welcome/login/?next=/repository/{}/projects/{}/update'.format(repo_id, proj_id))
@@ -389,7 +392,7 @@ class ProjectUpdateViewTest(TestCase):
         repo_id, pk = get_repository_and_project_id(0, 0)
         self.client.login(username=USER2_USERNAME, password=USER2_PASSWORD)
         response = self.client.post(reverse('project_update', kwargs={'repo_id': repo_id, 'pk': pk}),
-                                    {'name': 'edited test name', 'description': 'edited test description'})
+                                    {'name': TEST_NAME, 'description': TEST_DESCRIPTION})
         self.assertEqual(response.status_code, 403)
 
 
@@ -441,9 +444,9 @@ class ChangeIssueStatusTest(TestCase):
     def test_status_successfully_changed_and_reopened(self):
         status = 'TODO'
         repo_id = get_repository_id(0)
-        issue_id = Issue.objects.filter(title='test issue 5').first().id
+        issue_id = Issue.objects.filter(title=TEST_ISSUE).first().id
         response = self.send_ajax_request(repo_id, issue_id, status)
-        issue = Issue.objects.filter(title='test issue 5').first()
+        issue = Issue.objects.filter(title=TEST_ISSUE).first()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(issue.issue_status, status)
         self.assertFalse(issue.closed)
@@ -473,7 +476,7 @@ class ChangeIssueStatusTest(TestCase):
     def test_user_without_permission(self):
         status = 'TODO'
         repo_id = get_repository_id(0)
-        issue_id = Issue.objects.filter(title='test issue 5').first().id
+        issue_id = Issue.objects.filter(title=TEST_ISSUE).first().id
         self.client.login(username=USER2_USERNAME, password=USER2_PASSWORD)
         response = self.client.get(reverse('update_issue', kwargs={'repo_id': repo_id}),
                                    {'i_id': issue_id, 'list_id': status}, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
