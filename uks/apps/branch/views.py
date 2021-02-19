@@ -31,6 +31,7 @@ class BranchListView(ListView):
         context['repository'] = self.repository
         context['p_form'] = self.p_form
         context['show'] = True
+        context['collab'] = self.request.user in self.repository.collaborators.all() or self.request.user == self.repository.owner
         return context
 
 
