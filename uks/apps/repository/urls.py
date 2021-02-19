@@ -27,5 +27,5 @@ urlpatterns = [
     path('<int:repository_id>/insights/', RepositoryInsightsView.as_view(), name='repository-insights'),
     path('<int:repository_id>/insights/issues/', IssueStatisticsView.as_view(), name='issue-statistics'),
     path('<int:repository_id>/insights/commits/', CommitStatisticsView.as_view(), name='commit-statistics'),
-    path('<int:repository_id>/insights/milestones/', MilestoneStatisticsView.as_view(), name='milestone-statistics'),
+    path('<int:repository_id>/insights/milestone/', MilestoneStatisticsView.as_view(), name='milestone-statistics'),
 ]
