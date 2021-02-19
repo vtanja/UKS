@@ -46,8 +46,7 @@ class BranchDeleteView(UserPassesTestMixin, DeleteView):
     def test_func(self):
         logger.info('Checking if user has permission to delete branch!')
         repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
-        is_collab = self.request.user in repo.collaborators.all()
-        return is_collab or repo.owner == self.request.user
+        return repo.test_user(self.request.user)
 
 
 def update_branch(request, repo_id, pk):
