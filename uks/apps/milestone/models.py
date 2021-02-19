@@ -46,7 +46,7 @@ class Milestone(models.Model):
 
     def is_finished(self):
         finished = True
-        if self.issue_set.count() is 0:
+        if self.issue_set.count() == 0:
             finished = False
         else:
             for i in self.issue_set.values():
