@@ -47,6 +47,7 @@ def profile(request, pk):
 
     context = {}
 
+    context['user'] = user
     logger.info('Getting all repositories of user initialized!')
     repositories = all_users_repositories(request)
     context['repos'] = repositories
@@ -63,18 +64,21 @@ def profile(request, pk):
 
 @login_required
 def get_profile_form(request, user):
-    if request.method == 'POST':
-        p_form = ProfileImageUpdateForm(request.POST,
-                                        request.FILES,
-                                        instance=user)
-        if p_form.is_valid():
-            logger.info('User profile form is valid!')
-            p_form.save()
-            logger.info('Successfully updating profile!')
-            messages.success(request, f'You have successfully updated your profile!')
-            return "redirect"
+    if request.user == user.user:
+        if request.method == 'POST':
+            p_form = ProfileImageUpdateForm(request.POST,
+                                            request.FILES,
+                                            instance=user)
+            if p_form.is_valid():
+                logger.info('User profile form is valid!')
+                p_form.save()
+                logger.info('Successfully updating profile!')
+                messages.success(request, f'You have successfully updated your profile!')
+                return "redirect"
+        else:
+            p_form = ProfileImageUpdateForm(instance=user)
     else:
-        p_form = ProfileImageUpdateForm(instance=user)
+        p_form = None
 
     return p_form
 

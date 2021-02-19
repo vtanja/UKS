@@ -20,11 +20,14 @@
         <div class="row">
 
           <div class="media col-md-3">
-            <img class="rounded-circle profile-pic" src="{{ request.user.siteuser.profile_img.url }}" alt="Profile picture">
+            <img class="rounded-circle profile-pic" src="{{ user.profile_img.url }}" alt="Profile picture">
             <div class="media-body">
-              <h2 class="account-heading">{{ request.user.username }}</h2>
-              <p class="text-secondary">{{ request.user.email }}</p>
-                <button  onclick="location.href='{% url 'password-reset' %}'" class=" btn btn-outline-success"> Reset password</button>
+              <h2 class="account-heading">{{ user.user.username }}</h2>
+              <p class="text-secondary">{{ user.user.email }}</p>
+
+                {% if p_form is not None %}
+                    <button  onclick="location.href='{% url 'password-reset' %}'" class=" btn btn-outline-success"> Reset password</button>
+                {% endif %}
 
                 <div class="media-body">
                     <br>
@@ -32,7 +35,9 @@
                         {% csrf_token %}
                         {{p_form | crispy}}
                     <br>
-                        <button class="btn btn-outline-success" type="submit" >Update profile</button>
+                        {% if p_form is not None %}
+                            <button class="btn btn-outline-success" type="submit" >Update profile</button>
+                        {% endif %}
                     </form>
                 </div>
             </div>
