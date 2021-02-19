@@ -74,9 +74,8 @@ class Issue(models.Model):
             create_history_item(self, user, 'closed')
             milestone = getattr(self, 'milestone')
             self.save()
-            if milestone:
-                if milestone.is_finished():
-                    milestone.set_finish_time()
+            if milestone and milestone.is_finished():
+                milestone.set_finish_time()
         else:
             self.closed = False
         self.save()
