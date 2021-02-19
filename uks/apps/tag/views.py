@@ -68,7 +68,7 @@ class TagUpdateView(LoginRequiredMixin, UpdateView):
         commit = commits.first()
         form.instance.commit = commit
         return super().form_valid(form)
-        
+
     def get_form_kwargs(self):
         kwargs = super(TagUpdateView, self).get_form_kwargs()
         kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['id'])
