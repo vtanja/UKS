@@ -18,7 +18,7 @@ class ListTagView(ListView):
 
     def get_queryset(self):
         self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
-        return Tag.objects.filter(repository=self.repository)
+        return Tag.objects.filter(branch__repository=self.repository)
 
     def get_context_data(self, **kwargs):
         context = super(ListTagView, self).get_context_data(**kwargs)
@@ -33,11 +33,8 @@ class CreateTagView(LoginRequiredMixin, CreateView):
     form_class = CreateTagForm
 
     def form_valid(self, form):
-        form.instance.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         branch_name = form.cleaned_data['branch']
-        branches = Branch.objects.filter(name=branch_name)
-        branch = branches.get(repository=form.instance.repository)
-        commits = Commit.objects.filter(branches__id=branch.id)
+        commits = Commit.objects.filter(branches__id=branch_name.id)
         commits = commits.extra(order_by=['-date'])
         commit = commits.first()
         form.instance.commit = commit
@@ -62,6 +59,14 @@ class TagUpdateView(LoginRequiredMixin, UpdateView):
     model = Tag
     form_class = CreateTagForm
     template_name = 'tag/edit_tag.html'
+
+    def form_valid(self, form):
+        branch_name = form.cleaned_data['branch']
+        commits = Commit.objects.filter(branches__id=branch_name.id)
+        commits = commits.extra(order_by=['-date'])
+        commit = commits.first()
+        form.instance.commit = commit
+        return super().form_valid(form)
 
     def get_form_kwargs(self):
         kwargs = super(TagUpdateView, self).get_form_kwargs()

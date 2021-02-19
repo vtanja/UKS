@@ -8,6 +8,7 @@ from apps.user.models import HistoryItem
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, \
     PasswordResetCompleteView
 from django.db.models import Q
@@ -46,6 +47,7 @@ def profile(request, pk):
 
     context = {}
 
+    context['user'] = user
     logger.info('Getting all repositories of user initialized!')
     repositories = all_users_repositories(request)
     context['repos'] = repositories
@@ -62,18 +64,21 @@ def profile(request, pk):
 
 @login_required
 def get_profile_form(request, user):
-    if request.method == 'POST':
-        p_form = ProfileImageUpdateForm(request.POST,
-                                        request.FILES,
-                                        instance=user)
-        if p_form.is_valid():
-            logger.info('User profile form is valid!')
-            p_form.save()
-            logger.info('Successfully updating profile!')
-            messages.success(request, f'You have successfully updated your profile!')
-            return "redirect"
+    if request.user == user.user:
+        if request.method == 'POST':
+            p_form = ProfileImageUpdateForm(request.POST,
+                                            request.FILES,
+                                            instance=user)
+            if p_form.is_valid():
+                logger.info('User profile form is valid!')
+                p_form.save()
+                logger.info('Successfully updating profile!')
+                messages.success(request, f'You have successfully updated your profile!')
+                return "redirect"
+        else:
+            p_form = ProfileImageUpdateForm(instance=user)
     else:
-        p_form = ProfileImageUpdateForm(instance=user)
+        p_form = None
 
     return p_form
 
@@ -101,3 +106,26 @@ class MyPasswordResetConfirmView(LoginRequiredMixin, PasswordResetConfirmView):
 
 class MyPasswordResetCompleteView(LoginRequiredMixin, PasswordResetCompleteView):
     template_name = 'user/password_reset_complete.html'
+
+
+class SearchResultsView(ListView):
+    model = Repository
+    template_name = 'user/search_results.html'
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        user = self.request.user
+        admin = User.objects.get(username='admin')
+        object_tmp_list = Repository.objects.filter(
+            Q(name__icontains=query)
+        ).exclude(owner=admin)
+        if not user.is_authenticated:
+            object_list = object_tmp_list.filter(public=True)
+            return object_list
+
+        object_list = object_tmp_list
+        for repository in object_tmp_list:
+            if repository.public is False and repository.owner != user:
+                object_list = object_tmp_list.exclude(id=repository.id)
+
+        return object_list
