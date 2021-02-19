@@ -11,6 +11,7 @@ class Repository(models.Model):
     repo_url = models.CharField(max_length=100, blank=True, null=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner')
     collaborators = models.ManyToManyField(User, related_name='collaborators', blank=True)
+    public = models.BooleanField(blank=False, default=True)
 
     def get_absolute_url(self):
         return "/repository/" + str(self.id) + "/"

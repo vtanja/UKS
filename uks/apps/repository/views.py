@@ -14,7 +14,7 @@ from django.utils import timezone
 from django.views.generic import DetailView, DeleteView, UpdateView, TemplateView
 from ghapi.all import GhApi
 
-from .forms import RepositoryForm, CollaboratorsForm, RepositoryFormEdit
+from .forms import RepositoryForm, CollaboratorsForm, RepositoryFormEdit, RepositoryFormVisibilityEdit
 from .models import Repository
 from ..branch.models import Branch
 from ..commit.models import Commit
@@ -24,6 +24,7 @@ from ..user.models import HistoryItem
 logger = logging.getLogger('django')
 repo = 0
 manageAccessUrl = 'repository/manageAccess.html'
+
 
 def add_history_item(user, message):
     change = HistoryItem()
@@ -158,6 +159,7 @@ def add_repository(request):
     return render(request, 'user/dashboard.html', {'form': form})
 
 
+@login_required
 def manage_access(request, key):
     repository = Repository.objects.get(id=key)
     if not request.user == repository.owner:
@@ -347,6 +349,26 @@ class RepositoryDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('dashboard')
+
+
+class RepositoryUpdateVisibilityView(LoginRequiredMixin, UpdateView):
+    model = Repository
+    template_name = "repository/editVisibility.html"
+    form_class = RepositoryFormVisibilityEdit
+
+    def get_context_data(self, **kwargs):
+        self.repository = get_object_or_404(Repository, id=self.kwargs['pk'])
+        context = super(RepositoryUpdateVisibilityView, self).get_context_data(**kwargs)
+        context['repository'] = self.repository
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super(RepositoryUpdateVisibilityView, self).get_form_kwargs()
+        kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['pk'])
+        return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy('manage_access', kwargs={'key': repo})
 
 
 class RepositoryInsightsView(LoginRequiredMixin, TemplateView):

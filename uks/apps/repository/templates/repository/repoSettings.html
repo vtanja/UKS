@@ -6,7 +6,6 @@
     <div class="list-group" id="list-tab" role="tablist">
       <a class="list-group-item list-group-item-action" href="{% url 'manage_access' repository.id %}">Manage access</a>
       <a class="list-group-item list-group-item-action" href="{% url 'options' repository.id %}">Options</a>
-      <a class="list-group-item list-group-item-action" href="#">Diagrams</a>
     </div>
   </div>
   <div class="col-10">
@@ -18,8 +17,6 @@
       <div class="tab-pane fade show active" id="tab2" role="tabpanel" aria-labelledby="options">
          {% block options %}
          {% endblock %}
-      </div>
-      <div class="tab-pane fade" id="tab3" role="tabpanel" aria-labelledby="diagrams">
       </div>
     </div>
   </div>

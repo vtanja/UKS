@@ -7,10 +7,17 @@
   <div class="card-deck">
     <div class="card col-3">
       <div class="card-body">
+          {% if repository.public %}
         <h5>Public repository <em class="fas fa-eye"></em></h5>
-        <p></p>
-        <p>This repository is public and visible to anyone.</p>
-        <a href="#">Manage</a>
+          <p></p>
+          <p>This repository is public and visible to anyone.</p>
+          {% endif %}
+          {% if repository.public == False %}
+           <h5>Private repository <em class="fas fa-eye-slash"></em></h5>
+           <p></p>
+          <p>This repository is private.</p>
+          {% endif %}
+        <a href="{% url 'repository_visibility_update' repository.id %}">Manage</a>
       </div>
     </div>
     <div class="card col-3">
