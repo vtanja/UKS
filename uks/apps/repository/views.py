@@ -72,7 +72,7 @@ class RepositoryDetailView(DetailView):
 
         context['commits'] = commits
 
-        context['tags'] = Tag.objects.filter(repository=self.repository)
+        context['tags'] = Tag.objects.filter(branch__repository=self.repository)
         return context
 
     def check_args(self):
