@@ -477,5 +477,4 @@ class ChangeIssueStatusTest(TestCase):
         self.client.login(username=USER2_USERNAME, password=USER2_PASSWORD)
         response = self.client.get(reverse('update_issue', kwargs={'repo_id': repo_id}),
                                    {'i_id': issue_id, 'list_id': status}, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
-        issue = Issue.objects.filter(title='test issue 5').first()
         self.assertEqual(response.status_code, 403)

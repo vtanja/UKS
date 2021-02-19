@@ -1,9 +1,9 @@
 import json
 import logging
+
 from apps.issue.models import Issue
 from apps.project.models import Project
 from apps.repository.models import Repository
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse
@@ -12,7 +12,6 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.decorators.cache import never_cache
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
-
 
 logger = logging.getLogger('django')
 

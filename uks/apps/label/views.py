@@ -105,17 +105,16 @@ class LabelDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         label = get_object_or_404(Label, id=self.kwargs['pk'])
         Label.objects.filter(id=label.id).delete()
 
-
     def get_context_data(self, **kwargs):
-            self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
-            context = super(LabelDeleteView, self).get_context_data(**kwargs)
-            context['repository'] = self.repository
-            return context
+        self.repository = get_object_or_404(Repository, id=self.kwargs['id'])
+        context = super(LabelDeleteView, self).get_context_data(**kwargs)
+        context['repository'] = self.repository
+        return context
 
     def get_form_kwargs(self):
-            kwargs = super(LabelDeleteView, self).get_form_kwargs()
-            kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['id'])
-            return kwargs
+        kwargs = super(LabelDeleteView, self).get_form_kwargs()
+        kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['id'])
+        return kwargs
 
     def get_success_url(self):
         return reverse_lazy('repository_labels', kwargs={'id': self.kwargs['id']})

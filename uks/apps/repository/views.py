@@ -166,6 +166,10 @@ def add_repository(request):
 @login_required
 def manage_access(request, key):
     repository = Repository.objects.get(id=key)
+    return helper_method(repository, request)
+
+
+def helper_method(repository, request):
     if not request.user == repository.owner:
         return redirect('dashboard')
     else:
@@ -245,18 +249,10 @@ def repository_settings(request, key):
     repository = get_object_or_404(Repository, id=key)
     if not repository.test_user(request.user):
         logger.warning('User does not have permission.')
-        messages.error('User does not have permission.')
+        messages.error(request, 'User does not have permission.')
         return redirect('dashboard')
 
-    if not request.user == repository.owner:
-        return redirect('dashboard')
-    else:
-        global repo
-        repo = repository.id
-        users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
-        collabs = repository.collaborators.all()
-        context = {'repository': repository, 'users': users, 'collabs': collabs}
-        return render(request, manageAccessUrl, context)
+    return helper_method(repository, request)
 
 
 @login_required
