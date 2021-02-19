@@ -1,7 +1,8 @@
 import logging
 
 from django.contrib import messages
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DeleteView
@@ -13,7 +14,7 @@ from apps.repository.models import Repository
 logger = logging.getLogger('django')
 
 
-class BranchListView(ListView):
+class BranchListView(UserPassesTestMixin, ListView):
     model = Branch
 
     def get_queryset(self):
@@ -33,8 +34,13 @@ class BranchListView(ListView):
         context['collab'] = self.request.user in self.repository.collaborators.all() or self.request.user == self.repository.owner
         return context
 
+    def test_func(self):
+        logger.info('Checking if user has permission to create new wiki page!')
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        return repo.test_access(self.request.user)
 
-class BranchDeleteView(UserPassesTestMixin, DeleteView):
+
+class BranchDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Branch
 
     def get_success_url(self):
@@ -48,6 +54,7 @@ class BranchDeleteView(UserPassesTestMixin, DeleteView):
         return repo.test_user(self.request.user)
 
 
+@login_required
 def update_branch(request, repo_id, pk):
     logger.info('Getting branch that should be updates!')
     branch = get_object_or_404(Branch, id=pk)

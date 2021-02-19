@@ -3,6 +3,7 @@ from apps.issue.models import Issue
 from apps.milestone.forms import CreateMilestoneForm
 from apps.milestone.models import Milestone
 from apps.repository.models import Repository
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404, redirect
@@ -14,12 +15,11 @@ logger = logging.getLogger('django')
 
 
 def get_repo(repo_id):
-    logger.info('Checking if user has permission to create new wiki page!')
     repo = get_object_or_404(Repository, id=repo_id)
     return repo
 
 
-class MilestoneListView(ListView):
+class MilestoneListView(UserPassesTestMixin, ListView):
     model = Milestone
     template_name = 'milestone/milestone_list.html'
 
@@ -33,6 +33,10 @@ class MilestoneListView(ListView):
         context['show'] = False
         logger.info('Milestone list view context initialized')
         return context
+
+    def test_func(self):
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        return repo.test_access(self.request.user)
 
 
 class CreateMilestoneView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
@@ -79,8 +83,8 @@ class MilestoneDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         return context
 
     def test_func(self):
-        repo = get_repo(self.kwargs['repo_id'])
-        return repo.test_user(self.request.user)
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        return repo.test_access(self.request.user)
 
 
 class MilestoneUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -115,6 +119,7 @@ def close_milestone(request, repo_id, pk):
     repository = get_object_or_404(Repository, id=repo_id)
     if not repository.test_user(request.user):
         logger.warning('User does not have permission.')
+        messages.error(request, 'User does not have permission.')
         return redirect(reverse_lazy('repository_milestones', kwargs={'repo_id': repo_id}))
 
     milestone = get_object_or_404(Milestone, pk=pk)

@@ -1,6 +1,6 @@
 from apps.repository.models import Repository
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -12,7 +12,7 @@ from .models import Issue
 from ..user.models import HistoryItem
 
 
-class IssuesListView(ListView):
+class IssuesListView(UserPassesTestMixin, ListView):
     model = Issue
 
     def get_queryset(self):
@@ -24,6 +24,10 @@ class IssuesListView(ListView):
         context['repository'] = self.repository
         context['show'] = False
         return context
+
+    def test_func(self):
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        return repo.test_access(self.request.user)
 
 
 class IssueDetailView(DetailView):
@@ -75,7 +79,7 @@ def set_message(changed_field, form, original_issue, attribute):
         return 'added this to "{}" {}'.format(form.cleaned_data[changed_field], attribute)
 
 
-class IssueUpdateView(LoginRequiredMixin, UpdateView):
+class IssueUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Issue
     form_class = CreateIssueForm
 
@@ -119,6 +123,10 @@ class IssueUpdateView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('issue-details', kwargs={'repository_id': self.kwargs['repository_id'], 'pk': self.kwargs['pk']})
 
+    def test_func(self):
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        return repo.test_access(self.request.user)
+
 
 @login_required
 def close_issue(request, repository_id, pk):
@@ -128,7 +136,7 @@ def close_issue(request, repository_id, pk):
     return redirect(reverse_lazy('issue-details', kwargs={'repository_id': repository_id, 'pk': pk}))
 
 
-class IssueStatisticsView(LoginRequiredMixin, TemplateView):
+class IssueStatisticsView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'issue/issue_statistics.html'
 
     def get_context_data(self, **kwargs):
@@ -139,3 +147,7 @@ class IssueStatisticsView(LoginRequiredMixin, TemplateView):
         context['opened_issues'] = repository_issues.filter(closed=False).count()
         context['closed_issues'] = repository_issues.filter(closed=True).count()
         return context
+
+    def test_func(self):
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        return repo.test_access(self.request.user)

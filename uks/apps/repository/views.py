@@ -4,7 +4,7 @@ import os
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -34,7 +34,7 @@ def add_history_item(user, message):
     return change
 
 
-class RepositoryDetailView(DetailView):
+class RepositoryDetailView(UserPassesTestMixin, DetailView):
     model = Repository
     template_name = 'repository/overview.html'
 
@@ -89,16 +89,20 @@ class RepositoryDetailView(DetailView):
             else:
                 self.branch = self.repository.branch_set.first()
 
+    def test_func(self):
+        repository = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        return repository.test_access(self.request.user)
 
-@login_required
-def detail(request, id):
-    repositories = Repository.objects.filter(
-        Q(owner=request.user) | Q(collaborators__username__in=[str(request.user)])
-    )
-    repository = Repository.objects.get(id=id)
-    print(repository.name)
-    context = {'repositories': repositories, 'repository': repository}
-    return render(request, 'repository/repoDetail.html', context)
+
+# @login_required
+# def detail(request, id):
+#     repositories = Repository.objects.filter(
+#         Q(owner=request.user) | Q(collaborators__username__in=[str(request.user)])
+#     )
+#     repository = Repository.objects.get(id=id)
+#     print(repository.name)
+#     context = {'repositories': repositories, 'repository': repository}
+#     return render(request, 'repository/repoDetail.html', context)
 
 
 def get_branches(repository):
@@ -238,7 +242,12 @@ def get_github_api(repository):
 
 @login_required
 def repository_settings(request, key):
-    repository = Repository.objects.get(id=key)
+    repository = get_object_or_404(Repository, id=key)
+    if not repository.test_user(request.user):
+        logger.warning('User does not have permission.')
+        messages.error('User does not have permission.')
+        return redirect('dashboard')
+
     if not request.user == repository.owner:
         return redirect('dashboard')
     else:
@@ -281,7 +290,7 @@ def add_collaborators(request):
     return render(request, manageAccessUrl, context)
 
 
-class CollaboratorsDeleteView(LoginRequiredMixin, DeleteView):
+class CollaboratorsDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = User
     template_name = "repository/deleteCollaborators.html"
 
@@ -302,6 +311,11 @@ class CollaboratorsDeleteView(LoginRequiredMixin, DeleteView):
         success_url = self.get_success_url()
         return redirect(success_url)
 
+    def test_func(self):
+        logger.info('Checking if user has permission to create new wiki page!')
+        repository = get_object_or_404(Repository, id=repo)
+        return repository.owner == self.request.user
+
     def get_form_kwargs(self):
         kwargs = super(CollaboratorsDeleteView, self).get_form_kwargs()
         kwargs['repository'] = get_object_or_404(Repository, id=repo)
@@ -311,7 +325,7 @@ class CollaboratorsDeleteView(LoginRequiredMixin, DeleteView):
         return reverse_lazy('manage_access', kwargs={'key': repo})
 
 
-class RepositoryUpdateView(LoginRequiredMixin, UpdateView):
+class RepositoryUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Repository
     template_name = "repository/repoUpdate.html"
     form_class = RepositoryFormEdit
@@ -330,8 +344,13 @@ class RepositoryUpdateView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('options', kwargs={'key': repo})
 
+    def test_func(self):
+        logger.info('Checking if user has permission to create new wiki page!')
+        repository = get_object_or_404(Repository, id=repo)
+        return repository.owner == self.request.user
 
-class RepositoryDeleteView(LoginRequiredMixin, DeleteView):
+
+class RepositoryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Repository
     template_name = "repository/repositoryDelete.html"
 
@@ -350,8 +369,13 @@ class RepositoryDeleteView(LoginRequiredMixin, DeleteView):
     def get_success_url(self):
         return reverse_lazy('dashboard')
 
+    def test_func(self):
+        logger.info('Checking if user has permission to create new wiki page!')
+        repository = get_object_or_404(Repository, id=repo)
+        return repository.owner == self.request.user
 
-class RepositoryUpdateVisibilityView(LoginRequiredMixin, UpdateView):
+
+class RepositoryUpdateVisibilityView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Repository
     template_name = "repository/editVisibility.html"
     form_class = RepositoryFormVisibilityEdit
@@ -370,8 +394,13 @@ class RepositoryUpdateVisibilityView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('manage_access', kwargs={'key': repo})
 
+    def test_func(self):
+        logger.info('Checking if user has permission to create new wiki page!')
+        repository = get_object_or_404(Repository, id=repo)
+        return repository.owner == self.request.user
 
-class RepositoryInsightsView(LoginRequiredMixin, TemplateView):
+
+class RepositoryInsightsView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'repository/repository_insights.html'
 
     def get_context_data(self, **kwargs):
@@ -379,3 +408,8 @@ class RepositoryInsightsView(LoginRequiredMixin, TemplateView):
         context = super(RepositoryInsightsView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
         return context
+
+    def test_func(self):
+        logger.info('Checking if user has permission to create new wiki page!')
+        repository = get_object_or_404(Repository, id=repo)
+        return repository.test_user(self.request.user)

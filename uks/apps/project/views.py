@@ -3,6 +3,7 @@ import logging
 from apps.issue.models import Issue
 from apps.project.models import Project
 from apps.repository.models import Repository
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse
@@ -37,8 +38,8 @@ class ProjectListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return context
 
     def test_func(self):
-        repo = get_repo(self.kwargs['repo_id'])
-        return repo.test_user(self.request.user)
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        return repo.test_access(self.request.user)
 
 
 class CreateProjectView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
@@ -94,8 +95,8 @@ class ProjectDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         return super().dispatch(request, *args, **kwargs)
 
     def test_func(self):
-        repo = get_repo(self.kwargs['repo_id'])
-        return repo.test_user(self.request.user)
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        return repo.test_access(self.request.user)
 
 
 @login_required

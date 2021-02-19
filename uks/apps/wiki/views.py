@@ -21,7 +21,8 @@ def add_history_item(user, message):
     change.message = message
     return change
 
-class WikiListView(LoginRequiredMixin, ListView):
+
+class WikiListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Wiki
     template_name = 'wiki/wiki_list.html'
 
@@ -44,8 +45,13 @@ class WikiListView(LoginRequiredMixin, ListView):
         context['show'] = False
         return context
 
+    def test_func(self):
+        logger.info('Checking if user has permission to create new wiki page!')
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        return repo.test_access(self.request.user)
 
-class WikiDetailPage(LoginRequiredMixin, DetailView):
+
+class WikiDetailPage(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Wiki
     template_name = 'wiki/wiki_detail.html'
 
@@ -60,6 +66,11 @@ class WikiDetailPage(LoginRequiredMixin, DetailView):
         context['last_update'] = HistoryItem.objects.filter(changed_wiki_object_id=self.object.id).order_by('-date_changed').first()
 
         return context
+
+    def test_func(self):
+        logger.info('Checking if user has permission to create new wiki page!')
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        return repo.test_access(self.request.user)
 
 
 class CreateWikiView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
