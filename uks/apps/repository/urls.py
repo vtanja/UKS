@@ -1,6 +1,8 @@
 from django.urls import path, include
 
+from ..commit.views import CommitStatisticsView
 from ..issue.views import IssueStatisticsView
+from ..milestone.views import MilestoneStatisticsView
 from ..repository.views import RepositoryDetailView, add_repository, add_collaborators, \
     CollaboratorsDeleteView, manage_access, options, RepositoryUpdateView, RepositoryDeleteView, repository_settings, \
     RepositoryInsightsView
@@ -23,5 +25,7 @@ urlpatterns = [
     path('<int:id>/tag/', include('apps.tag.urls')),
     path('<int:repo_id>/wiki/', include('apps.wiki.urls')),
     path('<int:repository_id>/insights/', RepositoryInsightsView.as_view(), name='repository-insights'),
-    path('<int:repository_id>/insights/issues/', IssueStatisticsView.as_view(), name='issue-statistics')
+    path('<int:repository_id>/insights/issues/', IssueStatisticsView.as_view(), name='issue-statistics'),
+    path('<int:repository_id>/insights/commits/', CommitStatisticsView.as_view(), name='commit-statistics'),
+    path('<int:repository_id>/insights/milestones/', MilestoneStatisticsView.as_view(), name='milestone-statistics'),
 ]
