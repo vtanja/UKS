@@ -1,0 +1,62 @@
+{% extends 'repository/repository_insights.html' %}
+
+
+{% block statistics %}
+    <div class="container" style="padding-right: 4cm">
+        <h3>Milestone statistics</h3>
+        <p>Milestones closed until now</p>
+        <div class="progress" style="vertical-align: center">
+            <div class="progress-bar bg-success" role="progressbar" style="width: {{ closed_milestones_percent }}%" aria-valuenow="{{ closed_milestones_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <br>
+        <div style="float: right"><em>Closed {{ closed_milestones }} out of {{ all_milestones }} milestones</em></div>
+        <br>
+        <hr>
+        <p>Average time to finish a milestone is <em>{{ average_lasting }}</em></p>
+        <canvas id="milestoneChart" width="90" height="30"></canvas>
+    </div>
+
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        let ctx = document.getElementById('milestoneChart').getContext('2d');
+        let lens = '{{ lens }}'.split(',');
+        let labels = '{{ labels }}'.split(',');
+        let average = '{{ average }}'.split(',');
+        let openedClosedChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Duration',
+                    data: lens,
+                    borderWidth: 1,
+                    backgroundColor: [
+                        'rgb(246,218,173)',
+                    ],
+                    borderColor: [
+                        'rgb(248,199,116)',
+                    ],
+                }, {
+                    label: 'Average',
+                    data: average,
+                    borderWidth: 1,
+                    backgroundColor: [
+                        'rgb(205,238,182)',
+                    ],
+                    borderColor: [
+                        'rgb(180,233,133)',
+                    ],
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Duration of milestones',
+                    position: 'bottom',
+                }
+            }
+        });
+    </script>
+{% endblock %}
