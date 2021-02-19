@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='tag',
             name='dateCreated',
-            field=models.DateField(blank=True, default=datetime.date.today, verbose_name='Created'),
+            field=models.DateField(blank=True, verbose_name='Created'),
         ),
     ]
