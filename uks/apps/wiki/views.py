@@ -20,7 +20,7 @@ def add_history_item(user, message):
     change.message = message
     return change
 
-class WikiListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+class WikiListView(LoginRequiredMixin, ListView):
     model = Wiki
     template_name = 'wiki/wiki_list.html'
 
@@ -43,30 +43,20 @@ class WikiListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         context['show'] = False
         return context
 
-    def test_func(self):
-        logger.info('Checking if user has permission to delete branch!')
-        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
-        is_collab = self.request.user in repo.collaborators.all()
-        return is_collab or repo.owner == self.request.user
 
-
-class WikiDetailPage(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+class WikiDetailPage(LoginRequiredMixin, DetailView):
     model = Wiki
     template_name = 'wiki/wiki_detail.html'
 
     def get_context_data(self, **kwargs):
         context = super(WikiDetailPage, self).get_context_data(**kwargs)
         logger.info('Retrieving wiki that belong to repository with id: %s', self.kwargs['repo_id'])
+        repository = get_object_or_404(Repository, id=self.kwargs['repo_id'])
         context['wikis'] = Wiki.objects.filter(repository_id=self.kwargs['repo_id'])
-        context['repository'] = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        context['repository'] = repository
         context['show'] = False
+        context['collab'] = repository.test_user(self.request.user)
         return context
-
-    def test_func(self):
-        logger.info('Checking if user has permission to delete branch!')
-        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
-        is_collab = self.request.user in repo.collaborators.all()
-        return is_collab or repo.owner == self.request.user
 
 
 class CreateWikiView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
@@ -107,10 +97,10 @@ class CreateWikiView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return reverse_lazy('wiki-overview', kwargs={'repo_id': self.kwargs['repo_id']})
 
     def test_func(self):
-        logger.info('Checking if user has permission to delete branch!')
+        logger.info('Checking if user has permission to create new wiki page!')
         repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
-        is_collab = self.request.user in repo.collaborators.all()
-        return is_collab or repo.owner == self.request.user
+        return repo.test_user(self.request.user)
+
 
 class WikiUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Wiki
@@ -152,10 +142,9 @@ class WikiUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return reverse_lazy('wiki-details', kwargs={'repo_id': self.kwargs['repo_id'], 'pk': self.kwargs['pk']})
 
     def test_func(self):
-        logger.info('Checking if user has permission to delete branch!')
+        logger.info('Checking if user has permission to update wiki page!')
         repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
-        is_collab = self.request.user in repo.collaborators.all()
-        return is_collab or repo.owner == self.request.user
+        return repo.test_user(self.request.user)
 
 
 class WikiDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -169,10 +158,9 @@ class WikiDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return reverse_lazy('wiki-overview', kwargs={'repo_id': self.kwargs['repo_id']})
 
     def test_func(self):
-        logger.info('Checking if user has permission to delete branch!')
+        logger.info('Checking if user has permission to delete wiki page!')
         repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
-        is_collab = self.request.user in repo.collaborators.all()
-        return is_collab or repo.owner == self.request.user
+        return repo.test_user(self.request.user)
 
 
 class HistoryListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -196,7 +184,7 @@ class HistoryListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return context
 
     def test_func(self):
-        logger.info('Checking if user has permission to delete branch!')
+        logger.info('Checking if user has permission to access wiki history page!')
         repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
-        is_collab = self.request.user in repo.collaborators.all()
-        return is_collab or repo.owner == self.request.user
+        return repo.test_user(self.request.user)
+
