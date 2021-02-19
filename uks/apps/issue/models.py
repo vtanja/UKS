@@ -51,13 +51,19 @@ class Issue(models.Model):
         return reverse('issue-details', args=[str(self.repository_id), str(self.id)])
 
     def toggle_issue_close(self, user):
-        if self.closed:
-            message = 'opened'
-        else:
-            message = 'closed'
-        create_history_item(self, user, message)
         self.closed = not self.closed
         self.save()
+        if self.closed:
+            message = 'closed'
+            self.save()
+            if self.milestone:
+                milestone = getattr(self, 'milestone')
+                if milestone.is_finished():
+                    milestone.set_finish_time()
+        else:
+            message = 'opened'
+
+        create_history_item(self, user, message)
 
     def change_status(self, status, user):
         create_history_item(self, user, 'changed issue status from {old} to {new}'
@@ -65,6 +71,11 @@ class Issue(models.Model):
         self.issue_status = status
         if status == 'DONE':
             self.closed = True
+            create_history_item(self, user, 'closed')
+            milestone = getattr(self, 'milestone')
+            self.save()
+            if milestone and milestone.is_finished():
+                milestone.set_finish_time()
         else:
             self.closed = False
         self.save()

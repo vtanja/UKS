@@ -1,6 +1,6 @@
 import django
 from django.db import models
-from datetime import date
+from datetime import date, datetime
 
 # Create your models here.
 from apps.repository.models import Repository
@@ -15,6 +15,7 @@ class Milestone(models.Model):
     dateUpdated = models.DateField(verbose_name='Last updated', default=date.today, blank=True)
     closed = models.BooleanField(default=False)
     repository = models.ForeignKey(Repository, on_delete=models.CASCADE, null=False)
+    dateClosed = models.DateField(verbose_name='Date closed', blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -22,7 +23,7 @@ class Milestone(models.Model):
     def get_completed_percentage(self):
         all_count = self.issue_set.count()
         if all_count == 0:
-            return 100
+            return 0
         closed_count = self.issue_set.filter(closed=True).count()
         res = (100*closed_count)/all_count
         return round(res)
@@ -35,6 +36,27 @@ class Milestone(models.Model):
 
     def toggle_milestone_close(self):
         self.closed = not self.closed
+        self.dateUpdated = datetime.now()
+        self.dateClosed = datetime.now()
+        self.save()
+
+    def set_updated(self):
+        self.dateUpdated = datetime.now()
+        self.save()
+
+    def is_finished(self):
+        finished = True
+        if self.issue_set.count() == 0:
+            finished = False
+        else:
+            for i in self.issue_set.values():
+                if not i['closed']:
+                    finished = False
+                    break
+        return finished
+
+    def set_finish_time(self):
+        self.dateClosed = datetime.now()
         self.save()
 
     def get_absolute_url(self):
