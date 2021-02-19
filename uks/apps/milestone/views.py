@@ -10,7 +10,6 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
-
 logger = logging.getLogger('django')
 
 
@@ -107,6 +106,8 @@ class MilestoneUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def get_success_url(self):
         logger.info('Milestone with id {} successfully updated'.format(self.kwargs['pk']))
+        milestone = get_object_or_404(Milestone, id=self.kwargs['pk'])
+        milestone.set_updated()
         return reverse_lazy('repository_milestones', kwargs={'repo_id': self.kwargs['repo_id']})
 
     def test_func(self):

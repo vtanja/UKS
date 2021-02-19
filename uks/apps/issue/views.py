@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
 from .forms import CreateIssueForm
 from .models import Issue
@@ -134,20 +134,3 @@ def close_issue(request, repository_id, pk):
     get_object_or_404(Repository, pk=repository_id)
     issue.toggle_issue_close(request.user)
     return redirect(reverse_lazy('issue-details', kwargs={'repository_id': repository_id, 'pk': pk}))
-
-
-class IssueStatisticsView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
-    template_name = 'issue/issue_statistics.html'
-
-    def get_context_data(self, **kwargs):
-        self.repository = get_object_or_404(Repository, id=self.kwargs['repository_id'])
-        context = super(IssueStatisticsView, self).get_context_data(**kwargs)
-        context['repository'] = self.repository
-        repository_issues = Issue.objects.filter(repository=self.repository)
-        context['opened_issues'] = repository_issues.filter(closed=False).count()
-        context['closed_issues'] = repository_issues.filter(closed=True).count()
-        return context
-
-    def test_func(self):
-        repo = get_object_or_404(Repository, id=self.kwargs['repository_id'])
-        return repo.test_access(self.request.user)

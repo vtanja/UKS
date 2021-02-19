@@ -1,0 +1,122 @@
+{% extends 'repository/repository_insights.html' %}
+
+
+{% block statistics %}
+    <div class="container" style="padding-right: 4cm">
+        <h3>Commit statistics</h3>
+        <hr>
+        <p>Code frequency for main branch</p>
+        <canvas id="commitAllChartMaster" width="90" height="30" ></canvas>
+        <hr>
+        <p>Contributions to the main in last 30 days</p>
+        <canvas id="commitPerUserChartMaster" width="90" height="30"></canvas>
+        <hr>
+        <p>Code frequency overall</p>
+        <canvas id="commitAllChart" width="90" height="30" ></canvas>
+        <hr>
+        <p>Contributions overall in last 30 days</p>
+        <canvas id="commitPerUserChart" width="90" height="30"></canvas>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        let ctx_master = document.getElementById('commitAllChartMaster').getContext('2d');
+        let ctx2_master = document.getElementById('commitPerUserChartMaster').getContext('2d');
+        let comms_pp_master = '{{ master_comms_pp }}'.split(',');
+        let labels_pp_master = '{{ master_labels_pp }}'.split(',');
+        let comms_pd_master = '{{ master_comms_pd }}'.split(',');
+        let labels_pd_master = '{{ master_labels_pd }}'.split('*');
+        let commitAllChartMaster = new Chart(ctx_master, {
+            type: 'line',
+            data: {
+                labels: labels_pd_master,
+                datasets: [{
+                    label: 'commits',
+                    data: comms_pd_master,
+                    borderWidth: 1,
+                    backgroundColor: [
+                        'rgb(246,218,173)',
+                    ],
+                    borderColor: [
+                        'rgb(248,199,116)',
+                    ],
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Commits per day to master',
+                    position: 'bottom',
+                }
+            }
+        });
+        let commitPerUserChartMaster = new Chart(ctx2_master, {
+            type: 'bar',
+            data: {
+                labels: labels_pp_master,
+                datasets: [{
+                    label: 'commits',
+                    data: comms_pp_master,
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Commits per user to master',
+                    position: 'bottom',
+                }
+            }
+        });
+
+        let ctx = document.getElementById('commitAllChart').getContext('2d');
+        let ctx2 = document.getElementById('commitPerUserChart').getContext('2d');
+        let comms_pp = '{{ comms_pp }}'.split(',');
+        let labels_pp = '{{ labels_pp }}'.split(',');
+        let comms_pd = '{{ comms_pd }}'.split(',');
+        let labels_pd = '{{ labels_pd }}'.split('*');
+        let commitAllChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels_pd,
+                datasets: [{
+                    label: 'commits',
+                    data: comms_pd,
+                    borderWidth: 1,
+                    backgroundColor: [
+                        'rgb(246,218,173)',
+                    ],
+                    borderColor: [
+                        'rgb(248,199,116)',
+                    ],
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Commits per day',
+                    position: 'bottom',
+                }
+            }
+        });
+        let commitPerUserChart = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: labels_pp,
+                datasets: [{
+                    label: 'commits',
+                    data: comms_pp,
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Commits per user',
+                    position: 'bottom',
+                }
+            }
+        });
+    </script>
+{% endblock %}

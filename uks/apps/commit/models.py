@@ -16,3 +16,7 @@ class Commit(models.Model):
 
     def get_absolute_url(self):
         return self.url
+
+    def is_in_repository(self, repository):
+        branches = self.branches.all()
+        return branches[0].repository == repository
