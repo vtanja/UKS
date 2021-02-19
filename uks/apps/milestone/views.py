@@ -165,7 +165,7 @@ class MilestoneStatisticsView(LoginRequiredMixin, TemplateView):
                 count = count + 1
                 length += diff
         if count == 0:
-            response = 'no data'
+            response = 'no data', lens, labels, average_l
             return response
         average = round(length/count)
         if average < 30:
