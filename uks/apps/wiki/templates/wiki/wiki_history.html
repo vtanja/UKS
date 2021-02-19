@@ -11,7 +11,7 @@
                         <div class="card" >
                             <div class="card-body">
                                 <div class="card-text" >
-                                    <div style="float:left"><a href="{{ item.belongs_to.get_absolute_url }}" >{{ item.belongs_to.username }}</a> &nbsp;{{ item.message }} wiki page</div>
+                                    <div style="float:left"><a href="{{ item.belongs_to.siteuser.get_absolute_url }}" >{{ item.belongs_to.username }}</a> &nbsp;{{ item.message }} wiki page</div>
                                 <em style="float: right">{{  item.get_time_of_change}}</em>
                                 </div>
                             </div>
