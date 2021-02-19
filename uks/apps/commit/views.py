@@ -21,9 +21,9 @@ class CommitStatisticsView(LoginRequiredMixin, TemplateView):
         for commit in all_commits:
             if commit.is_in_repository(self.repository):
                 repository_commits.append(commit)
-        branches = Branch.objects.filter(name='develop', repository=self.repository)
+        branches = Branch.objects.filter(name='master', repository=self.repository)
         if branches.count() == 0:
-            branches = Branch.objects.filter(name='dev')
+            branches = Branch.objects.filter(name='main')
         main = branches.first()
         master_commits = Commit.objects.filter(branches__in=[main])
         comms_pp, labels_pp = self.get_commits_per_user(repository_commits)
