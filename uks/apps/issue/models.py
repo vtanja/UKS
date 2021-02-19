@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from apps.label.models import Label
 from apps.milestone.models import Milestone
 from apps.project.models import Project
@@ -42,6 +44,7 @@ class Issue(models.Model):
     milestone = models.ForeignKey(Milestone, on_delete=models.CASCADE, null=True, blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True)
     date_created = models.DateTimeField(verbose_name='Date of creation')
+    date_closed = models.DateTimeField(verbose_name='Date closed', null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -55,6 +58,10 @@ class Issue(models.Model):
             message = 'opened'
         else:
             message = 'closed'
+            self.date_closed = datetime.now()
+            milestone = self.milestone.value_from_object(self)
+            if milestone.is_finished_except(self):
+                milestone.set_finish_time()
         create_history_item(self, user, message)
         self.closed = not self.closed
         self.save()
@@ -65,6 +72,11 @@ class Issue(models.Model):
         self.issue_status = status
         if status == 'DONE':
             self.closed = True
+            self.date_closed = datetime.now()
+            milestone = getattr(self, 'milestone')
+            self.save()
+            if milestone.is_finished():
+                milestone.set_finish_time()
         else:
             self.closed = False
         self.save()
