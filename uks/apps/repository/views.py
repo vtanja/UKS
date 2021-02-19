@@ -351,7 +351,6 @@ class RepositoryDeleteView(LoginRequiredMixin, DeleteView):
         return reverse_lazy('dashboard')
 
 
-
 class RepositoryUpdateVisibilityView(LoginRequiredMixin, UpdateView):
     model = Repository
     template_name = "repository/editVisibility.html"
@@ -372,7 +371,6 @@ class RepositoryUpdateVisibilityView(LoginRequiredMixin, UpdateView):
         return reverse_lazy('manage_access', kwargs={'key': repo})
 
 
-
 class RepositoryInsightsView(LoginRequiredMixin, TemplateView):
     template_name = 'repository/repository_insights.html'
 
@@ -381,4 +379,3 @@ class RepositoryInsightsView(LoginRequiredMixin, TemplateView):
         context = super(RepositoryInsightsView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
         return context
-
