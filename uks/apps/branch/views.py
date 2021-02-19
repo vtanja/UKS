@@ -49,8 +49,9 @@ class BranchDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return reverse_lazy('branch_list', kwargs={'pk': self.kwargs['pk']})
 
     def delete(self, request, *args, **kwargs):
-        branch = get_object_or_404(Branch, self.kwargs['branch_id'])
+        branch = get_object_or_404(Branch, id=self.kwargs['branch_id'])
         branch.delete()
+        return redirect(self.get_success_url())
 
     def test_func(self):
         logger.info('Checking if user has permission to delete branch!')
