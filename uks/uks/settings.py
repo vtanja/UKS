@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'apps.label',
     'apps.project',
     'apps.wiki',
+    'apps.insights',
     'security',
     'crispy_forms',
     'fontawesome-free',

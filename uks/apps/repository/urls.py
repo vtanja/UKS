@@ -1,8 +1,6 @@
 from django.urls import path, include
 
-from ..commit.views import CommitStatisticsView
-from ..issue.views import IssueStatisticsView
-from ..milestone.views import MilestoneStatisticsView
+from ..insights.views import IssueStatisticsView, CommitStatisticsView, MilestoneStatisticsView
 from ..repository.views import RepositoryDetailView, add_repository, add_collaborators, \
     CollaboratorsDeleteView, manage_access, options, RepositoryUpdateView, RepositoryDeleteView, repository_settings, \
     RepositoryUpdateVisibilityView, RepositoryInsightsView
