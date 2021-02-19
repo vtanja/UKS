@@ -153,7 +153,9 @@ class IssueStatisticsView(LoginRequiredMixin, TemplateView):
         average_l = []
         for issue in issues:
             if issue.closed:
-                diff = issue.date_closed - issue.date_created
+                hi_l = HistoryItem.objects.filter(changed_issue=issue, message__contains='closed').order_by('-date_changed')
+                hi = hi_l[0]
+                diff = hi.date_changed - issue.date_created
                 diff = diff.days
                 lens.append(diff)
                 labels.append(issue.title)
