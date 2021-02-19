@@ -2,10 +2,11 @@ import json
 import logging
 import os
 
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -17,12 +18,12 @@ from .forms import RepositoryForm, CollaboratorsForm, RepositoryFormEdit
 from .models import Repository
 from ..branch.models import Branch
 from ..commit.models import Commit
+from ..tag.models import Tag
 from ..user.models import HistoryItem
 
 logger = logging.getLogger('django')
 repo = 0
 manageAccessUrl = 'repository/manageAccess.html'
-
 
 def add_history_item(user, message):
     change = HistoryItem()
@@ -46,9 +47,46 @@ class RepositoryDetailView(DetailView):
 
         qs = Branch.objects.filter(repository=self.repository)
         context["qs_json"] = json.dumps([obj.as_dict() for obj in qs])
-        context['first'] = Branch.objects.filter(Q(repository_id=self.repository.id)).first()
         context['show'] = True
+
+        self.check_args()
+
+        commits = Commit.objects.filter(branches__in=[self.branch]).order_by('-date')
+
+        context['commit_num'] = commits.count()
+
+        context['branch'] = self.branch
+
+        paginator = Paginator(commits, 15)  # Show 25 contacts per page.
+
+        page_number = self.request.GET.get('page')
+        if page_number is None:
+            page_number = 1
+
+        page_obj = paginator.get_page(page_number)
+
+        context['page_obj'] = page_obj
+
+        commits = paginator.page(page_number)
+
+        context['commits'] = commits
+
+        context['tags'] = Tag.objects.filter(repository=self.repository)
         return context
+
+    def check_args(self):
+        if self.kwargs.keys().__contains__('branch_id'):
+            if self.kwargs['branch_id'] is not None:
+                self.branch = get_object_or_404(Branch, id=self.kwargs['branch_id'])
+        else:
+            if self.repository.branch_set.filter(name='main').count() != 0:
+                self.branch = Branch.objects.filter(repository_id=self.repository.id, name='main').get()
+            elif self.repository.branch_set.filter(name='master').count() != 0:
+                self.branch = Branch.objects.filter(repository_id=self.repository.id, name='master').get()
+            elif self.repository.branch_set.filter(name='develop').count() != 0:
+                self.branch = Branch.objects.filter(repository_id=self.repository.id, name='develop').get()
+            else:
+                self.branch = self.repository.branch_set.first()
 
 
 @login_required
@@ -64,10 +102,13 @@ def detail(request, id):
 
 def get_branches(repository):
     api = get_github_api(repository)
+    if api is None:
+        return
     logger.info('Sending request for getting all branches of repository')
     branches = api.repos.list_branches(per_page=100)
-    for branch in branches:
+    for index, branch in enumerate(branches):
         logger.info('Creating new branch')
+        print('Adding branch {}/{}'.format(index + 1, len(branches)))
         br = Branch()
         br.name = branch.name
         br.repository = repository
@@ -98,6 +139,7 @@ def add_repository(request):
                 form.instance.repo_url = 'https://github.com/vtanja/UKS'
 
             repository = form.save()
+            repository.collaborators.add(request.user)
 
             start = timezone.now()
             get_branches(repository)
@@ -183,9 +225,13 @@ def add_parents_that_were_missing_to_commits(commits_with_missing_parents):
 
 
 def get_github_api(repository):
-    repository_name, owner = get_repository_name_and_owner(repository)
-    api = GhApi(owner=owner, repo=repository_name, token=os.getenv('GITHUB_TOKEN'))
-    return api
+    if os.getenv('GIT_TOKEN'):
+        repository_name, owner = get_repository_name_and_owner(repository)
+        api = GhApi(owner=owner, repo=repository_name, token=os.getenv('GIT_TOKEN'))
+        return api
+    else:
+        logger.error('GitHub api token does not exist')
+        return None
 
 
 @login_required
