@@ -390,3 +390,52 @@ class WikiUpdateViewTest(TestCase):
         response = self.client.post(reverse('wiki-update', kwargs={'repo_id': repo_id, 'pk': wiki_id}),
                                     {'title': 'Test wiki 1', 'content': 'Test description 2 '})
         self.assertEqual(response.status_code, 403)
+
+class HistoryListViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        fill_test_db()
+
+    def request(self, repo_id, wiki_id):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        return self.client.get(reverse('wiki-history', kwargs={'repo_id': repo_id, 'pk':wiki_id}))
+
+    def test_view_url_exists_at_desired_location(self):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        repo_id, wiki_id = get_wiki_and_repository_id()
+        response = self.client.get('/repository/{}/wiki/{}/history/'.format(repo_id, wiki_id))
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_url_accessible_by_name(self):
+        repo_id, wiki_id = get_wiki_and_repository_id()
+        response = self.request(repo_id, wiki_id)
+        self.assertEqual(response.status_code, 200)
+
+    def test_redirect_if_not_logged_in(self):
+        repo_id, wiki_id = get_wiki_and_repository_id()
+        response = self.client.get(reverse('wiki-history', kwargs={'repo_id':repo_id, 'pk':wiki_id}))
+        self.assertRedirects(response, '/welcome/login/?next=/repository/{}/wiki/{}/history/'.format(repo_id, wiki_id))
+
+    def test_view_uses_correct_template(self):
+        repo_id, wiki_id = get_wiki_and_repository_id()
+        response = self.request(repo_id, wiki_id)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'wiki/wiki_history.html')
+
+    def test_HTTP404_if_repository_doesnt_exist(self):
+        repo_id, wiki_id = get_wiki_and_repository_id(-1, 0)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        response = self.client.get(reverse('wiki-history', kwargs={'repo_id': repo_id, 'pk':wiki_id}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_HTTP404_if_wiki_doesnt_exist(self):
+        repo_id, wiki_id = get_wiki_and_repository_id(-1, 0)
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        response = self.client.get(reverse('wiki-history', kwargs={'repo_id': repo_id, 'pk':wiki_id}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_user_without_permission_access_history(self):
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
+        repo_id, wiki_id = get_wiki_and_repository_id(1, 2)
+        response = self.client.get(reverse('wiki-history', kwargs={'repo_id': repo_id, 'pk': wiki_id}))
+        self.assertEqual(response.status_code, 403)
