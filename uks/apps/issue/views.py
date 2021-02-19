@@ -138,4 +138,37 @@ class IssueStatisticsView(LoginRequiredMixin, TemplateView):
         repository_issues = Issue.objects.filter(repository=self.repository)
         context['opened_issues'] = repository_issues.filter(closed=False).count()
         context['closed_issues'] = repository_issues.filter(closed=True).count()
+        context['average_lasting'], lens_l, labels_l, average_l = self.get_average_issue_length(issues=repository_issues)
+        context['lengths'] = ','.join([str(i) for i in lens_l])
+        context['labels'] = ','.join([str(i) for i in labels_l])
+        context['average'] = ','.join([str(i) for i in average_l])
         return context
+
+    def get_average_issue_length(self, issues):
+        cnt = 0
+        length = 0
+        response = ''
+        lens = []
+        labels = []
+        average_l = []
+        for issue in issues:
+            if issue.closed:
+                diff = issue.date_closed - issue.date_created
+                diff = diff.days
+                lens.append(diff)
+                labels.append(issue.title)
+                cnt = cnt + 1
+                length += diff
+        if cnt == 0:
+            response = 'no available data', lens, labels, average_l
+            return response
+        average = round(length/cnt)
+        if average < 30:
+            response = str(average) + ' days.'
+        elif 30 < average < 365:
+            months = round(average/30)
+            days = average - (months*30)
+            response = '{} months and {} days.'.format(str(months), str(days))
+        for len in lens:
+            average_l.append(average)
+        return response, lens, labels, average_l
