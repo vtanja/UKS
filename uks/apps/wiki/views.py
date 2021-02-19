@@ -56,6 +56,8 @@ class WikiDetailPage(LoginRequiredMixin, DetailView):
         context['repository'] = repository
         context['show'] = False
         context['collab'] = repository.test_user(self.request.user)
+        context['last_update'] = HistoryItem.objects.filter(changed_wiki_object_id=self.object.id).order_by('-date_changed').first()
+
         return context
 
 

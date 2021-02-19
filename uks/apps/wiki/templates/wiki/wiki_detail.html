@@ -5,7 +5,7 @@
             <div class="row">
                 <div class="col-md-9" style="text-align: left">
                     <h3>{{ wiki.title }}</h3>
-                    <p style="font-style: italic">This will be last update info</p>
+                    <p style="font-style: italic">{{ last_update.belongs_to }} edited on {{ last_update.date_changed.date }}</p>
                     <hr>
                     <div>{{ wiki.content | safe }}</div>
                 </div>
