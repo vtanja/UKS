@@ -147,6 +147,14 @@ class ProjectCreateViewTest(TestCase):
         repository = Repository.objects.filter(id=get_repository_id(0)).first()
         self.assertEqual(response.context['repository'], repository)
 
+    def test_user_without_permission(self):
+        repo_id = get_repository_id(0)
+        self.client.login(username=USER2_USERNAME, password=USER2_PASSWORD)
+        response = self.client.post(reverse('create_project', kwargs={'repo_id': repo_id}),
+                                    {'name': 'new project test', 'description': 'description'})
+        self.assertEqual(response.status_code, 403)
+
+
 
 class ProjectDetailViewTest(TestCase):
     @classmethod
@@ -280,6 +288,12 @@ class ProjectDeleteViewTest(TestCase):
         response = self.post_response(0, 50)
         self.assertEqual(response.status_code, 404)
 
+    def test_user_without_permission(self):
+        repo_id, pk = get_repository_and_project_id(0, 0)
+        self.client.login(username=USER2_USERNAME, password=USER2_PASSWORD)
+        response = self.client.delete(reverse('project_delete', kwargs={'repo_id': repo_id, 'pk': pk}))
+        self.assertEqual(response.status_code, 403)
+
 
 class ProjectUpdateViewTest(TestCase):
     @classmethod
@@ -351,6 +365,13 @@ class ProjectUpdateViewTest(TestCase):
     def test_updating_non_existent(self):
         response = self.post_response(0, 10)
         self.assertEqual(response.status_code, 404)
+
+    def test_user_without_permission(self):
+        repo_id, pk = get_repository_and_project_id(0, 0)
+        self.client.login(username=USER2_USERNAME, password=USER2_PASSWORD)
+        response = self.client.post(reverse('project_update', kwargs={'repo_id': repo_id, 'pk': pk}),
+                                    {'name': 'edited test name', 'description': 'edited test description'})
+        self.assertEqual(response.status_code, 403)
 
 
 class ChangeIssueStatusTest(TestCase):
