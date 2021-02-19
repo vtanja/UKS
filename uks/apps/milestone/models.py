@@ -15,6 +15,7 @@ class Milestone(models.Model):
     dateUpdated = models.DateField(verbose_name='Last updated', default=date.today, blank=True)
     closed = models.BooleanField(default=False)
     repository = models.ForeignKey(Repository, on_delete=models.CASCADE, null=False)
+    dateClosed = models.DateField(verbose_name='Date closed', blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -36,6 +37,7 @@ class Milestone(models.Model):
     def toggle_milestone_close(self):
         self.closed = not self.closed
         self.dateUpdated = datetime.now()
+        self.dateClosed = datetime.now()
         self.save()
 
     def set_updated(self):
