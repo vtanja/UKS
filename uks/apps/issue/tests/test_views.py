@@ -430,7 +430,7 @@ class IssueStatisticsViewTest(TestCase):
         fill_test_db()
 
     def test_redirect_user_if_not_logged_in(self):
-        repository_id, issue_id = get_issue_and_repository_id()
+        repository_id = get_repository_id()
         response = self.client.get('/repository/{}/insights/issues/'.format(repository_id))
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response,
@@ -443,7 +443,7 @@ class IssueStatisticsViewTest(TestCase):
         return response, repository_id
 
     def test_issue_statistics_accessible_by_name(self):
-        response, repository_id = self.get_issue_statistics()
+        response, _ = self.get_issue_statistics()
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'issue/issue_statistics.html')
 
