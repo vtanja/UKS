@@ -23,7 +23,7 @@ class Milestone(models.Model):
     def get_completed_percentage(self):
         all_count = self.issue_set.count()
         if all_count == 0:
-            return 100
+            return 0
         closed_count = self.issue_set.filter(closed=True).count()
         res = (100*closed_count)/all_count
         return round(res)
@@ -46,10 +46,13 @@ class Milestone(models.Model):
 
     def is_finished(self):
         finished = True
-        for i in self.issue_set.values():
-            if not i['closed']:
-                finished = False
-                break
+        if self.issue_set.count() is 0:
+            finished = False
+        else:
+            for i in self.issue_set.values():
+                if not i['closed']:
+                    finished = False
+                    break
         return finished
 
     def set_finish_time(self):

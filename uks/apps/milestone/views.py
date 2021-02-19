@@ -143,7 +143,7 @@ class MilestoneStatisticsView(LoginRequiredMixin, TemplateView):
 def get_completed_percentage(milestones):
     all_count = milestones.count()
     if all_count == 0:
-        return 100
+        return 0
     closed_count = milestones.filter(closed=True).count()
     res = (100*closed_count)/all_count
     return round(res)
