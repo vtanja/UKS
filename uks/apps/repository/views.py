@@ -90,19 +90,19 @@ class RepositoryDetailView(UserPassesTestMixin, DetailView):
                 self.branch = self.repository.branch_set.first()
 
     def test_func(self):
-        repository = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        repository = get_object_or_404(Repository, id=self.kwargs['pk'])
         return repository.test_access(self.request.user)
 
 
-# @login_required
-# def detail(request, id):
-#     repositories = Repository.objects.filter(
-#         Q(owner=request.user) | Q(collaborators__username__in=[str(request.user)])
-#     )
-#     repository = Repository.objects.get(id=id)
-#     print(repository.name)
-#     context = {'repositories': repositories, 'repository': repository}
-#     return render(request, 'repository/repoDetail.html', context)
+@login_required
+def detail(request, id):
+    repositories = Repository.objects.filter(
+        Q(owner=request.user) | Q(collaborators__username__in=[str(request.user)])
+    )
+    repository = Repository.objects.get(id=id)
+    print(repository.name)
+    context = {'repositories': repositories, 'repository': repository}
+    return render(request, 'repository/repoDetail.html', context)
 
 
 def get_branches(repository):
@@ -411,5 +411,5 @@ class RepositoryInsightsView(LoginRequiredMixin, UserPassesTestMixin, TemplateVi
 
     def test_func(self):
         logger.info('Checking if user has permission to create new wiki page!')
-        repository = get_object_or_404(Repository, id=repo)
+        repository = get_object_or_404(Repository, id=self.kwargs['repository_id'])
         return repository.test_user(self.request.user)
