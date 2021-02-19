@@ -56,10 +56,6 @@ jobs:
       run: |
         python ./uks/manage.py migrate
     - name: Run coverage
-      coverage:
-        range: 70..100
-        round: down
-        precision: 2
       run: coverage run --source='uks' uks/manage.py test apps.issue apps.wiki apps.project apps.label; coverage xml -i -o coverage-reports/coverage.xml
     - uses: codecov/codecov-action@v1
       with:
