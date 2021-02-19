@@ -1,14 +1,15 @@
 import logging
 
-from apps.repository.models import Repository
-from apps.user.models import HistoryItem
-from apps.wiki.forms import CreateWikiForm
-from apps.wiki.models import Wiki
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.utils import timezone
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+
+from apps.repository.models import Repository
+from apps.user.models import HistoryItem
+from apps.wiki.forms import CreateWikiForm
+from apps.wiki.models import Wiki
 
 logger = logging.getLogger('django')
 
@@ -116,12 +117,6 @@ class WikiUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
         logger.info('Wiki page [%s] change done!', self.object.title)
         return response
-
-    def test_func(self):
-        logger.info('Checking if user has permission to delete branch!')
-        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
-        is_collab = self.request.user in repo.collaborators.all()
-        return is_collab or repo.owner == self.request.user
 
     def get_context_data(self, **kwargs):
         self.repository = get_object_or_404(Repository, id=self.kwargs['repo_id'])
