@@ -33,7 +33,6 @@ class CreateTagView(LoginRequiredMixin, CreateView):
     form_class = CreateTagForm
 
     def form_valid(self, form):
-        # form.instance.repository = get_object_or_404(Repository, id=self.kwargs['id'])
         branch_name = form.cleaned_data['branch']
         commits = Commit.objects.filter(branches__id=branch_name.id)
         commits = commits.extra(order_by=['-date'])
