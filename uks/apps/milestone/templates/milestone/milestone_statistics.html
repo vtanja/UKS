@@ -9,7 +9,7 @@
             <div class="progress-bar bg-success" role="progressbar" style="width: {{ closed_milestones_percent }}%" aria-valuenow="{{ closed_milestones_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
         <br>
-        <div style="float: right"><em>Closed {{ closed_milestones }} out of {{ all_milestones }} milestones</em></div>
+        <div style="float: right"><em>Finished {{ closed_milestones }} out of {{ all_milestones }} milestones</em></div>
         <br>
         <hr>
         <p>Average time to finish a milestone is <em>{{ average_lasting }}</em></p>
@@ -24,7 +24,7 @@
         let lens = '{{ lens }}'.split(',');
         let labels = '{{ labels }}'.split(',');
         let average = '{{ average }}'.split(',');
-        let openedClosedChart = new Chart(ctx, {
+        let milestoneChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,

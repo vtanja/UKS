@@ -157,7 +157,7 @@ class MilestoneStatisticsView(LoginRequiredMixin, TemplateView):
         labels = []
         average_l = []
         for milestone in milestones:
-            if milestone.closed:
+            if milestone.is_finished():
                 diff = milestone.dateClosed - milestone.dateCreated
                 diff = diff.days
                 lens.append(diff)

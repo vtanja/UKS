@@ -44,5 +44,17 @@ class Milestone(models.Model):
         self.dateUpdated = datetime.now()
         self.save()
 
+    def is_finished(self):
+        finished = True
+        for i in self.issue_set.values():
+            if not i['closed']:
+                finished = False
+                break
+        return finished
+
+    def set_finish_time(self):
+        self.dateClosed = datetime.now()
+        self.save()
+
     def get_absolute_url(self):
         return reverse('milestone_details', args=[str(self.repository_id), str(self.pk)])
