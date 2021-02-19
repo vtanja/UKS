@@ -56,13 +56,13 @@ def fill_test_db():
 
     # Create issues and add them to repositories
     test_issue1 = Issue.objects.create(title='test issue', description='test', repository=test_repository,
-                                       created_by=test_user)
+                                       created_by=test_user, date_created=timezone.now())
     test_issue2 = Issue.objects.create(title='test issue2', description='test desc', repository=test_repository,
-                                       created_by=test_user)
+                                       created_by=test_user, date_created=timezone.now())
     test_issue3 = Issue.objects.create(title='test issue 3', description='test', repository=test_repository1,
-                                       created_by=test_user1)
+                                       created_by=test_user1, date_created=timezone.now())
     test_issue4 = Issue.objects.create(title='test issue four', description='...', repository=test_repository1,
-                                       created_by=test_user1, closed=True)
+                                       created_by=test_user1, closed=True, date_created=timezone.now())
     test_issue1.milestone = test_milestone
     test_issue1.project = test_project
     test_issue1.labels.add(test_label)
@@ -421,3 +421,33 @@ class CloseIssueTet(TestCase):
         self.client.get(reverse('issue-close', kwargs={'repository_id': issue.repository.id, 'pk': issue.pk}))
         issue.refresh_from_db()
         return issue
+
+
+class IssueStatisticsViewTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        fill_test_db()
+
+    def test_redirect_user_if_not_logged_in(self):
+        repository_id = get_repository_id()
+        response = self.client.get('/repository/{}/insights/issues/'.format(repository_id))
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response,
+                             '/welcome/login/?next=/repository/{}/insights/issues/'.format(repository_id))
+
+    def get_issue_statistics(self, repository_id=0):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        repository_id = get_repository_id(repository_id)
+        response = self.client.get(reverse('issue-statistics', kwargs={'repository_id': repository_id}))
+        return response, repository_id
+
+    def test_issue_statistics_accessible_by_name(self):
+        response, _ = self.get_issue_statistics()
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'issue/issue_statistics.html')
+
+    def test_HTTP404_if_repository_doesnt_exist(self):
+        response, _, = self.get_issue_statistics(repository_id=-1)
+        self.assertEqual(response.status_code, 404)
+        self.assertRaises(Http404)

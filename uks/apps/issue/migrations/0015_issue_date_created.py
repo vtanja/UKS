@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='issue',
             name='date_created',
-            field=models.DateTimeField(default=datetime.datetime(2021, 2, 18, 17, 48, 14, 892463, tzinfo=utc), verbose_name='Date of creation'),
+            field=models.DateTimeField(verbose_name='Date of creation'),
             preserve_default=False,
         ),
     ]
