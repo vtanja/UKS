@@ -56,13 +56,13 @@ def fill_test_db():
 
     # Create issues and add them to repositories
     test_issue1 = Issue.objects.create(title='test issue', description='test', repository=test_repository,
-                                       created_by=test_user)
+                                       created_by=test_user, date_created=timezone.now())
     test_issue2 = Issue.objects.create(title='test issue2', description='test desc', repository=test_repository,
-                                       created_by=test_user)
+                                       created_by=test_user, date_created=timezone.now())
     test_issue3 = Issue.objects.create(title='test issue 3', description='test', repository=test_repository1,
-                                       created_by=test_user1)
+                                       created_by=test_user1, date_created=timezone.now())
     test_issue4 = Issue.objects.create(title='test issue four', description='...', repository=test_repository1,
-                                       created_by=test_user1, closed=True)
+                                       created_by=test_user1, closed=True, date_created=timezone.now())
     test_issue1.milestone = test_milestone
     test_issue1.project = test_project
     test_issue1.labels.add(test_label)
