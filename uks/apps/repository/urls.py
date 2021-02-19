@@ -6,7 +6,7 @@ from ..repository.views import RepositoryDetailView, add_repository, add_collabo
 urlpatterns = [
     path('<int:pk>/', RepositoryDetailView.as_view(), name='detail'),
     path('add/', add_repository, name='add'),
-    path('<int:pk>/branch/', include('apps.branch.urls')),
+    path('<int:repo_id>/branch/', include('apps.branch.urls')),
     path('<int:repository_id>/issues/', include('apps.issue.urls')),
     path('<int:repo_id>/milestones/', include('apps.milestone.urls')),
     path('<int:id>/labels/', include('apps.label.urls')),

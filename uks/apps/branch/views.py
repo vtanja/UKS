@@ -1,7 +1,8 @@
-
 import logging
 
 from django.contrib import messages
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DeleteView
@@ -18,7 +19,7 @@ class BranchListView(ListView):
 
     def get_queryset(self):
         logger.info('Getting current repository!')
-        self.repository = get_object_or_404(Repository, id=self.kwargs['pk'])
+        self.repository = get_object_or_404(Repository, id=self.kwargs['repo_id'])
         logger.info('Creating form for updating branch!')
         self.p_form = UpdateBranchForm()
         logger.info('Getting all branches that belong to repository [name: %s]!', self.repository.name)
@@ -33,25 +34,33 @@ class BranchListView(ListView):
         return context
 
 
-class BranchDeleteView(DeleteView):
+class BranchDeleteView(UserPassesTestMixin, DeleteView):
     model = Branch
 
     def get_success_url(self):
         logger.info('Routing to all branches after deleting branch!')
+        messages.success(self.request, 'Successfully deleted branch!')
         return reverse_lazy('branch_list', kwargs={'repo_id': self.kwargs['repo_id']})
 
+    def test_func(self):
+        logger.info('Checking if user has permission to delete branch!')
+        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        is_collab = self.request.user in repo.collaborators.all()
+        return is_collab or repo.owner == self.request.user
 
-def update_branch(request, pk, branch_id):
+
+def update_branch(request, repo_id, pk):
     logger.info('Getting branch that should be updates!')
-    branch = get_object_or_404(Branch, id=branch_id)
+    branch = get_object_or_404(Branch, id=pk)
     if request.method == 'POST':
         p_form = UpdateBranchForm(request.POST,
-                                        instance=branch)
+                                  instance=branch)
         if p_form.is_valid():
             logger.info('Valid form for updating branch!')
             p_form.save()
-            logger.info('Successfully updating branch[id: %s]', branch_id)
+            logger.info('Successfully updating branch[id: %s]', pk)
             messages.success(request, 'You have successfully updated branch!')
 
+    messages.success(request, 'Successfully updated branch!')
     logger.info('Routing to all branches after updating branch!')
-    return redirect('branch_list', id=pk)
+    return redirect('branch_list', id=repo_id)
