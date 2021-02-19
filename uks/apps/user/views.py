@@ -115,10 +115,9 @@ class SearchResultsView(ListView):
     def get_queryset(self):
         query = self.request.GET.get('q')
         user = self.request.user
-        admin = User.objects.get(username='admin')
         object_tmp_list = Repository.objects.filter(
             Q(name__icontains=query)
-        ).exclude(owner=admin)
+        )
         if not user.is_authenticated:
             object_list = object_tmp_list.filter(public=True)
             return object_list

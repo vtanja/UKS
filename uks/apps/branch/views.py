@@ -19,7 +19,7 @@ class BranchListView(UserPassesTestMixin, ListView):
 
     def get_queryset(self):
         logger.info('Getting current repository!')
-        self.repository = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        self.repository = get_object_or_404(Repository, id=self.kwargs['pk'])
         logger.info('Creating form for updating branch!')
         self.p_form = UpdateBranchForm()
         logger.info('Getting all branches that belong to repository [name: %s]!', self.repository.name)
@@ -36,7 +36,7 @@ class BranchListView(UserPassesTestMixin, ListView):
 
     def test_func(self):
         logger.info('Checking if user has permission to create new wiki page!')
-        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        repo = get_object_or_404(Repository, id=self.kwargs['pk'])
         return repo.test_access(self.request.user)
 
 
@@ -46,18 +46,23 @@ class BranchDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def get_success_url(self):
         logger.info('Routing to all branches after deleting branch!')
         messages.success(self.request, 'Successfully deleted branch!')
-        return reverse_lazy('branch_list', kwargs={'repo_id': self.kwargs['repo_id']})
+        return reverse_lazy('branch_list', kwargs={'pk': self.kwargs['pk']})
+
+    def delete(self, request, *args, **kwargs):
+        branch = get_object_or_404(Branch, id=self.kwargs['branch_id'])
+        branch.delete()
+        return redirect(self.get_success_url())
 
     def test_func(self):
         logger.info('Checking if user has permission to delete branch!')
-        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        repo = get_object_or_404(Repository, id=self.kwargs['pk'])
         return repo.test_user(self.request.user)
 
 
 @login_required
-def update_branch(request, repo_id, pk):
+def update_branch(request, pk, branch_id):
     logger.info('Getting branch that should be updates!')
-    branch = get_object_or_404(Branch, id=pk)
+    branch = get_object_or_404(Branch, id=branch_id)
 
     is_collab = request.user in branch.repository.collaborators.all()
     if is_collab or branch.repository.owner == request.user:
@@ -67,11 +72,11 @@ def update_branch(request, repo_id, pk):
             if p_form.is_valid():
                 logger.info('Valid form for updating branch!')
                 p_form.save()
-                logger.info('Successfully updating branch[id: %s]', pk)
+                logger.info('Successfully updating branch[id: %s]', branch_id)
                 messages.success(request, 'You have successfully updated branch!')
 
         logger.info('Routing to all branches after updating branch!')
-        return redirect('branch_list', repo_id=repo_id)
+        return redirect('branch_list', pk=pk)
     else:
         messages.error(request, 'User has no permissions for this action!')
-        return redirect('branch_list', repo_id=repo_id)
+        return redirect('branch_list', pk=pk)

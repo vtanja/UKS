@@ -24,7 +24,7 @@ class ListTagView(UserPassesTestMixin, ListView):
         return context
 
     def test_func(self):
-        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        repo = get_object_or_404(Repository, id=self.kwargs['id'])
         return repo.test_access(self.request.user)
 
 
@@ -56,7 +56,7 @@ class CreateTagView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return reverse_lazy('repository_tags', kwargs={'id': self.kwargs['id']})
 
     def test_func(self):
-        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        repo = get_object_or_404(Repository, id=self.kwargs['id'])
         return repo.test_user(self.request.user)
 
 
@@ -89,5 +89,5 @@ class TagUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return reverse_lazy('repository_tags', kwargs={'id': self.kwargs['id']})
 
     def test_func(self):
-        repo = get_object_or_404(Repository, id=self.kwargs['repo_id'])
+        repo = get_object_or_404(Repository, id=self.kwargs['id'])
         return repo.test_user(self.request.user)
