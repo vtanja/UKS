@@ -230,7 +230,7 @@ class CreateWikiViewTest(TestCase):
     def request_post(self, repo_id):
         self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
         return self.client.post(reverse('wiki-add', kwargs={'repo_id': repo_id}),
-                                    {'title': 'Test wiki 4', 'content': 'Test description'})
+                                    {'title': 'Test wiki 4', 'content': 'Test description x'})
 
     def test_redirect_if_user_not_logged_in(self):
         repo_id = get_repository_id()
@@ -240,7 +240,7 @@ class CreateWikiViewTest(TestCase):
     def test_redirect_if_user_not_logged_in_creates_wiki(self):
         repo_id = get_repository_id()
         response = self.client.post(reverse('wiki-add', kwargs={'repo_id': repo_id}),
-                                    {'title': 'Test wiki 3', 'content': 'Test description'})
+                                    {'title': 'Test wiki 3', 'content': 'Test description xx'})
         self.assertRedirects(response, '/welcome/login/?next=/repository/{}/wiki/add/'.format(repo_id))
 
     def test_view_url_exists_at_desired_location(self):
@@ -300,9 +300,9 @@ class CreateWikiViewTest(TestCase):
 
     def test_user_without_permission_creating(self):
         self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
-        repo_id, wiki_id = get_wiki_and_repository_id(1, 2)
+        repo_id = get_repository_id(1)
         response = self.client.post(reverse('wiki-add', kwargs={'repo_id': repo_id}),
-                                    {'title': 'Test wiki 4', 'content': 'Test description'})
+                                    {'title': 'Test wiki 4', 'content': 'Test description xxx'})
         self.assertEqual(response.status_code, 403)
 
 
