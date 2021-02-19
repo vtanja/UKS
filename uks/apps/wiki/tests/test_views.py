@@ -32,7 +32,7 @@ def fill_test_db():
     # Create repositories
     repository_test = Repository.objects.create(name='test_repository', description='test', owner=user_test)
     repository_test1 = Repository.objects.create(name='test_repository1', description='test2', owner=user_test)
-    repository_test2 = Repository.objects.create(name='test_repository2', description='desc', owner=user_test1)
+    repository_test2 = Repository.objects.create(name='test_repository2', description='desc', owner=user_test)
     repository_test3 = Repository.objects.create(name='test_repository 3', description='test', owner=user_test)
     repository_test.save()
     repository_test1.save()
@@ -158,6 +158,12 @@ class WikiDeleteViewTest(TestCase):
         change = HistoryItem.objects.filter(date_changed__gt=start_of_the_test, belongs_to=response.wsgi_request.user,
                                               message__contains='deleted wiki page')
         self.assertEqual(len(change), 1)
+
+    def test_user_without_permission_deleting(self):
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
+        repo_id, wiki_id = get_wiki_and_repository_id(1, 2)
+        response = self.client.delete(reverse('wiki-delete', kwargs={'repo_id': repo_id, 'pk': wiki_id}))
+        self.assertEqual(response.status_code, 403)
 
 
 class WikiDetailViewTest(TestCase):
@@ -292,6 +298,13 @@ class CreateWikiViewTest(TestCase):
                                                 message__contains='created')
         self.assertEqual(len(change), 1)
 
+    def test_user_without_permission_creating(self):
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
+        repo_id, wiki_id = get_wiki_and_repository_id(1, 2)
+        response = self.client.post(reverse('wiki-add', kwargs={'repo_id': repo_id}),
+                                    {'title': 'Test wiki 4', 'content': 'Test description'})
+        self.assertEqual(response.status_code, 403)
+
 
 class WikiUpdateViewTest(TestCase):
     @classmethod
@@ -370,3 +383,10 @@ class WikiUpdateViewTest(TestCase):
         change = HistoryItem.objects.filter(date_changed__gt=start_of_the_test, belongs_to=response.wsgi_request.user,
                                                           message__contains='changed')
         self.assertEqual(len(change), 1)
+
+    def test_user_without_permission_updating(self):
+        self.client.login(username=USER1_USERNAME, password=USER1_PASSWORD)
+        repo_id, wiki_id = get_wiki_and_repository_id(1, 2)
+        response = self.client.post(reverse('wiki-update', kwargs={'repo_id': repo_id, 'pk': wiki_id}),
+                                    {'title': 'Test wiki 1', 'content': 'Test description 2'})
+        self.assertEqual(response.status_code, 403)
