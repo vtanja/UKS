@@ -1,0 +1,21 @@
+{% extends "home.html" %}
+
+{% block search %}
+<br>
+<div class="container">
+         <div class="card-header" style="text-align: left">{{object_list.count}} repositories</div>
+        {% for repository in object_list %}
+            <div class="card" style="width: 100%" >
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col" style="text-align: left">
+                            <a class="text text-success font-weight-bold"  href="{{repository.get_absolute_url}}"><i class="fas fa-book"></i> {{ repository.name }}</a>
+                        </div>
+                        <div class="col" style="text-align: left">owner: {{repository.owner.username}} </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+         <br>
+    </div>
+{% endblock %}
