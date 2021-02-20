@@ -15,5 +15,8 @@ class Commit(models.Model):
         return '{author} committed {hash} at {date}'.format(author=self.author, hash=self.sha, date=self.date)
 
     def get_absolute_url(self):
-        from django.shortcuts import redirect
-        return redirect(self.url)
+        return self.url
+
+    def is_in_repository(self, repository):
+        branches = self.branches.all()
+        return branches[0].repository == repository

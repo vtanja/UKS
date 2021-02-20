@@ -1,10 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<p>This is branch detail</p>
-</body>
-</html>
+<br><br>
+
+<div class="col" >
+<hr><br>
+<div style="text-align: start;">
+                    {% for commit in commits %}
+                        <div class="card" >
+                            <div class="card-body">
+                                    <div class="card-text" >
+                                       <div style="float:left; width: 100%; margin-bottom: 5px"> {{ commit.message }} </div>
+                                       <div style="width: 100%">
+                                            <a class="text-success" style="float: right; " href="{{commit.get_absolute_url}}">{{ commit.sha}}  </a>
+                                            <div style="float: left;"> {{ commit.author }}</div>
+                                       </div>
+                                    </div>
+                            </div>
+                        </div> <br>
+                    {% endfor %}
+                </div>
+<br>
+<div class="row" style="min-width: auto; margin: auto">
+    {% if page_obj.has_previous %}
+        <a class="btn btn-outline-success mb-4" href="?page=1">First</a>
+        <a class="btn btn-outline-success mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+        {%  if page_obj.number == num %}
+            <a class="btn btn-success mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and  num < page_obj.number|add:'3' %}
+            <a class="btn btn-outline-success mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+    {% if page_obj.has_next %}
+        <a class="btn btn-outline-success mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+        <a class="btn btn-outline-success mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+    {% endif %}
+</div>
+</div>

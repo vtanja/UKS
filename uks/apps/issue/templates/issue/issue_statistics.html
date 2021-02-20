@@ -1,0 +1,80 @@
+{% extends 'repository/repository_insights.html' %}
+
+{% block statistics %}
+    <div class="container" style="padding-right: 4cm">
+        <h3>Issue statistics</h3>
+        <canvas id="opened-closed" width="180" height="60"></canvas>
+        <p>Average time to resolve an issue is <em>{{ average_lasting }}</em></p>
+        <canvas id="issueAverageChart" width="180" height="60"></canvas>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        let ctx = document.getElementById('opened-closed').getContext('2d');
+        let openedClosedChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['# open issues', '# closed issues'],
+                datasets: [{
+                    label: '# of Votes',
+                    data: [{{ opened_issues }}, {{ closed_issues }}],
+                    backgroundColor: [
+                        'rgb(189,239,152)',
+                        'rgb(210,210,210)',
+                    ],
+                    borderColor: [
+                        'rgb(168,227,115)',
+                        'rgb(176,176,176)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Ratio of opened and closed issues',
+                    position: 'bottom',
+                }
+            }
+        });
+        let ctx2 = document.getElementById('issueAverageChart').getContext('2d');
+        let lens = '{{ lengths }}'.split(',');
+        let labels = '{{ labels }}'.split(',');
+        let average = '{{ average }}'.split(',');
+        let issueAverageChart = new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Duration',
+                    data: lens,
+                    borderWidth: 1,
+                    backgroundColor: [
+                        'rgb(210,210,210)',
+                    ],
+                    borderColor: [
+                        'rgb(176,176,176)',
+                    ],
+                }, {
+                    label: 'Average',
+                    data: average,
+                    borderWidth: 1,
+                    backgroundColor: [
+                        'rgb(189,239,152)',
+                    ],
+                    borderColor: [
+                        'rgb(168,227,115)',
+                    ],
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Duration of issues',
+                    position: 'bottom',
+                }
+            }
+        });
+    </script>
+{% endblock %}

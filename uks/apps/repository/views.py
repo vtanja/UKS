@@ -3,36 +3,40 @@ import logging
 import os
 
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import DetailView, DeleteView
+from django.views.generic import DetailView, DeleteView, UpdateView, TemplateView
 from ghapi.all import GhApi
 
-from .forms import RepositoryForm, CollaboratorsForm
+from .forms import RepositoryForm, CollaboratorsForm, RepositoryFormEdit, RepositoryFormVisibilityEdit
 from .models import Repository
-# Create your views here.
 from ..branch.models import Branch
 from ..commit.models import Commit
+from ..tag.models import Tag
 from ..user.models import HistoryItem
+
+MSG = 'Checking if user has permission to create new wiki page!'
 
 logger = logging.getLogger('django')
 repo = 0
-
+manageAccessUrl = 'repository/manageAccess.html'
 
 
 def add_history_item(user, message):
     change = HistoryItem()
-    change.dateChanged = timezone.now()
-    change.belongsTo = user
+    change.date_changed = timezone.now()
+    change.belongs_to = user
     change.message = message
     return change
 
 
-class RepositoryDetailView(DetailView):
+class RepositoryDetailView(UserPassesTestMixin, DetailView):
     model = Repository
     template_name = 'repository/overview.html'
 
@@ -46,11 +50,53 @@ class RepositoryDetailView(DetailView):
 
         qs = Branch.objects.filter(repository=self.repository)
         context["qs_json"] = json.dumps([obj.as_dict() for obj in qs])
-        context['first'] = Branch.objects.filter(Q(repository_id=self.repository.id)).first()
         context['show'] = True
+
+        self.check_args()
+
+        commits = Commit.objects.filter(branches__in=[self.branch]).order_by('-date')
+
+        context['commit_num'] = commits.count()
+
+        context['branch'] = self.branch
+
+        paginator = Paginator(commits, 15)  # Show 25 contacts per page.
+
+        page_number = self.request.GET.get('page')
+        if page_number is None:
+            page_number = 1
+
+        page_obj = paginator.get_page(page_number)
+
+        context['page_obj'] = page_obj
+
+        commits = paginator.page(page_number)
+
+        context['commits'] = commits
+
+        context['tags'] = Tag.objects.filter(branch__repository=self.repository)
         return context
 
+    def check_args(self):
+        if self.kwargs.keys().__contains__('branch_id'):
+            if self.kwargs['branch_id'] is not None:
+                self.branch = get_object_or_404(Branch, id=self.kwargs['branch_id'])
+        else:
+            if self.repository.branch_set.filter(name='main').count() != 0:
+                self.branch = Branch.objects.filter(repository_id=self.repository.id, name='main').get()
+            elif self.repository.branch_set.filter(name='master').count() != 0:
+                self.branch = Branch.objects.filter(repository_id=self.repository.id, name='master').get()
+            elif self.repository.branch_set.filter(name='develop').count() != 0:
+                self.branch = Branch.objects.filter(repository_id=self.repository.id, name='develop').get()
+            else:
+                self.branch = self.repository.branch_set.first()
 
+    def test_func(self):
+        repository = get_object_or_404(Repository, id=self.kwargs['pk'])
+        return repository.test_access(self.request.user)
+
+
+@login_required
 def detail(request, id):
     repositories = Repository.objects.filter(
         Q(owner=request.user) | Q(collaborators__username__in=[str(request.user)])
@@ -63,10 +109,13 @@ def detail(request, id):
 
 def get_branches(repository):
     api = get_github_api(repository)
+    if api is None:
+        return
     logger.info('Sending request for getting all branches of repository')
     branches = api.repos.list_branches(per_page=100)
-    for branch in branches:
+    for index, branch in enumerate(branches):
         logger.info('Creating new branch')
+        print('Adding branch {}/{}'.format(index + 1, len(branches)))
         br = Branch()
         br.name = branch.name
         br.repository = repository
@@ -82,6 +131,7 @@ def get_repository_name_and_owner(repository):
     return repo_name, user
 
 
+@login_required
 def add_repository(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -92,10 +142,11 @@ def add_repository(request):
             # form.save()
             form.instance.owner = request.user
 
-            if form.instance.repo_url == None:
+            if form.instance.repo_url is None:
                 form.instance.repo_url = 'https://github.com/vtanja/UKS'
 
             repository = form.save()
+            repository.collaborators.add(request.user)
 
             start = timezone.now()
             get_branches(repository)
@@ -112,6 +163,24 @@ def add_repository(request):
             print('Forma nije validna')
 
     return render(request, 'user/dashboard.html', {'form': form})
+
+
+@login_required
+def manage_access(request, key):
+    repository = Repository.objects.get(id=key)
+    return helper_method(repository, request)
+
+
+def helper_method(repository, request):
+    if not request.user == repository.owner:
+        return redirect('dashboard')
+    else:
+        global repo
+        repo = repository.id
+        users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
+        collabs = repository.collaborators.all()
+        context = {'repository': repository, 'users': users, 'collabs': collabs}
+        return render(request, manageAccessUrl, context)
 
 
 def get_commits(api, br):
@@ -168,22 +237,37 @@ def add_parents_that_were_missing_to_commits(commits_with_missing_parents):
 
 
 def get_github_api(repository):
-    repository_name, owner = get_repository_name_and_owner(repository)
-    api = GhApi(owner=owner, repo=repository_name, token=os.getenv('GITHUB_TOKEN'))
-    return api
+    if os.getenv('GIT_TOKEN'):
+        repository_name, owner = get_repository_name_and_owner(repository)
+        api = GhApi(owner=owner, repo=repository_name, token=os.getenv('GIT_TOKEN'))
+        return api
+    else:
+        logger.error('GitHub api token does not exist')
+        return None
 
 
+@login_required
 def repository_settings(request, key):
+    repository = get_object_or_404(Repository, id=key)
+    if not repository.test_user(request.user):
+        logger.warning('User does not have permission.')
+        messages.error(request, 'User does not have permission.')
+        return redirect('dashboard')
 
+    return helper_method(repository, request)
+
+
+@login_required
+def options(request, key):
     repository = Repository.objects.get(id=key)
-    global repo
-    repo = repository.id
-    users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
-    collabs = repository.collaborators.all()
-    context = {'repository': repository, 'users': users, 'collabs': collabs}
-    return render(request, 'repository/repoSettings.html', context)
+    if not request.user == repository.owner:
+        return redirect('dashboard')
+    else:
+        context = {'repository': repository}
+        return render(request, 'repository/options.html', context)
 
 
+@login_required
 def add_collaborators(request):
     if request.method == 'POST':
         form = CollaboratorsForm(request.POST)
@@ -201,15 +285,14 @@ def add_collaborators(request):
     users = User.objects.filter().exclude(id=repository.owner.id).exclude(username='admin')
     collabs = repository.collaborators.all()
     context = {'repository': repository, 'users': users, 'collabs': collabs}
-    return render(request, 'repository/repoSettings.html', context)
+    return render(request, manageAccessUrl, context)
 
 
-class CollaboratorsDeleteView(LoginRequiredMixin, DeleteView):
+class CollaboratorsDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = User
     template_name = "repository/deleteCollaborators.html"
 
     def get_context_data(self, **kwargs):
-        print('abc')
         self.repository = get_object_or_404(Repository, id=repo)
         context = super(CollaboratorsDeleteView, self).get_context_data(**kwargs)
         context['repository'] = self.repository
@@ -226,11 +309,105 @@ class CollaboratorsDeleteView(LoginRequiredMixin, DeleteView):
         success_url = self.get_success_url()
         return redirect(success_url)
 
+    def test_func(self):
+        logger.info(MSG)
+        repository = get_object_or_404(Repository, id=repo)
+        return repository.owner == self.request.user
+
     def get_form_kwargs(self):
-        print('dfg')
         kwargs = super(CollaboratorsDeleteView, self).get_form_kwargs()
         kwargs['repository'] = get_object_or_404(Repository, id=repo)
         return kwargs
 
     def get_success_url(self):
-        return reverse_lazy('repository_settings', kwargs={'key': repo})
+        return reverse_lazy('manage_access', kwargs={'key': repo})
+
+
+class RepositoryUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Repository
+    template_name = "repository/repoUpdate.html"
+    form_class = RepositoryFormEdit
+
+    def get_context_data(self, **kwargs):
+        self.repository = get_object_or_404(Repository, id=self.kwargs['pk'])
+        context = super(RepositoryUpdateView, self).get_context_data(**kwargs)
+        context['repository'] = self.repository
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super(RepositoryUpdateView, self).get_form_kwargs()
+        kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['pk'])
+        return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy('options', kwargs={'key': repo})
+
+    def test_func(self):
+        logger.info(MSG)
+        repository = get_object_or_404(Repository, id=repo)
+        return repository.owner == self.request.user
+
+
+class RepositoryDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Repository
+    template_name = "repository/repositoryDelete.html"
+
+    def get_context_data(self, **kwargs):
+        self.repository = get_object_or_404(Repository, id=self.kwargs['pk'])
+        context = super(RepositoryDeleteView, self).get_context_data(**kwargs)
+        context['repository'] = self.repository
+        print(context)
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super(RepositoryDeleteView, self).get_form_kwargs()
+        kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['pk'])
+        return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy('dashboard')
+
+    def test_func(self):
+        logger.info(MSG)
+        repository = get_object_or_404(Repository, id=repo)
+        return repository.owner == self.request.user
+
+
+class RepositoryUpdateVisibilityView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Repository
+    template_name = "repository/editVisibility.html"
+    form_class = RepositoryFormVisibilityEdit
+
+    def get_context_data(self, **kwargs):
+        self.repository = get_object_or_404(Repository, id=self.kwargs['pk'])
+        context = super(RepositoryUpdateVisibilityView, self).get_context_data(**kwargs)
+        context['repository'] = self.repository
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super(RepositoryUpdateVisibilityView, self).get_form_kwargs()
+        kwargs['repository'] = get_object_or_404(Repository, id=self.kwargs['pk'])
+        return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy('manage_access', kwargs={'key': repo})
+
+    def test_func(self):
+        logger.info(MSG)
+        repository = get_object_or_404(Repository, id=repo)
+        return repository.owner == self.request.user
+
+
+class RepositoryInsightsView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = 'repository/repository_insights.html'
+
+    def get_context_data(self, **kwargs):
+        self.repository = get_object_or_404(Repository, id=self.kwargs['repository_id'])
+        context = super(RepositoryInsightsView, self).get_context_data(**kwargs)
+        context['repository'] = self.repository
+        return context
+
+    def test_func(self):
+        logger.info(MSG)
+        repository = get_object_or_404(Repository, id=self.kwargs['repository_id'])
+        return repository.test_user(self.request.user)

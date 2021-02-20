@@ -9,9 +9,9 @@
                     <div class="card-body">
                         <div style="display: flex; height: fit-content" class="row">
                             <div class="col" style="text-align: left;">
-                                <a href="#" class="text-success">  {{ branch.name }} </a>
+                                <a href="{% url 'branch-detail' repository.id  branch.id%}" class="text-success">  {{ branch.name }} </a>
                             </div>
-                            {% if request.user.is_authenticated %}
+                            {% if request.user.is_authenticated and collab %}
                             <div class="col" style="text-align: right">
                                 <a class="far fa-edit" style="cursor: pointer"  data-toggle="modal"data-target="#{{ branch.id }}" onclick="hide_or_show('update', {{ branch.id }})" ></a>&nbsp;&nbsp;
                                 <a style="color: red; cursor: pointer" class="far fa-trash-alt" data-toggle="modal" data-target="#{{ branch.id }}" onclick="hide_or_show('delete', {{ branch.id }})"  ></a>

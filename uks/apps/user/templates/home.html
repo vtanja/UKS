@@ -21,6 +21,10 @@
           <li class="nav-item" >
             <a class="nav-link" href="{% url 'all-user-issues' %}">Issues</a>
           </li>
+          <form action="{% url 'search_results' %}" method="get">
+              <input name="q" type="text" placeholder="Search...">
+              <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+          </form>
         {% endif %}
         </ul>
         <ul class="navbar-nav mr-2 items-right">
@@ -38,6 +42,8 @@
 	</nav>
 
     {% block dashboard %}
+    {% endblock %}
+    {% block search %}
     {% endblock %}
 
 {% endblock %}

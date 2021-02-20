@@ -2,7 +2,7 @@
 
 {% block dashboard %}
     <br>
-    <div class="card text-center" style="width: 90%; margin:auto">
+    <div class="card text-center" style="width: 80%; margin:auto">
         <div class="card-header">
             <ul class="nav nav-tabs card-header-tabs">
                 <li class="nav-item" style="color: green">
@@ -11,9 +11,9 @@
                 <li class="nav-item" style="color: green">
                      <a class="nav-link text-success {% if show %} active {% endif %}" id="one-tab" href="{% url 'detail' repository.id   %}" >Overview</a>
                 </li>
-            {% if request.user.is_authenticated %}
                 <li class="nav-item" >
-                    <a  class="nav-link text-success {% if 'issues' in request.path %} active {% endif %}" id="two-tab" href="{% url 'repository-issues' repository.id %}">Issues</a>
+                    <a  class="nav-link text-success {% if 'issues' in request.path and 'insights' not in request.path %}
+                     active {% endif %}" id="two-tab" href="{% url 'repository-issues' repository.id %}">Issues</a>
                 </li>
                 <li class="nav-item" >
                     <a  class="nav-link text-success {%if 'milestones' in request.path%}active{% endif %}" id="three-tab"
@@ -31,12 +31,15 @@
                     <a  class="nav-link text-success {%if 'wiki' in request.path%}active{% endif %}" id="fifth-tab"
                         href="{% url 'wiki-overview' repository.id %}">Wiki</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link text-success {% if 'insights' in request.path %}active{% endif %}" id="sixth=tab"
+                        href="{% url 'repository-insights' repository.id %}">Insights</a>
+                </li>
                 {% if repository.owner == request.user %}
                 <li class="nav-item" >
                     <a  class="nav-link text-success {%if 'settings' in request.path%}active{% endif %}" id="seven-tab"
                         href="{% url 'repository_settings' repository.id %}">Settings</a>
                 </li>
-                {% endif %}
                 {% endif %}
             </ul>
         </div>

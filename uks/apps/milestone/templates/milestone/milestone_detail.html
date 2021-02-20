@@ -15,7 +15,7 @@
             <h3 style="padding: 3mm">
                 <a class="btn {% if milestone.closed %}btn-success{% else %}btn-danger{% endif %} m-2" style="color: ghostwhite"
                    href="{% url 'milestone_close' repository.id milestone.id %}">
-                    {% if milestone.closed %}Reopen{% else %}Close{% endif %}
+                    {% if milestone.closed %}Reopen milestone{% else %}Close milestone{% endif %}
                 </a>
             </h3>
         </div>
@@ -50,7 +50,16 @@
                         </div>
                         <div class="card-footer">
                             <p><em>Created by: </em>{{ issue.created_by }}</p>
-                            <p>Labels...</p>
+                            <p style="font-size: medium"><em>Assignee:</em>
+                                {% for assignee in issue.assignees.all %} <a>{{ assignee.username }}</a>
+                                    {% empty %} Not assigned
+                                {% endfor %}
+                            </p>
+                            <div>
+                                {% for label in issue.labels.all %}
+                                    <span class="badge badge-light" style="background-color: {{label.color}}!important;color:white">{{label.name}}</span>
+                                {% endfor %}
+                            </div>
                         </div>
                     </div> <br>
                 {% endfor %}

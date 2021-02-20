@@ -7,10 +7,12 @@
         {% endblock %}
     {% else %}
         <br>
-        <h5>There are no wiki pages yet!</h5>
-        <br>
-        <a class="btn btn-success"  href="{% url 'wiki-add' repository.id %}">New page</a>
-        <p/>
+        <div style="text-align: center">
+            <h5>There are no wiki pages yet!</h5>
+            <br>
+            <a class="btn btn-success"  href="{% url 'wiki-add' repository.id %}">New page</a>
+            <p/>
+        </div>
         <br><br>
     {% endif %}
 {% endblock %}

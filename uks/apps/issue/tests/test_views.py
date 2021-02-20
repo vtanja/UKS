@@ -4,8 +4,12 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from ..models import Issue
+from ...label.models import Label
+from ...milestone.models import Milestone
+from ...project.models import Project
 from ...repository.models import Repository
-from ..models import Issue, IssueChange
+from ...user.models import HistoryItem
 
 USER_USERNAME = 'testuser'
 USER1_USERNAME = 'testuser1'
@@ -34,15 +38,34 @@ def fill_test_db():
     test_repository1.save()
     test_repository2.save()
 
+    test_project = Project.objects.create(name='test project', description='des', repository=test_repository)
+    test_project1 = Project.objects.create(name='test project1', description='des', repository=test_repository)
+    test_project.save()
+    test_project1.save()
+
+    test_milestone = Milestone.objects.create(title='test milestone', description='test', repository=test_repository,
+                                              closed=False, dateCreated=timezone.now(), dueDate=timezone.now())
+    test_milestone1 = Milestone.objects.create(title='test milestone1', description='tes2t', repository=test_repository,
+                                               closed=False, dateCreated=timezone.now(), dueDate=timezone.now())
+    test_milestone.save()
+    test_milestone1.save()
+
+    test_label = Label.objects.create(name='functional', description='asdf', color='#3375FFFF',
+                                      repository=test_repository)
+    test_label.save()
+
     # Create issues and add them to repositories
     test_issue1 = Issue.objects.create(title='test issue', description='test', repository=test_repository,
-                                       created_by=test_user)
+                                       created_by=test_user, date_created=timezone.now())
     test_issue2 = Issue.objects.create(title='test issue2', description='test desc', repository=test_repository,
-                                       created_by=test_user)
+                                       created_by=test_user, date_created=timezone.now())
     test_issue3 = Issue.objects.create(title='test issue 3', description='test', repository=test_repository1,
-                                       created_by=test_user1)
+                                       created_by=test_user1, date_created=timezone.now())
     test_issue4 = Issue.objects.create(title='test issue four', description='...', repository=test_repository1,
-                                       created_by=test_user1, closed=True)
+                                       created_by=test_user1, closed=True, date_created=timezone.now())
+    test_issue1.milestone = test_milestone
+    test_issue1.project = test_project
+    test_issue1.labels.add(test_label)
     test_issue1.save()
     test_issue2.save()
     test_issue3.save()
@@ -292,22 +315,59 @@ class IssueUpdateViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertRaises(Http404)
 
-    def test_issue_change_created_for_every_change_and_redirect(self):
+    def test_history_item_created_for_every_change_and_redirect(self):
         """Test editing existing issue. Then it checks whether correct amount of IssueChange objects were created."""
         start_of_the_test = timezone.now()
         _, repository_id, issue_id = self.logged_in_user_get_edit_view()
 
         response = self.client.post(reverse('issue-update', kwargs={'repository_id': repository_id, 'pk': issue_id}),
-                                    {'title': 'Changed test title', 'description': 'test',
-                                     'assignees': [], 'milestone': ''})
+                                    {'title': 'Changed test title', 'description': 'changed test desc',
+                                     'assignees': [], 'milestone': '', 'project': '', 'labels': []})
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/repository/{}/issues/{}/'.format(repository_id, issue_id))
         # Find all objects that have been changed since start of the test process
-        issue_change_objects = IssueChange.objects.filter(date__gt=start_of_the_test,
-                                                          message__contains=response.wsgi_request.user)
+        issue_change_objects = HistoryItem.objects.filter(date_changed__gt=start_of_the_test,
+                                                          belongs_to=response.wsgi_request.user)
         # Changed title and assignee list
-        self.assertEqual(len(issue_change_objects), 2)
+        self.assertEqual(len(issue_change_objects), 6)
+        for issue_change in issue_change_objects:
+            if issue_change.message.find('assignees') != -1:
+                self.assertEquals(issue_change.message, 'changed assignees')
+            elif issue_change.message.find('title') != -1:
+                self.assertEqual(issue_change.message, 'changed title from "test issue" to "Changed test title"')
+            elif issue_change.message.find('description') != -1:
+                self.assertEqual(issue_change.message, 'changed description')
+            elif issue_change.message.find('milestone') != -1:
+                self.assertEqual(issue_change.message, 'changed milestone from "test milestone" to "None"')
+            elif issue_change.message.find('project') != -1:
+                self.assertEqual(issue_change.message, 'changed project from "test project" to "None"')
+            elif issue_change.message.find('labels') != -1:
+                self.assertEqual(issue_change.message, 'changed labels')
+            self.assertEqual(issue_change.belongs_to, response.wsgi_request.user)
+
+    def test_add_milestone_and_project_to_issue_without_milestone_and_project(self):
+        start_of_the_test = timezone.now()
+        _, repository_id, issue_id = self.logged_in_user_get_edit_view(issue_id=3)
+
+        response = self.client.post(reverse('issue-update', kwargs={'repository_id': repository_id, 'pk': issue_id}),
+                                    {'title': 'test issue 2', 'description': 'test desc',
+                                     'assignees': [], 'milestone': '{}'.format(Milestone.objects.all()[0].id),
+                                     'project': '{}'.format(Project.objects.all()[0].id), 'labels': []})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/repository/{}/issues/{}/'.format(repository_id, issue_id))
+        # Find all objects that have been changed since start of the test process
+        issue_change_objects = HistoryItem.objects.filter(date_changed__gt=start_of_the_test,
+                                                          belongs_to=response.wsgi_request.user)
+        # Changed title and assignee list
+        self.assertEqual(len(issue_change_objects), 4)
+        for issue_change in issue_change_objects:
+            if issue_change.message.find('milestone') != -1:
+                self.assertEqual(issue_change.message, 'added this to "test milestone" milestone')
+            elif issue_change.message.find('project') != -1:
+                self.assertEqual(issue_change.message, 'added this to "test project" project')
+            self.assertEqual(issue_change.belongs_to, response.wsgi_request.user)
 
 
 class CloseIssueTet(TestCase):
@@ -332,7 +392,8 @@ class CloseIssueTet(TestCase):
     def test_close_issue_accessible_by_name(self):
         response, repository_id, issue_id = self.get_response_for_close_issue()
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('issue-details', kwargs={'repository_id': repository_id, 'pk': issue_id}))
+        self.assertRedirects(response,
+                             reverse('issue-details', kwargs={'repository_id': repository_id, 'pk': issue_id}))
 
     def test_HTTP404_if_repository_doesnt_exist(self):
         response, _, _ = self.get_response_for_close_issue(repository_id=-1)
@@ -360,3 +421,33 @@ class CloseIssueTet(TestCase):
         self.client.get(reverse('issue-close', kwargs={'repository_id': issue.repository.id, 'pk': issue.pk}))
         issue.refresh_from_db()
         return issue
+
+
+class IssueStatisticsViewTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        fill_test_db()
+
+    def test_redirect_user_if_not_logged_in(self):
+        repository_id = get_repository_id()
+        response = self.client.get('/repository/{}/insights/issues/'.format(repository_id))
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response,
+                             '/welcome/login/?next=/repository/{}/insights/issues/'.format(repository_id))
+
+    def get_issue_statistics(self, repository_id=0):
+        self.client.login(username=USER_USERNAME, password=USER_PASSWORD)
+        repository_id = get_repository_id(repository_id)
+        response = self.client.get(reverse('issue-statistics', kwargs={'repository_id': repository_id}))
+        return response, repository_id
+
+    def test_issue_statistics_accessible_by_name(self):
+        response, _ = self.get_issue_statistics()
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'issue/issue_statistics.html')
+
+    def test_HTTP404_if_repository_doesnt_exist(self):
+        response, _, = self.get_issue_statistics(repository_id=-1)
+        self.assertEqual(response.status_code, 404)
+        self.assertRaises(Http404)
